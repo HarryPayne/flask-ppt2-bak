@@ -1,0 +1,201 @@
+<div project-data-display
+  datasource="project.as.getRawAttributes('disposition')"
+  detail-datasource="project.as.getProjectAttributes('disposition')"
+  error="project.ds.error"
+  header="'Disposition History'"
+  hide="project.ds.hideDetails"
+  keys="project.as.getKeys('disposition')"
+  mode="project.ds.currentMode()"
+  on-save-click="project.ds.saveProject"
+  show="project.ds.showDetails"
+  show-success="project.ds.showEditSuccess()"
+  success="project.ds.success"
+  table="'disposition'"
+  ></div>  
+
+  <!--div project-data-display
+  datasource="project.as.getRawAttributes('disposition')"
+  error="project.ds.error"
+  header="'Comments'"
+  mode="'edit'"
+  on-save-click="project.ds.saveProject(table)"
+  success="project.ds.success"
+  table="'comment'"
+  ></div --> 
+
+<!--h4 ng-show="project.currentMode() == 'disposition.add'" class="col-sm-12">Add a Disposition</h4>
+<div ng-show="project.currentMode() == 'disposition.add'">
+
+  <div class="form-group">
+    <label for="dispositionID" class="col-sm-2 control-label">
+      <span ng-bind="project.as.getAttribute('disposedInFY').value.desc"></span>
+      <span ng-bind="project.as.getAttribute('disposedInQ').value.desc"></span>
+    </label>
+    <div class="col-sm-10" style="padding-top: 7px;">
+      <span ng-bind="project.as.getAttribute('dispositionID').value.desc" class="text-capitalize">
+        </span><span ng-show="project.as.getAttribute('dispositionID').value.desc">.</span>
+
+      <span ng-show="project.as.getAttribute('reconsiderInFY').value.desc || project.as.getAttribute('reconsiderInQ').value.desc">
+        Reconsider in <span ng-bind="project.as.getAttribute('reconsiderInFY').value.desc"></span>
+        <span ng-bind="project.as.getAttribute('reconsiderInQ').value.desc"></span>.
+      </span>
+
+      <span ng-show="project.as.getAttribute('startInY').value.desc || project.as.getAttribute('startInM').value.desc">
+        Start in <span ng-bind="project.as.getAttribute('startInM').value.desc"></span>
+        <span ng-bind="project.as.getAttribute('startInY').value.desc"></span>.
+      </span>
+
+      <span ng-show="project.as.getAttribute('finishInY').value.desc || project.as.getAttribute('finishInM').value.desc">
+        Finish in <span ng-bind="project.as.getAttribute('finishInM').value.desc"></span>
+        <span ng-bind="project.as.getAttribute('finishInY').value.desc"></span>.
+      </span>
+
+      <button type="button" 
+        ng-click="project.ds.hideDetails('disposition', 
+                    [project.as.getAttribute('disposedInFY'),
+                     project.as.getAttribute('disposedInQ')])"> Cancel </button>
+    </div>
+  </div>
+
+  <div
+    ng-repeat="attr in project.as.getProjectAttributes('disposition')"
+    ng-include src="'static/project/templates/form-edit-field.html'">
+  </div>
+
+  <div class="col-sm-offset-2 col-sm-10">
+    <button type="button" 
+      ng-click="project.ds.saveProject('disposition', 
+                  [project.as.getAttribute('disposedInFY'),
+                   project.as.getAttribute('disposedInQ')])"> Save </button>
+    <button type="button" 
+      ng-click="project.ds.hideDetails('disposition', 
+                  [project.as.getAttribute('disposedInFY'),
+                   project.as.getAttribute('disposedInQ')])"> Cancel </button>
+    <span ng-show="project.ds.success" ng-bind="project.ds.success" class="alert alert-success" role="alert"></span>
+  </div>
+</div>
+
+<h4 ng-show="project.currentMode() == 'disposition.add'" 
+  class="col-sm-12">Previous Dispositions</h4>
+
+<h4 ng-show="project.currentMode() == 'view' || project.currentMode().substring(0, 'disposition.edit'.length) == 'disposition.edit'"
+  class="col-sm-12">Disposition History</h4>
+
+<dl class="dl-horizontal" 
+  ng-show="project.currentMode() == 'view' || project.currentMode() == 'disposition.add' || project.currentMode() == 'disposition.edit'"
+  ng-repeat="disp in project.as.getRawAttributes('disposition')">
+  <dt>
+    <label ng-bind="disp['disposedInFY'].desc"></label>
+    <label ng-bind="disp['disposedInQ'].desc"></label>
+  </dt>
+  <dd>
+    <p>
+    <span ng-bind="disp['dispositionID'].desc" class="text-capitalize"></span>.
+
+    <span ng-show="disp['reconsiderInQ'].desc || disp['reconsiderInFY'].desc">
+      Reconsider in <span ng-bind="disp['reconsiderInFY'].desc"></span>
+      <span ng-bind="disp['reconsiderInQ'].desc"></span>.
+    </span>
+
+    <span ng-show="disp['startInY'].desc || disp['startInM'].desc">
+      Start in <span ng-bind="disp['startInM'].desc"></span>
+      <span ng-bind="disp['startInY'].desc"></span>.
+    </span>
+
+    <span ng-show="disp['finishInY'].desc || disp['finishInM'].desc">
+      Finish in <span ng-bind="disp['finishInM'].desc"></span>
+      <span ng-bind="disp['finishInY'].desc"></span>.
+    </span>
+    
+    <!-- span>
+    Last modified by <span ng-bind="disp['lastModifiedBy']"></span> on <span ng-bind="disp['lastModified.printValue']"></span>
+    </span-->
+    
+    <button type="button"
+      ng-show="project.currentMode() == 'disposition.edit'"
+      ng-click="project.ds.showDetails('disposition', 
+                  [{name: 'disposedInFY', id: disp['disposedInFY']['id']}, 
+                   {name: 'disposedInQ', id: disp['disposedInQ']['id']}])"> Edit </button>
+    </p>
+  </dd>
+</dl>
+
+<div ng-show="project.currentMode() == 'disposition.edit.detail'"
+  ng-repeat="disp in project.as.getRawAttributes('disposition')">
+
+  <div class="form-group"
+    ng-hide="disp['disposedInFY'].id == project.ds.stateParams.disposedInFY && disp['disposedInQ'].id == project.ds.stateParams.disposedInQ">
+    <label for="dispositionID" class="col-sm-2 control-label">
+      <span ng-bind="disp['disposedInFY'].desc"></span>
+      <span ng-bind="disp['disposedInQ'].desc"></span>
+    </label>
+    <div class="col-sm-10" style="padding-top: 7px;">
+      <span ng-bind="disp['dispositionID'].desc" class="text-capitalize"></span>.
+
+      <span ng-show="disp['reconsiderInQ'].desc || disp['reconsiderInFY'].desc">
+        Reconsider in <span ng-bind="disp['reconsiderInFY'].desc"></span>
+        <span ng-bind="disp['reconsiderInQ'].desc"></span>.
+      </span>
+
+      <span ng-show="disp['startInY'].desc || disp['startInM'].desc">
+        Start in <span ng-bind="disp['startInM'].desc"></span>
+        <span ng-bind="disp['startInY'].desc"></span>.
+      </span>
+
+      <span ng-show="disp['finishInY'].desc || disp['finishInM'].desc">
+        Finish in <span ng-bind="disp['finishInM'].desc"></span>
+        <span ng-bind="disp['finishInY'].desc"></span>.
+      </span>
+    </div>
+  </div>
+
+  <div class="form-group"
+    ng-show="disp['disposedInFY'].id == project.ds.stateParams.disposedInFY && disp['disposedInQ'].id == project.ds.stateParams.disposedInQ">
+    <label for="dispositionID" class="col-sm-2 control-label">
+      <span ng-bind="project.as.getAttribute('disposedInFY').value.desc"></span>
+      <span ng-bind="project.as.getAttribute('disposedInQ').value.desc"></span>
+    </label>
+    <div class="col-sm-10" style="padding-top: 7px;">
+      <span ng-bind="project.as.getAttribute('dispositionID').value.desc" class="text-capitalize">
+        </span><span ng-show="project.as.getAttribute('dispositionID').value.desc">.</span>
+
+      <span ng-show="project.as.getAttribute('reconsiderInFY').value.desc || project.as.getAttribute('reconsiderInQ').value.desc">
+        Reconsider in <span ng-bind="project.as.getAttribute('reconsiderInFY').value.desc"></span>
+        <span ng-bind="project.as.getAttribute('reconsiderInQ').value.desc"></span>.
+      </span>
+
+      <span ng-show="project.as.getAttribute('startInY').value.desc || project.as.getAttribute('startInM').value.desc">
+        Start in <span ng-bind="project.as.getAttribute('startInM').value.desc"></span>
+        <span ng-bind="project.as.getAttribute('startInY').value.desc"></span>.
+      </span>
+
+      <span ng-show="project.as.getAttribute('finishInY').value.desc || project.as.getAttribute('finishInM').value.desc">
+        Finish in <span ng-bind="project.as.getAttribute('finishInM').value.desc"></span>
+        <span ng-bind="project.as.getAttribute('finishInY').value.desc"></span>.
+      </span>
+
+      <button type="button" 
+        ng-click="project.ds.hideDetails('disposition', 
+                    [project.as.getAttribute('disposedInFY'),
+                     project.as.getAttribute('disposedInQ')])"> Cancel </button>
+    </div>
+
+    <div
+      ng-repeat="attr in project.as.getProjectAttributes('disposition')" 
+      ng-include src="'static/project/templates/form-edit-field.html'">
+    </div>
+
+    <div ng-show="disp['disposedInFY'].id == project.ds.stateParams.disposedInFY && disp['disposedInQ'].id == project.ds.stateParams.disposedInQ"
+      class="col-sm-offset-2 col-sm-10">
+      <button type="button" 
+        ng-click="project.ds.saveProject('disposition', 
+                    [project.as.getAttribute('disposedInFY'),
+                     project.as.getAttribute('disposedInQ')])"> Save </button>
+      <button type="button" 
+        ng-click="project.ds.hideDetails('disposition', 
+                    [project.as.getAttribute('disposedInFY'),
+                     project.as.getAttribute('disposedInQ')])"> Cancel </button>
+      <span ng-show="project.ds.success" ng-bind="project.ds.success" class="alert alert-success" role="alert"></span>
+    </div>
+  </div>
+</div>

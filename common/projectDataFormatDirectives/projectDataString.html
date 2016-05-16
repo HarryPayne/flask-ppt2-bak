@@ -1,0 +1,16 @@
+<span ng-if="ctrl.mode=='view'">
+  <span ng-bind-html="attr.value"></span>
+</span>
+<span ng-if="ctrl.mode=='edit' || ctrl.mode=='edit.detail' || ctrl.mode == 'add'">
+  <p ng-bind-html="attr.help" ng-show="attr.help"></p>
+  <span ng-if="attr.computed">
+    <span ng-bind-html="attr.value"></span>
+  </span>
+  <span ng-if="!attr.computed">
+    <input type="text" name="{{attr.name}}"
+      class="form-control"
+      ng-model="attr.value"
+      ng-required="attr.required"
+      />
+  </span>
+</span>

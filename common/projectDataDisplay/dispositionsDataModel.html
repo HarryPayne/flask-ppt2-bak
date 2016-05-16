@@ -1,0 +1,31 @@
+
+<span ng-show="ctrl.success" class="col-sm-offset-2 col-sm-10 alert alert-success alert-dismissible">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">×</button>
+  <span ng-bind="ctrl.success"></span>
+</span>
+<span ng-show="ctrl.error" class="col-sm-offset-2 col-sm-10 alert alert-danger alert-dismissible">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">×</button>
+  <span ng-bind="ctrl.error"></span>
+</span>
+
+<div ng-if="ctrl.mode == 'view' || ctrl.mode == 'edit' || ctrl.mode == 'edit.detail'">
+  <h4 class="col-sm-12" ng-bind="ctrl.header"></h4>
+</div>
+<div ng-if="ctrl.mode == 'add'">
+  <h4 class="col-sm-12">Add a disposition </h4>
+</div>
+
+<div ng-if="ctrl.mode == 'add'">
+  <div project-data-disposition-detail></div>
+</div>
+
+<div class="form-group" 
+  ng-repeat="disp in ctrl.datasource()">
+  <div ng-show="(ctrl.mode == 'edit.detail' && ctrl.isSelected(disp))">
+    <div project-data-disposition-detail></div>
+  </div>
+  <div ng-hide="ctrl.mode == 'edit.detail' && ctrl.isSelected(disp)">
+    <div project-data-disposition></div>
+  </div>
+</div>
+

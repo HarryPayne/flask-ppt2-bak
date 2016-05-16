@@ -1,0 +1,70 @@
+<html>
+  <head></head>
+  <body>
+    <div ng-controller="Manage as manage">
+      <h2>Add a Project</h2>
+
+<p
+  tal:attributes="
+    class string:notForPrintableView">
+Fill out the form and press the "Save" button.  The new project 
+is not created until you press the button.
+</p>
+  
+<p
+  tal:attributes="
+    class string:notForPrintableView">
+Don't worry about the items where you don't know the answer.  You 
+can set all of the details by editing the new project after it is 
+created.  But please don't guess.  Instead, refer to the <a 
+href="metadataDefs">Metadata  
+definitions</a> document for help in picking the right values. The 
+integrity of the database depends on it.
+</p>
+
+<form 
+  tal:attributes="
+    method string:post;
+    dojoType string:dijit.form.Form;">
+<input type="hidden" name="action" value="edit">
+
+  <div id="project">
+  <span tal:repeat="attr python:here.attributeList_SQL(require=[ 'name', 
+            'description', 'rationale', 'proposer' ])"
+        tal:omit-tag="
+  "><a name="attrItem" id="attrItem"  
+        tal:define="
+            view python:here.project_view_attr(project,attr,action);
+            label python:view[0];
+            output python:view[1];
+            help python:view[2];"
+        tal:attributes="
+            name python:attr.attributeName+'Item';
+            id python:attr.attributeName+'Item';"
+   ><h3 tal:condition="python:attr.format == 'header'" tal:content="label"></h3
+   ><span 
+        tal:condition="python:attr.format != 'header' and output"
+        tal:attributes="class string:attrLabel;"
+        tal:content="structure python:label+': '">Label :</span
+   ><span 
+        tal:condition="python:action=='edit' and help"
+        tal:replace="structure python:help">Help text here.</span
+   ><span 
+        tal:condition="python:action=='show' and output"
+        tal:replace="structure python:output">Attribute value.</span
+   ><span 
+        tal:condition="python:action=='edit' and output"
+        tal:omit-tag="">    <p><span tal:replace="structure python:output">Attribute value.</span></p></span></a>
+  </span>
+  </div>
+  <button 
+    tal:attributes="
+      type string:submit;
+      name string:onchange_add;
+      value string: Add project ;
+      dojoType string:dijit.form.Button;"> Add project </button>
+  
+  </form>
+    </div>
+  </body>
+</html>

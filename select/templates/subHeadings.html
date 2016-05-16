@@ -1,0 +1,14 @@
+<div class="container">
+  <ul class="list-inline text-right clearfix">
+    <li ng-show="currentUser.roles.indexOf('Curator') > -1 || currentUser.roles.indexOf('Manager') > -1">
+      <span ng-show="select.logss.canAddProjects()"
+        ng-hide="select.state.current.name == 'select.addProject'">
+        <a ui-sref="select.addProject">Add a project</a>
+      </span>
+      <span ng-show="select.state.current.name == 'select.addProject'">
+        <a ui-sref="select.home">Cancel add a project</a>
+      </span>
+      </li>
+    <li>Comments by user</li>
+  </ul>
+</div>

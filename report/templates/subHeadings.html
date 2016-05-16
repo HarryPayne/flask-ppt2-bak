@@ -1,0 +1,13 @@
+<div  class="container">
+  <ul class="list-inline text-right clearfix">
+    <li>Download as spreadsheet</li>
+    <li ng-hide="ctrl.report.state.current.name == 'ctrl.report.columns'">
+      <a ui-sref="report.columns">Select other columns</a>
+    </li>
+    <li ng-show="ctrl.report.state.current.name == 'ctrl.report.columns'">
+      Select other columns
+    </li>
+    <li>Change report title</li>
+  </ul>
+</div>
+

@@ -1,0 +1,13 @@
+<form name="addProject" class="form-horizontal container">
+  <div project-data-display
+    datasource="select.as.getProjectAttributes('description')"
+    error="select.ds.error"
+    header="'Add a project'"
+    mode="'edit'"
+    on-save-click="select.ds.addProject"
+    on-cancel-click="select.ds.cancelAddProject"
+    show-success="select.ds.showEditSuccess()"
+    success="select.ds.success"
+    table="'description'"
+    ></div>  
+</form>

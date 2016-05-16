@@ -1,0 +1,18 @@
+<!--div project-data-display
+  datasource="project.as.getProjectAttributes('description')"
+  error="project.ds.error"
+  header="'Description Attributes'"
+  mode="project.ds.currentMode()"
+  on-save-click="project.ds.saveProject"
+  show-success="project.ds.showEditSuccess()"
+  success="project.ds.success"
+  table="'description'"
+  ></div-->    
+
+  <h4 class="col-sm-12">Description Attributes</h4>
+  <formly-form model="project.ds.projectModel" 
+    fields="project.as.formlyFields.description"
+    options="project.editOptions">
+    <button type="submit" class="col-sm-offset-2"
+      ng-click="project.ds.saveProject('description')">Save</button>
+  </formly-form>

@@ -1,0 +1,31 @@
+<label for="dispositionID" class="col-sm-2 control-label">
+  <label ng-bind="disp['disposedInFY'].desc"></label>
+  <label ng-bind="disp['disposedInQ'].desc"></label>
+</label>
+<div class="col-sm-10" style="padding-top: 7px;">
+  <span ng-bind="disp['dispositionID'].desc" class="text-capitalize"></span>.
+  <span ng-show="disp['reconsiderInQ'].desc || disp['reconsiderInFY'].desc">
+    Reconsider in <span ng-bind="disp['reconsiderInFY'].desc"></span>
+    <span ng-bind="disp['reconsiderInQ'].desc"></span>.
+  </span>
+  <span ng-show="disp['startInY'].desc || disp['startInM'].desc">
+    Start in <span ng-bind="disp['startInM'].desc"></span>
+    <span ng-bind="disp['startInY'].desc"></span>.
+  </span>
+  <span ng-show="disp['finishInY'].desc || disp['finishInM'].desc">
+    Finish in <span ng-bind="disp['finishInM'].desc"></span>
+    <span ng-bind="disp['finishInY'].desc"></span>.
+  </span>
+  <span ng-show="disp['explanation']">
+    <br/>
+    <span ng-bind-html="disp['explanation']"></span>
+  </span>
+  <span>
+    <br/>
+    Last modified by <span ng-bind="disp['lastModifiedBy']"></span> on <span ng-bind="disp['lastModified.printValue']"></span>
+  </span>
+
+  <button type="button"
+    ng-show="ctrl.mode == 'edit'"
+    ng-click="ctrl.showDetails('disposition', [{name: 'disposedInFY', value: {id: disp['disposedInFY']['id']}}, {name: 'disposedInQ', value: {id: disp['disposedInQ']['id']}}])"> Edit </button>
+</div>

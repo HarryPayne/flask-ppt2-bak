@@ -1,0 +1,103 @@
+<html>
+  <head></head>
+  <body >
+    <h3>Metadata Definition</h3>
+    
+<dtml-var standard_html_header>
+<div style="font-family: arial, helvetica, sans-serif;font-size: 11pt;margin: 0in;">
+
+<a href="http://www.stsci.edu/institute/org/ot/"><dtml-var "_['L2Banner.gif.jpeg'].tag(border='0')"></a>
+
+<h1  style="font-size: 15pt;font-weight: bold;">Metadata Definitions</h1>
+
+<dtml-if "REQUEST.has_key('home')">
+  <dtml-call "REQUEST.RESPONSE.redirect(URL1+'/')">
+<dtml-else>
+  <form><input type="submit" name="home" value=" PPT Home "></form>
+</dtml-if>
+
+<p>
+This document describes the metadata items and values used in the
+Project Portfolio Database.  The usefulness of this database will
+depend on agreement about what these data mean, and our commitment to
+choosing carefully when editing the data.
+</p>
+
+<p>
+The attributes are arranged into categories:
+</p>
+
+<ol>
+<dtml-in headerTOC_SQL>
+<dtml-var "_['sequence-item'][0]"> 
+</dtml-in>
+</ol>
+  
+<p>
+Those listed first, which make up the bulk of the data, simply
+describe the project in terms suitable for planning. The second
+category contains project portfolio data, used to compare projects
+against each other.  The third category records a project's
+disposition at the end of every planning cycle: is it committed to
+the portfolio or is it deferred, to be reconsidered in a future
+cycle?  Finally, there is some information about the project when it
+is actually being worked.  
+</p>
+
+<dl>
+<dtml-in attributeList_SQL mapping>
+
+<dtml-if "format == 'header'">
+  </dl>
+  <h2 style="font-size: 13pt;font-weight: bold;"><a name="<dtml-var 
+    attributeName>"><dtml-var "_.string.capwords(label)"></a></h2>
+  <dtml-if help><p><dtml-var help fmt=structured-text></p></dtml-if>
+  <dl>
+<dtml-else>
+  <p><dt style="font-weight: bold;"><dtml-var "_.string.capwords(label)">
+  <dd><dtml-var help fmt=structured-text></p>
+</dtml-if header>
+
+<dtml-if "format == 'multipleSelect'">
+  <dtml-if orderByID>
+  <dtml-in "tableList_SQL(itemName=attributeName,orderByID=1)" mapping>
+    <dtml-if attributeHelp>
+      <dtml-if sequence-start><p>Allowed values: <br>
+        <dl></dtml-if>
+      <dt style="font-weight: bold;"><dtml-var "_[attributeName+'Desc']">
+      <dd><dtml-var "_[attributeName+'Text']" newline_to_br><br>
+      <dtml-if sequence-end></dl><dtml-else><br></dtml-if>
+    <dtml-else>
+      <dtml-if sequence-start><p>Allowed values: </dtml-if>
+      <dtml-var "_[attributeName+'Desc']"><dtml-if sequence-end>.</p><dtml-else>, </dtml-if>
+    </dtml-if attributeText>
+  </dtml-in>
+  <dtml-else>
+  <dtml-in "tableList_SQL(itemName=attributeName)" mapping>
+    <dtml-if attributeHelp>
+      <dtml-if sequence-start><p>Allowed values: <br>
+        <dl></dtml-if>
+      <dt style="font-weight: bold;"><dtml-var "_[attributeName+'Desc']">
+      <dd><dtml-var "_[attributeName+'Text']" newline_to_br><br>
+      <dtml-if sequence-end></dl><dtml-else><br></dtml-if>
+    <dtml-else>
+      <dtml-if sequence-start><p>Allowed values: </dtml-if>
+      <dtml-var "_[attributeName+'Desc']"><dtml-if sequence-end>.</p><dtml-else>, </dtml-if>
+    </dtml-if attributeText>
+  </dtml-in>
+  </dtml-if orderByID>
+</dtml-if>
+</dtml-in>
+</dl>
+
+<dtml-if "REQUEST.has_key('home')">
+  <dtml-call "REQUEST.RESPONSE.redirect(URL1+'/')">
+<dtml-else>
+  <form><input type="submit" name="home" value=" PPT Home "></form>
+</dtml-if>
+
+</div>
+<dtml-var standard_html_footer>
+
+  </body>
+</html>

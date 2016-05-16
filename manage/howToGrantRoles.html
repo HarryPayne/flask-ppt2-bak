@@ -1,0 +1,78 @@
+<html>
+ <head></head>
+ <body>
+  <div ng-controller="Manage as manage">
+    <h2>How to Grant Roles</h2>
+    
+    <p>
+    Authentication for the PPT is done against LDAP, but we made no
+    changes in LDAP for authorization to use the tool.  Instead, roles
+    are stored in the acl_users object, which is an LDAPUserFolder
+    object in this folder. This is a little bit different from "local
+    roles," which are set on a folder. 
+    </p>
+    
+    <p>
+    To grant someone an elevated role, go into the Zope management
+    interface, traverse into the /mysql folder, click on the acl_users
+    object, and then click on the "Users" tab.  Enter a user's last name
+    in the text box and press the search button (or hit return).  You
+    will get a list of all of the matching entries in LDAP.  Click on
+    the Distinguished Name of the person you are looking for.  If you
+    know the username you are looking for, select "uid (uid)" in the
+    pulldown on the left and then enter the username.
+    </p>
+    
+    <p>
+    Once you have found the right person, scroll down to "LDAP Groups
+    for uid=whoever...," click the boxes next to the roles you want to
+    grant, and press the "Change Groups" button. If you are doing a
+    bunch of people at once, there is a search box at the bottom of the
+    page in case you are in too much of a damned hurry to click on the
+    "Users" tab again and wait for it to load.
+    </p>
+    
+    <p>
+    To remove someone from the list of PPT users, remove all their roles.
+    Deleting the user does not work. It tries to remove the user from LDAP,
+    which would be a bad thing.  The connection to LDAP is "read-only"
+    however, so you can't do any harm.
+    </p>
+    
+    <p>
+    Here is <a tal:attributes="href python:request.URL1+'/acl_users/manage_userrecords'">a
+    link to the acl_users "Users" tab</a>.
+    </p>
+    
+    <p>
+    Here's how to decide what roles to grant:
+    <dl>
+      <dt style="font-weight: bold;">Anonymous</dt>
+      <dd>If you don't grant any role, the user should be able to view the
+      site without a password while at work, and can view the site from
+      home after supplying their LDAP username and password.</dd><br>
+      
+      <dt style="font-weight: bold;">ContentProvider</dt>
+      <dd>This is the role appropriate for Technology Committee members,
+      mission heads, division heads, etc.  In addition to viewing the site,
+      users with this role can enter comments on the projects, and edit
+      their previous comments.</dd><br>
+      
+      <dt style="font-weight: bold;">Curator</dt>
+      <dd>Users with this role have the ability to edit the metadata on
+      the projects.  Right now, only a SIPE and a few other people in CPT
+      management and OT have this role.  If you make someone a Curator,
+      make them a ContentProvider as well.</dd><br>
+      
+      <dt style="font-weight: bold;">Manager</dt>
+      <dd>Users with this role, like you, have the Zope "View management
+      screens" and "Manage users" roles, which allows you to use the ZMI
+      and to modify the acl_users object to grant roles.  Managers also
+      are able to run the method that clears the table of edit log
+      entries.  Be stingy with this one, but if you make someone a
+      Manager, make them a Curator and a ContentProvider as well.</dd><br>
+    
+    </dl>
+  </div>
+ </body>
+</html>
