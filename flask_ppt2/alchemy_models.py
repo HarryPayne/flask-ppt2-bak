@@ -561,6 +561,7 @@ class Description(Base):
                                 info={"attributeID": 120})
     stakeholders = association_proxy("stakeholderID", "stakeholderlist",
                                      info={"attributeID": 130})
+    latest_dispositions = association_proxy("latest_dispositionID", "latest_list")
 
 class Disposition(Base):
     __tablename__ = "disposition"
@@ -653,7 +654,7 @@ class Latest_disposition(Base):
         return "FY{} Q{}".format(str(self.disposedInFY)[-2:],
                                  str(self.disposedInQ))
 
-    dispositionID = Column("dispositionID", Integer,
+    latest_dispositionID = Column("dispositionID", Integer,
                                   ForeignKey(Dispositionlist.dispositionID),
                            info={"attributeID": 320},
                            nullable=True, index=True, 
@@ -699,8 +700,7 @@ class Latest_disposition(Base):
                        info={"attributeID": 365},
                        nullable=True, server_default=text("'0'"))
 #     finishMChoice = relationship("Months",
-#                                     primaryjoin=finishInM==Months.monthID,
-#                                     backref="latest_disposition_finish")
+#                                   backref="latest_disposition_finish")
 
     @hybrid_property
     def finishIn(self):
@@ -718,12 +718,22 @@ class Latest_disposition(Base):
         nullable=True, server_default=text("''"),
         info={"attributeID": 999})
 
-    # Many to one relationship.
-    latest_disposition = relationship("Dispositionlist",
-                                      info={"attributeID": 320})
+#     # Many to one relationship.
+#     latest_disposition = relationship("Dispositionlist",
+#                                       info={"attributeID": 320})
 
-    # Relationship to base table.
-    t_description = relationship("Description", backref="latest_disposition")
+#     # Relationship to base table.
+#     t_description = relationship("Description", backref="disposition_latest")
+    
+    # Really a rich version of a child table, like Driver or Stakeholder
+    
+    description = relationship("Description",
+                               backref=backref("latest_dispositionID"))
+    latest_list = relationship("Dispositionlist")
+    
+    def __init__(self, latest_list=None, description=None):
+        self.latest_list = latest_list
+        self.description = description
 
 class Portfolio(Base):
     __tablename__ = "portfolio"

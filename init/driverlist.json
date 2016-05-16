@@ -1,0 +1,8 @@
+{"driverID":1,"driverDesc":"contract requirement","driverText":"A mission deliverable, such as Two Gyro support or NPG 2810.1."}
+{"driverID":2,"driverDesc":"disaster avoidance","driverText":"Work that prevents infrequent big disasters or frequent minor outages."}
+{"driverID":3,"driverDesc":"disaster recovery","driverText":"Such as backups, off-site P&S servers."}
+{"driverID":4,"driverDesc":"efficiency","driverText":"Improved productivity or efficiency, without recoverable FTE costs."}
+{"driverID":5,"driverDesc":"new business","driverText":"Bringing new contracts to the Institute."}
+{"driverID":6,"driverDesc":"save labor","driverText":"Recoverable labor FTE cost savings."}
+{"driverID":7,"driverDesc":"save money","driverText":"Recoverable operating expenses."}
+{"driverID":8,"driverDesc":"security","driverText":"Security is mostly about disaster avoidance and recovery, but it warrants it’s own driver."}

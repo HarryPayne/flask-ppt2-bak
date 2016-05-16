@@ -1,16 +1,16 @@
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
-import os
+import os 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-SECRET_KEY = 'cY98hu9aW7Acd7ri2mPttf@W^@p3fF2{9Dv/hZF?[[W/f2n+'
+SECRET_KEY = '$66i#]Wbxf;289kTdijVr+RFFgGkKFsafAXWjkjsPPBTaKLqKy'
 
 WTF_CSRF_ENABLED = True
 WTF_CSRF_SECRET_KEY = SECRET_KEY
 
 #SQLALCHEMY_DATABASE_URI = "mysql://root:stormy@localhost/projects"
 SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://payne:stormy@localhost/ppt"
-SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, '..', 'db_repository')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # LDAP authentication and authorization by group roles

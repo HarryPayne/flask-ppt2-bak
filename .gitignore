@@ -5,3 +5,6 @@
 /lib/
 /pip-selfcheck.json
 /.Python
+/.settings/
+/db_repository/
+*.pyc

@@ -1,0 +1,6 @@
+{"fundingsourceID":0,"fundingsourceDesc":"","fundingsourceText":""}
+{"fundingsourceID":1,"fundingsourceDesc":"HST direct","fundingsourceText":"A direct charge to the HST mission contract."}
+{"fundingsourceID":2,"fundingsourceDesc":"JWST direct","fundingsourceText":"A direct charge to the JWST mission contract."}
+{"fundingsourceID":6,"fundingsourceDesc":"Kepler direct","fundingsourceText":"A direct charge to the Kepler mission contract."}
+{"fundingsourceID":254,"fundingsourceDesc":"indirect","fundingsourceText":"A charge to indirect funds."}
+{"fundingsourceID":255,"fundingsourceDesc":"other","fundingsourceText":"Charge to grant(s), or contract other than HST or JWST."}

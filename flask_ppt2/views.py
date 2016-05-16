@@ -1,20 +1,26 @@
 from datetime import datetime
 import re
-from sqlalchemy import (Date, desc, String, Text)
+from sqlalchemy import Date, desc, String, Text
 from sqlalchemy.inspection import inspect
 from sqlalchemy.sql.expression import or_
 import sys
-from urllib.parse import unquote
-from urllib.parse import parse_qs
+try:
+    # Python 3
+    from urllib.parse import unquote, parse_qs
+except:
+    # Python 2
+    from urllib2 import unquote
+    from urlparse import parse_qs
 
 from flask import (abort, flash, g, json, jsonify, redirect,
-                   session, render_template, request,  url_for)
+                   render_template, request, url_for)
 from flask_jwt import current_identity, jwt_required
 from flask_login import login_user, logout_user, login_required
 from flask_cors import cross_origin
-from werkzeug import ImmutableMultiDict
+from werkzeug.datastructures import ImmutableMultiDict
+from werkzeug.urls import url_decode, url_unquote
 
-from flask_ppt2 import app, db, lm, jwt #, wtforms_json
+from flask_ppt2 import app, db, lm, jwt, wtforms_json
 # from app import csrf
 from flask_ppt2.models import User
 from flask_ppt2 import forms
@@ -37,31 +43,31 @@ TABLE_MODELS = [getattr(alch, t.name.capitalize())
 # show the user). We do check the directory again when handling each request,
 # and do not depend on the roles indicated in the jwt.
 
-@jwt.authentication_handler
-def authenticate(username, password):
-    """Try authenticating with given username and password."""
-    user = User(id=username, passwd=password)
-    if user.active is not False:
-        return user
-
-@jwt.user_handler
-def load_user(payload):
-    """Return user object referred to in payload."""
-    userid = payload["id"] or None
-    return User(id=userid)
-
-@jwt.payload_handler
-def make_payload(user):
-    """ Build JWT payload from user model."""
-    return {
-        'id': user.id,
-        'name': user.name,
-        'firstname': user.firstname,
-        'lastname': user.lastname,
-        'mail': user.mail,
-        'roles': user.groups,
-        'active': user.active
-        }
+# @jwt.authentication_handler
+# def authenticate(username, password):
+#     """Try authenticating with given username and password."""
+#     user = User(uid=username, passwd=password)
+#     if user.active is not False:
+#         return user
+# 
+# @jwt.user_handler
+# def load_user(payload):
+#     """Return user object referred to in payload."""
+#     userid = payload["uid"] or None
+#     return User(uid=userid)
+# 
+# @jwt.payload_handler
+# def make_payload(user):
+#     """ Build JWT payload from user model."""
+#     return {
+#         'uid': user.uid,
+#         'name': user.name,
+#         'firstname': user.firstname,
+#         'lastname': user.lastname,
+#         'mail': user.mail,
+#         'roles': user.groups,
+#         'active': user.active
+#         }
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -302,24 +308,31 @@ def getBriefDescriptions():
 
 @app.route("/getBreakdownChoices")
 def getBreakdownChoices_JSON():
-    return jsonify(choices=get_all_select_fields())
+    """Return breakdown results as JSON"""
+    # strip out query_factory functions to make field data serializable
+    fields = get_all_select_fields()
+    for field in fields:
+        del field["query_factory"]
+    return jsonify(choices=fields)
 
 def get_all_select_fields():
     """Send choices for breakdown by attribute dropdown as list of dicts."""
-    choices = []
-    choices += get_select_field_labels_from(forms.Description())
-    choices += get_select_field_labels_from(forms.Portfolio())
-    choices += get_select_field_labels_from(forms.Project())
-    choices += get_select_field_labels_from(forms.Disposition())
+    fields = []
+    fields += get_select_field_labels_from(forms.Description())
+    fields += get_select_field_labels_from(forms.Portfolio())
+    fields += get_select_field_labels_from(forms.Project())
+#     fields += get_select_field_labels_from(forms.Disposition())
+#     fields += get_select_field_labels_from(forms.Latest_disposition())
 
-    # put choices in alphabetical order
-    choices.sort(key = lambda item: item["desc"])
-    return choices
+    # put fields in alphabetical order
+    fields.sort(key = lambda item: item["desc"])
+    return fields
 
 def get_select_field_labels_from(form):
     """Return select field labels from form as list."""
     table_name = form.Meta.model.__table__.name
-    return [{"id": item.name, "desc": item.label.text, "table": table_name}
+    return [{"id": item.name, "desc": item.label.text, "table": table_name,
+             "query_factory": item.query_factory}
             for item in form if item.type.startswith("QuerySelect")]
 
 @app.route("/getBreakdownByAttribute/<key>")
@@ -418,13 +431,6 @@ def get_filter_column_for_key(p, key):
         data_table = getattr(alch, col.data_table_name.capitalize())
         none_model_name = re.sub("s\\b", "ID", key)
         col.none_model = getattr(data_table, none_model_name)
-
-        # Follow the naming convention to the matching form field to get
-        # the choices.
-        form = getattr(forms, col.data_table_name.capitalize())()
-        field = getattr(form, key)
-        col.label = field.label.text
-        col.choices = field.query_factory().all()
         col.add_null_choice = True
         p, col = join_data_table(p, col)
         return p, col
@@ -468,14 +474,13 @@ def get_column_for_key(key):
             True for association proxies. Otherwise False.
     """
 
-
     # Check for one-to-many relationships that have an association object and
     # table. The test for this less used path has to come first. Otherwise
     # the algorithm finds the association table, not the base table. Relations
     # going back to the Description table don't count.
     matched_by_rel = [t for t in TABLE_MODELS
-                      if [k for k in inspect(t).relationships.keys()
-                          if re.match(key, k)]]
+                        for k in inspect(t).relationships.keys()
+                          if re.match(key, k)]
     if matched_by_rel:
         # From the relationship we identify the table that holds the data.
         # We can get the column from the model of that table
@@ -520,14 +525,19 @@ def get_column_for_key(key):
         select_field = [c for c in select_fields if c["id"] == key]
         if len(select_field):
             try:
-                data_table_name = select_field[0]["table"]
+                field = select_field[0]
+                data_table_name = field["table"]
                 data_table = getattr(alch, data_table_name.capitalize())
                 col = getattr(data_table, key)
                 col.data_table_name = data_table_name
-                col.root = re.sub("s\\b", "", key)
                 col.filter = key
                 col.is_relationship = True
                 col.is_association_proxy = True
+                col.choices = field["query_factory"]().all()
+                attrs = inspect(col.choices[0]).dict.keys()
+                key_attr = [a for a in attrs if a.endswith("ID")][0]
+                col.root = re.sub("ID\\b", "", key_attr)
+                col.label = field["desc"]
                 return col
             except:
                 pass
@@ -553,7 +563,21 @@ def get_down_to_one(tables, key):
                             == "latest_disposition"]
     if len(matched_with_latest) == 1:
         return matched_with_latest[0]
-
+    
+    # If one of the list tables was matched because of a relationship back
+    # to one of the main tables, ignore it.
+    not_matched_with_list_table = [t for t in tables
+                                   if not inspect(t).tables[0].name.endswith("list")]
+    if len(not_matched_with_list_table) == 1:
+        return not_matched_with_list_table[0]
+    
+    # If the description table is in the list because of a relationship back
+    # to it from one of the other non-list tables, ignore it.
+    not_rel_to_description_table = [t for t in tables
+                                    if not inspect(t).tables[0].name != 'description']
+    if len(not_rel_to_description_table) == 1:
+        return not_rel_to_description_table[0]
+    
     raise AttributeError
 
 def join_data_table(p, col):
@@ -666,9 +690,8 @@ def getReportTableJSON():
 @app.route("/getReportResults", methods=["GET", "POST"])
 def getReportResults():
     """Get report data matching query_string from request.json."""
-#     import pydevd
-#     pydevd.settrace()
-    default_columns = ["name", "abstract", "maturity", "drivers", "flavor"]
+    default_columns = ["name", "abstract", "maturity", "drivers", 
+                       "latest_dispositions", "flavor"]
     if request.method == "POST":
         query_string = request.json.get("query_string", "")
         tableColumns = request.json.get("tableColumns", default_columns)
@@ -681,7 +704,6 @@ def getReportResults():
     # Generate a list of column entities for columns specified in the request.
     # Skip over bogus column names.
     entities = []
-    descs = []
     query_descs = []
     query_strings = []
     for key in tableColumns:
@@ -696,7 +718,7 @@ def getReportResults():
 
     if query_string != "":
         # Apply the filters specified in the query_string
-        query = parse_qs(unquote(query_string), True, True)
+        query = url_decode(url_unquote(query_string))
 
         for key in query.keys():
             # Pass special keys.
@@ -736,7 +758,7 @@ def getReportResults():
                     raw_values.remove("")
 
                 # Match accepted choices to request values.
-                int_values = map(int, raw_values)
+                int_values = [int(i) for i in raw_values]
                 accepted_choices = [choice for choice in col.choices
                                     if getattr(choice,
                                                "{}ID".format(col.root))
@@ -940,6 +962,7 @@ def get_report_rows_from_query(p, columns):
         for col in columns:
 
             result_model = get_result_model_from_item(col, item)
+            
             if not col.is_relationship:
                 value = getattr(result_model, col.key)
                 key = col.key
@@ -948,17 +971,22 @@ def get_report_rows_from_query(p, columns):
                 # Use naming convention to find the multiple select column.
                 # This test comes first because this entity object does not
                 # have a type attribute.
-                rel_object = getattr(result_model, col.root)
-                value = getattr(rel_object, "{}Desc".format(col.root))
+                if result_model:
+                    rel_object = getattr(result_model, col.root, "")
+                    value = getattr(rel_object, "{}Desc".format(col.root))
+                else:
+                    value = [getattr(c, "{}Desc".format(col.root)) 
+                             for c in col.choices 
+                             if getattr(c, "{}ID".format(col.root)) == 0][0]
                 key = col.root
 
             elif col.is_relationship and col.is_association_proxy:
-                proxy_name = "{}s".format(col.root)
-                rel_objects = getattr(result_model, proxy_name)
+                
+                rel_objects = getattr(result_model, col.filter)
                 values = [getattr(r, "{}Desc".format(col.root))
                           for r in rel_objects]
                 value = ", ".join(values)
-                key = proxy_name
+                key = col.filter
 
             elif isinstance(col.type, Text):
                 value = truncate_gracefully(value, 100)
@@ -994,8 +1022,10 @@ def get_result_model_from_item(col, item):
     elif col.data_table_name in ("portfolio", "project"):
         return getattr(item, col.data_table_name)[0]
     elif col.data_table_name in ("latest_disposition"):
-        table = getattr(item, "disposition", None)
-        if table:
+        latest_disposition = getattr(item, "disposition_latest", None)[0]
+        if latest_disposition:
+            # latest disposition is a Disposition table object
+            disposition = latest_disposition.disposition
             return getattr(item, table[0])
         else:
             return None

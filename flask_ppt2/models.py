@@ -1,8 +1,6 @@
 """User model with LDAP authentication and authorization."""
 from flask_login import UserMixin
-from hashlib import md5
-from ldap3 import Connection
-import simpleldap
+from ldap3 import Server, Connection, ALL, SUBTREE
 
 from flask_ppt2 import app
 
@@ -17,23 +15,34 @@ LDAP_GROUP_RDN = config.get("LDAP_GROUP_RDN")
 
 def ldap_fetch(uid=None, name=None, passwd=None):
     try:
+        server = Server(LDAP_HOST, get_info=ALL)
         dn = "{0}={1},{2}".format(LDAP_USER_OBJECTS_RDN, uid, LDAP_SEARCH_BASE)
 
         if uid is not None and passwd is not None:
-            l = Connection(LDAP_HOST, dn=dn, password=passwd)
+            conn = Connection(server, dn, passwd, auto_bind=True)
         else:
-            l = simpleldap.Connection(LDAP_HOST)
-        r = l.search('{0}={1}'.format(LDAP_USER_OBJECTS_RDN, uid), 
-                     base_dn=LDAP_SEARCH_BASE)
-        g = l.search("(&({0})({1}={2}))".format(LDAP_GROUP_OBJECT_FILTER, 
-                                                LDAP_GROUP_MEMBERS_FIELD, 
-                                                dn), 
-                     base_dn=LDAP_GROUP_SEARCH_BASE)
+            conn = Connection(LDAP_HOST, auto_bind=True)
+        conn.search(LDAP_SEARCH_BASE, 
+                    '({0}={1})'.format(LDAP_USER_OBJECTS_RDN, uid),
+                    search_scope=SUBTREE,
+                    attributes=[LDAP_USER_OBJECTS_RDN, 
+                                'cn', 'givenName', 'sn', 'mail'],
+                    get_operational_attributes=True)
+        r = conn.entries
+        conn.search(LDAP_GROUP_SEARCH_BASE,
+                    "(&({0})({1}={2}))".format(LDAP_GROUP_OBJECT_FILTER, 
+                                               LDAP_GROUP_MEMBERS_FIELD, 
+                                               dn),
+                    search_scope=SUBTREE,
+                    attributes=[LDAP_GROUP_RDN],
+                    get_operational_attributes=True)
+        g = conn.entries
+        
         return {
             'uid': r[0][LDAP_USER_OBJECTS_RDN][0],
-            'name': unicode(r[0]['cn'][0]),
-            "givenName": unicode(r[0]["givenname"][0]),
-            "sn": unicode(r[0]["sn"][0]),
+            'name': r[0]['cn'][0],
+            "givenName": r[0]["givenname"][0],
+            "sn": r[0]["sn"][0],
             "mail": r[0]["mail"][0],
             "groups": [item[LDAP_GROUP_RDN][0] for item in g]
         }
@@ -41,16 +50,16 @@ def ldap_fetch(uid=None, name=None, passwd=None):
         return None
 
 class User(UserMixin):
-    def __init__(self, id=None, name=None, passwd=None, groups=None, mail=None):
-        self.id = id
+    def __init__(self, uid=None, name=None, passwd=None, groups=None, mail=None):
+        self.uid = uid
         self.name = name
         self.groups = groups
         self.mail = mail
         self.active = False
-        ldapres = ldap_fetch(uid=id, name=name, passwd=passwd)
+        ldapres = ldap_fetch(uid=uid, name=name, passwd=passwd)
 
         if ldapres is not None:
-            self.id = ldapres["uid"]
+            self.uid = ldapres["uid"]
             self.groups = ldapres["groups"]
             self.name = ldapres["name"]
             self.firstname = ldapres["givenName"]
@@ -62,10 +71,10 @@ class User(UserMixin):
         return self.active
 
     def get_id(self):
-        return unicode(self.id)
+        return self.uid
     
     def get_user(self):
-        return {"id": self.id,
+        return {"uid": self.uid,
                 "name": self.name,
                 "firstname": self.firstname,
                 "lastname": self.lastname,
@@ -74,5 +83,5 @@ class User(UserMixin):
                 "is_active": self.active}
 
     def __repr__(self):
-        return '<User %r>' % (self.id)
+        return '<User %r>' % (self.uid)
 

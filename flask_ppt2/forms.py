@@ -60,7 +60,6 @@ class FormlyAttributes:
     """
     def formly_attributes(self):
         """Return a list of angular-formly fields for the form."""
-        model = inspect(self.Meta.model)
         attrs = []
         # get keys from the form to preserve order
         for key in self._fields.keys():
@@ -162,7 +161,7 @@ class FormlyAttributes:
 
     def get_options_from_factory(self, key, query_factory):
         """Convert query_factory tuples into Bootstrap select objects."""
-        choices = query_factory().all()
+        choices = query_factory.all()
         return self.get_options_from_list(key, choices)
 
     def get_options_from_list(self, key, choices):
@@ -331,6 +330,29 @@ class Months(GeneratedChoices):
 
 
 # Primary table forms
+def child_choices():
+    return alch.Childlist().query.order_by("childID")
+def disposition_choices():
+    return alch.Dispositionlist().query.order_by("dispositionDesc")
+def driver_choices():
+    return alch.Driverlist().query
+def final_choices():
+    return alch.Finallist().query.order_by("finalID")
+def fundingsource_choices():
+    return alch.Fundingsourcelist().query.order_by("fundingsourceID")
+def host_choices():
+    return alch.Hostlist().query.order_by("hostDesc")
+def maturity_choices():
+    return alch.Maturitylist().query.order_by("maturityID")
+def sponsor_choices():
+    return alch.Sponsorlist().query.order_by("sponsorDesc")
+def stakeholder_choices():
+    return alch.Stakeholderlist().query.order_by("stakeholderDesc")
+def technology_choices():
+    return alch.Technologylist().query.order_by("technologyID")
+def type_choices():
+    return alch.Typelist().query.order_by("typeDesc")
+
 class Description(ModelForm, FormlyAttributes, DataSerializer):
     class Meta:
         model = alch.Description
@@ -338,27 +360,6 @@ class Description(ModelForm, FormlyAttributes, DataSerializer):
         only = ["name", "abstract", "rationale", "businesscase",
                 "dependencies", "proposer", "customer", "created", "ended",
                 "descriptionLastModified", "descriptionLastModifiedBy"]
-
-    def child_choices(self):
-        return alch.Childlist().query.order_by("childID")
-    def driver_choices(self):
-        return alch.Driverlist().query
-    def final_choices(self):
-        return alch.Finallist().query.order_by("finalID")
-    def fundingsource_choices(self):
-        return alch.Fundingsourcelist(self).query.order_by("fundingsourceID")
-    def host_choices(self):
-        return alch.Hostlist().query.order_by("hostDesc")
-    def maturity_choices(self):
-        return alch.Maturitylist().query.order_by("maturityID")
-    def sponsor_choices(self):
-        return alch.Sponsorlist().query.order_by("sponsorDesc")
-    def stakeholder_choices(self):
-        return alch.Stakeholderlist().query.order_by("stakeholderDesc")
-    def technology_choices(self):
-        return alch.Technologylist().query.order_by("technologyID")
-    def type_choices(self):
-        return alch.Typelist().query.order_by("typeDesc")
 
     name = StringField(label=u"name",
         description=u"A clear description of the objective/purpose of "
@@ -455,6 +456,11 @@ class Description(ModelForm, FormlyAttributes, DataSerializer):
                       "surviving project. For a split project, enter the "
                       "project IDs of the child projects.")
 
+    latest_dispositions = QuerySelectField(u"disposition",
+        query_factory=disposition_choices,
+        description=u"What decision was made during the planning cycle with "
+                     "respect to this project?")
+
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
     descriptionLastModified = DateTimeField(u"last updated")
@@ -467,6 +473,23 @@ class Description(ModelForm, FormlyAttributes, DataSerializer):
         read_only(self.descriptionLastModified)
         read_only(self.descriptionLastModifiedBy)
 
+def complexity_choices():
+    return alch.Complexitylist().query
+def costlevel_choices():
+    return alch.Costlevellist().query
+def flavor_choices():
+    return alch.Flavorlist().query
+def initiative_choices():
+    return alch.Initiativelist().query.order_by("initiativeDesc")
+def risklevel_choices():
+    return alch.Risklevellist().query
+def scope_choices():
+    return alch.Scopelist().query
+def strategy_choices():
+    return alch.Strategylist().query.order_by("strategyDesc")
+def visibility_choices():
+    return alch.Visibilitylist().query
+
 class Portfolio(ModelForm, FormlyAttributes, DataSerializer):
     class Meta:
         model = alch.Portfolio
@@ -474,23 +497,7 @@ class Portfolio(ModelForm, FormlyAttributes, DataSerializer):
         only = ["rpu", "budgetIn",
                 "portfolioLastModified", "portfolioLastModifiedBy"]
 
-    def complexity_choices(self):
-        return alch.Complexitylist().query
-    def costlevel_choices(self):
-        return alch.Costlevellist().query
-    def flavor_choices(self):
-        return alch.Flavorlist().query
-    def initiative_choices(self):
-        return alch.Initiativelist().query.order_by("initiativeDesc")
-    def risklevel_choices(self):
-        return alch.Risklevellist().query
-    def scope_choices(self):
-        return alch.Scopelist().query
-    def strategy_choices(self):
-        return alch.Strategylist().query.order_by("strategyDesc")
-    def visibility_choices(self):
-        return alch.Visibilitylist().query
-
+    
     flavor = QuerySelectField(u"portfolio category",
         query_factory=flavor_choices,
         description=u"Project portfolio management is not all about strategy "
@@ -572,6 +579,11 @@ class Portfolio(ModelForm, FormlyAttributes, DataSerializer):
         read_only(self.portfolioLastModified)
         read_only(self.portfolioLastModifiedBy)
 
+def progress_choices():
+    return alch.Progresslist().query.order_by("progressID")
+def proj_visibility_choices():
+    return alch.Proj_visibilitylist().query.order_by("proj_visibilityID")
+
 class Project(ModelForm, FormlyAttributes, DataSerializer):
     class Meta:
         model = alch.Project
@@ -579,12 +591,7 @@ class Project(ModelForm, FormlyAttributes, DataSerializer):
         only = ["proj_manager", "tech_manager", "project_url", "startedOn",
                 "finishedOn", "projectLastModified", "projectLastModifiedBy"]
 
-    def progress_choices(self):
-        return alch.Progresslist().query.order_by("progressID")
-    def proj_visibility_choices(self):
-        return alch.Proj_visibilitylist().query.order_by("proj_visibilityID")
-
-    project_url = StringField(u"project url",
+        project_url = StringField(u"project url",
         description=u"The full URL of the project page. The project page is "
                      "where project status is reported, such as on the CPT "
                      "project wiki. Limited to 255 characters.")
@@ -620,23 +627,22 @@ class Project(ModelForm, FormlyAttributes, DataSerializer):
         read_only(self.projectLastModified)
         read_only(self.projectLastModifiedBy)
 
+
+def fiscal_years():
+    return alch.Fiscalyears().query
+def quarters():
+    return alch.Quarters().query
+def years():
+    return alch.Calendaryears().query
+def months():
+    return alch.Months().query
+
 class Disposition(ModelForm, FormlyAttributes, DataSerializer):
     class Meta:
         model = alch.Disposition
         include_primary_keys = True
         only = ["explanation",
                 "dispositionLastModified", "dispositionLastModifiedBy"]
-
-    def disposition_choices(self):
-        return alch.Dispositionlist().query.order_by("dispositionDesc")
-    def fiscal_years(self):
-        return alch.Fiscalyears().query
-    def quarters(self):
-        return alch.Quarters().query
-    def years(self):
-        return alch.Calendaryears().query
-    def months(self):
-        return alch.Months().query
 
     disposedIn = DateIntervalField(u"disposed",
         description=u"In which planning cycle was this disposition made? "

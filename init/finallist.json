@@ -1,0 +1,5 @@
+{"finalID":0,"finalDesc":"still alive","finalText":""}
+{"finalID":1,"finalDesc":"completed","finalText":"This project reached a successful conclusion."}
+{"finalID":3,"finalDesc":"terminated","finalText":"At any stage to up to completion, an idea or project can be terminated.  All work is stopped or to be stopped, and the project will not be reconsidered in this form."}
+{"finalID":4,"finalDesc":"absorbed","finalText":"This project has been absorbed into an existing project, or has been merged with one or more other projects into a new project.  The children attribute identifies this new project."}
+{"finalID":5,"finalDesc":"split","finalText":"This project has been split in to smaller pieces or multiple phases.  The children attribute identifies these new projects."}
