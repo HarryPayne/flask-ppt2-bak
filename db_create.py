@@ -2,17 +2,22 @@
 # Create all of the tables for the SQLAlchemy models.
 # You need to create the database first, though.
 
-import os.path
+from os import environ, path
+
+environ["PPT_ENVIRONMENT"] = "test"
+
 from flask_sqlalchemy import SQLAlchemy
 from migrate.versioning import api
-from config.settings import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO
-from flask_ppt2 import db
+from flask_ppt2 import app, db
+
+repo_uri = app.config["SQLALCHEMY_DATABASE_URI"]
+repo = app.config["SQLALCHEMY_MIGRATE_REPO"]
 
 db.create_all()
 db.session.commit()
-
-# if not os.path.exists(SQLALCHEMY_MIGRATE_REPO):
-#     api.create(SQLALCHEMY_MIGRATE_REPO, 'database repository')
-#     api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
-# else:
-#     api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO, api.version(SQLALCHEMY_MIGRATE_REPO))
+ 
+if not path.exists(repo):
+    api.create(repo, 'database repository')
+    api.version_control(repo_uri, repo)
+else:
+    api.version_control(repo_uri, repo, api.version(repo))
