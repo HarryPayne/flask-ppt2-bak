@@ -1,0 +1,26 @@
+    <div  class="container">
+      <h3>Build a Project Selection Filter</h3>
+  
+      <p>
+      Use this page to build a project selection filter by setting project
+      attribute values to the ones you are looking for, and date ranges to
+      span the dates you are looking for. Filters for different attributes
+      are AND'ed together, but multiple values for the same attribute (by
+      pressing "Open for multiple selections") are OR'ed together. Date and
+      number ranges are inclusive.
+      </p>
+      
+      <p>
+        Filter: {{ filter.masterList().description }}<br/>
+        {{filter.masterList().selectedIds.length}} projects selected
+      </p>
+    </div>
+
+    <div class="container">
+
+      <div jump-to-project-choice on-submit="filter.jumpToProject"
+        label="'Select'" options="filter.masterList().selectedProjects" 
+        help="'Select a project from the list and go to that project.'"></div>
+
+    </div>
+        

@@ -1,0 +1,22 @@
+      <form name="myform2" class="form-horizontal" novalidate ng-submit="submit()">
+        <div class="form-group">
+          <label for="jumpToProjectChoice_projectID" class="control-label col-xs-2 col-lg-2" ng-bind="ctrl.label + ':'"> 
+            Select:
+          </label>
+          <div class="col-xs-10 col-lg-10">
+            <div class="input-group">
+              <select id="jumpToProjectChoice_projectID" 
+                class="form-control"
+                aria-describedBy="jumpToProjectChoice_helpBlock"
+                ng-model="ctrl.option" 
+                ng-options="item.projectID+'. '+item.name for item in ctrl.options track by item.projectID"
+                ng-change="submit()">
+              </select>
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="submit"> Go </button>
+              </span>
+            </div>
+            <span id="jumpToProjectChoice_helpBlock" class="help-block">Select a project from the list and go to that project.</span>
+          </div>
+        </div>
+      </form>

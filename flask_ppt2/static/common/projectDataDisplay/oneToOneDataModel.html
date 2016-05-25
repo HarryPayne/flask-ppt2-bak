@@ -1,0 +1,38 @@
+<h4 class="col-sm-12" ng-bind="ctrl.header"></h4>
+
+<span ng-show="ctrl.success" class="col-sm-offset-2 col-sm-10 alert alert-success alert-dismissible">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">×</button>
+  <span ng-bind="ctrl.success"></span>
+</span>
+<span ng-show="ctrl.error" class="col-sm-offset-2 col-sm-10 alert alert-danger alert-dismissible">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">×</button>
+  <span ng-bind="ctrl.error"></span>
+</span>
+
+<div class="form-group" 
+  ng-repeat="attr in ctrl.datasource()" 
+  ng-if="!(ctrl.mode=='view' && !ctrl.hasAValue(attr))"
+  ng-class="{required: ctrl.mode=='edit' && attr.required}">
+  <label for="{{attr.name}}" 
+    ng-bind="attr.label" 
+    class="col-sm-2 control-label text-capitalize"></label>
+  <div ng-switch="attr.format" class="col-sm-10" style="padding-top: 7px;">
+    <div ng-show="attr.errors" class="alert alert-danger alert-dismissible">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">×</button>
+      <span ng-bind="attr.errors"></span>
+    </div>
+    <span ng-switch-when="date" project-data-date></span>
+    <span ng-switch-when="dateRangeSelect" project-data-date-range-select></span>
+    <span ng-switch-when="multipleSelect" project-data-multiple-select></span>
+    <span ng-switch-when="number" project-data-number></span>
+    <span ng-switch-when="string" project-data-string></span>
+    <span ng-switch-when="textArea" project-data-text-area></span>
+  </div>
+</div>
+
+<div ng-if="ctrl.mode=='edit'" class="col-sm-offset-2">
+  <span class="col-sm-4">
+    <button type="button" ng-click="ctrl.save(ctrl.table)"> Save </button>
+    <button type="button" ng-click="ctrl.cancel()" ng-show="ctrl.hasCancel()"> Cancel </button>
+  </span>
+</div>

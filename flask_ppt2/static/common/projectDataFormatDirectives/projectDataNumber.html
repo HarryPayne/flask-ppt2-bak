@@ -1,0 +1,11 @@
+<span ng-if="ctrl.mode=='view'">
+  <span ng-bind="attr.value"></span>
+</span>
+<span ng-if="ctrl.mode=='edit' || ctrl.mode=='edit.detail' || ctrl.mode == 'add'">
+  <p ng-bind="attr.help" ng-show="attr.help"></p>
+  <input type="number" name="{{attr.name}}" size="12"
+    class="form-control col-lg-4"
+    ng-model="attr.value"
+    ng-required="attr.required"
+    />
+</span>

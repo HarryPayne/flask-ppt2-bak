@@ -1,0 +1,29 @@
+<span ng-if="ctrl.mode=='view'">
+  <span ng-bind="attr.value.desc"></span>
+  <span ng-bind="attr.child.value.desc"></span>
+</span>
+<span ng-if="ctrl.mode=='edit' || ctrl.mode=='edit.detail' || ctrl.mode == 'add'">
+  <p ng-bind="attr.help" ng-show="attr.help"></p>
+  <span ng-if="attr.computed">
+    <span ng-bind="attr.value"></span>
+  </span>
+  <span ng-if="!attr.computed">
+    <select name="{{attr.name}}"
+      style="float: left; width: 30%"
+      class="select form-control col-lg-4"
+      ng-model="attr.value"
+      ng-required="attr.required"
+      ng-options="item.desc for item in attr.choices track by item.id"></select>
+  </span>
+  <span ng-if="attr.child.computed">
+    <span ng-model="attr.child.value"></span>
+  </span>
+  <span ng-if="!attr.child.computed">
+    <select name="{{attr.child.name}}"
+    style="float: left; width: 40%;"
+      class="form-control"
+      ng-model="attr.child.value"
+      ng-required="attr.required"
+      ng-options="item.desc for item in attr.child.choices track by item.id"></select>
+  </span>
+</span>
