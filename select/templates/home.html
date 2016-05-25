@@ -149,7 +149,8 @@
     <dl ng-repeat="project in filtered = (select.masterList().allProjects | nameSearch:select.ss.getMasterList().searchText:select.ss.getMasterList().name_absLogic:select.ss.getMasterList().finalID)"> 
       <dt>{{project.projectID}}. <a href="" ng-click="select.jumpToProject(project.projectID)">{{project.name}}</a>
       </dt>
-      <dd read-more content="{{ project.abstract }}" limit="200"></dd>
+      <!-- dd read-more content="{{ project.abstract }}" limit="200">></dd -->
+      <dd>{{ project.abstract }}</dd>
     </dl>
     <div class="row col-lg-4">
       <button class="btn btn-default" type="button" ng-click="select.ss.clearSearchText()"> Clear </button>

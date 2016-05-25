@@ -1,6 +1,9 @@
 (function() {
   
   angular
-    .module("app.modalConfirm", ["ui.bootstrap"]);
+    .module("app.modalConfirm", [
+      "ngAnimate",
+      "ui.bootstrap"
+    ]);
     
 }());

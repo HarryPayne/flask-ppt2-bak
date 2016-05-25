@@ -17,12 +17,12 @@
     .factory('reportTableService', ReportTableService);
 
   ReportTableService.$inject = ["$compile", "$http", "$location", "$rootScope", "$state",
-                                "$stateParams", "DTColumnBuilder", "DTInstances",
+                                "$stateParams", "DTColumnBuilder", 
                                 "DTOptionsBuilder", "projectListService",
                                 "stateLocationService"];
 
   function ReportTableService($compile, $http, $location, $rootScope, $state,
-                               $stateParams, DTColumnBuilder, DTInstances,
+                               $stateParams, DTColumnBuilder,
                                DTOptionsBuilder, projectListService,
                                stateLocationService) {
 

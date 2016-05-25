@@ -6,14 +6,14 @@
     .module("app.login")
     .service("loginService", loginService);
   
-  loginService.$inject = ["$modal", "$rootScope", "store", "jwtHelper"];
+  loginService.$inject = ["$uibModal", "$rootScope", "store", "jwtHelper"];
   
-  function loginService($modal, $rootScope, store, jwtHelper) {
+  function loginService($uibModal, $rootScope, store, jwtHelper) {
 
     return getUserViaModal;
     
     function getUserViaModal() {
-      var instance = $modal.open({
+      var instance = $uibModal.open({
         templateUrl: "static/login/login.html",
         controller: "Login",
         controllerAs: "login"
@@ -24,8 +24,8 @@
 
     function assignCurrentUser(response) {
       if (response.status == 200) {
-        store.set("jwt", response.data.token);
-        var user = jwtHelper.decodeToken(response.data.token);
+        store.set("jwt", response.data.access_token);
+        var user = jwtHelper.decodeToken(response.data.access_token).identity;
         $rootScope.currentUser = user;
         return user;
       }

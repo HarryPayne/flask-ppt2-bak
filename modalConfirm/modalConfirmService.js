@@ -7,9 +7,9 @@
     .module("app.modalConfirm")
     .factory("modalConfirmService", ModalConfirmService);
   
-  ModalConfirmService.$inject = ["$modal"];
+  ModalConfirmService.$inject = ["$uibModal"];
   
-  function ModalConfirmService($modal) {
+  function ModalConfirmService($uibModal) {
     var service = {
       modalDefaults: {
         backdrop: true,
@@ -37,14 +37,14 @@
       jQuery.extend(currentOptions, service.modalOptions, customOptions);
       
       if (!currentDefaults.controller) {
-        currentDefaults.controller = ["$scope", "$modalInstance",
-          function($scope, $modalInstance) {
+        currentDefaults.controller = ["$scope", "$uibModalInstance",
+          function($scope, $uibModalInstance) {
             $scope.modalOptions = currentOptions;
             $scope.modalOptions.ok = function(result) {
-              $modalInstance.close(result);
+            	$uibModalInstance.close(result);
             };
             $scope.modalOptions.close = function(result) {
-              $modalInstance.dismiss("cancel");
+            	$uibModalInstance.dismiss("cancel");
             };
           }
         ];

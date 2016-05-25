@@ -2,8 +2,8 @@
   
   angular
     .module("app.select", [
-      "ui.router", 
-      'readMore'
+      "ui.router"
+      // 'readMore'
     ]);
   
 }());
