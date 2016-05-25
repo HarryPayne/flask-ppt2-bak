@@ -1,5 +1,5 @@
 from dateutil.relativedelta import relativedelta
-from datetime import datetime
+from datetime import datetime, timedelta
 import os 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -27,7 +27,7 @@ LDAP_GROUP_RDN = "cn"
 # JWT options
 # Token expires after 10 hours
 # TODO: get renewal working?
-JWT_EXPIRATION_DELTA = 36000
+JWT_EXPIRATION_DELTA = timedelta(hours=10)
 
 # Offset to be added to calendar date to get FY date. Database dates are
 # calendar dates.

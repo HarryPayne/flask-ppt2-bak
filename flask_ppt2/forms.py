@@ -60,6 +60,7 @@ class FormlyAttributes:
     """
     def formly_attributes(self):
         """Return a list of angular-formly fields for the form."""
+        model = inspect(self.Meta.model)
         attrs = []
         # get keys from the form to preserve order
         for key in self._fields.keys():
@@ -161,7 +162,7 @@ class FormlyAttributes:
 
     def get_options_from_factory(self, key, query_factory):
         """Convert query_factory tuples into Bootstrap select objects."""
-        choices = query_factory.all()
+        choices = query_factory().all()
         return self.get_options_from_list(key, choices)
 
     def get_options_from_list(self, key, choices):

@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from flask import Flask
 from flask_jwt import JWT
 from flask_wtf.csrf import CsrfProtect
@@ -33,33 +34,31 @@ wtforms_json.init()
 # the user is in for use in role-based authorization on the front end (what to
 # show the user). We do check the directory again when handling each request.
 
-#@JWT.authentication_handler
 def authenticate(username, password):
     """Try authenticating with given username and password."""
     user = models.User(uid=username, passwd=password)
     if user.active is not False:
         return user
 
-#@JWT.user_handler
 def identity(payload):
     """Return user object referred to in payload."""
     userid = payload["uid"] or None
     return models.User(uid=userid)
 
-#@JWT.payload_handler
+jwt = JWT(app, authenticate, identity)
+
+@jwt.jwt_payload_handler
 def make_payload(user):
     """ Build JWT payload from user model."""
+    iat = datetime.utcnow()
+    exp = iat + app.config.get('JWT_EXPIRATION_DELTA')
+    nbf = iat + app.config.get('JWT_NOT_BEFORE_DELTA')
     return {
-        'uid': user.uid,
-        'name': user.name,
-        'firstname': user.firstname,
-        'lastname': user.lastname,
-        'mail': user.mail,
-        'roles': user.groups,
-        'active': user.active
+            "identity": user.get_user(),
+            "iat": iat,
+            "exp": exp,
+            "nbf": nbf
         }
-
-jwt = JWT(app, authenticate, identity)
 
 from flask_ppt2 import models, views
 

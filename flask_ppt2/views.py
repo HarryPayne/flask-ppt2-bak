@@ -4,13 +4,13 @@ from sqlalchemy import Date, desc, String, Text
 from sqlalchemy.inspection import inspect
 from sqlalchemy.sql.expression import or_
 import sys
-try:
-    # Python 3
-    from urllib.parse import unquote, parse_qs
-except:
-    # Python 2
-    from urllib2 import unquote
-    from urlparse import parse_qs
+# try:
+#     # Python 3
+#     from urllib.parse import unquote, parse_qs
+# except:
+#     # Python 2
+#     from urllib2 import unquote
+#     from urlparse import parse_qs
 
 from flask import (abort, flash, g, json, jsonify, redirect,
                    render_template, request, url_for)
@@ -35,39 +35,6 @@ import flask_ppt2.alchemy_models as alch
 TABLE_MODELS = [getattr(alch, t.name.capitalize())
                     for t in alch.DBmetadata.sorted_tables
                     if t.name not in ["fiscalyears"]]
-
-# authentication/login form methods. We use flask_jwt for authentication, and
-# send out a JSON web token that is stored in the client and sent back with
-# every request. The authentication back end is LDAP. We send out LDAP groups
-# the user is in for use is role-based authorization on the front end (what to
-# show the user). We do check the directory again when handling each request,
-# and do not depend on the roles indicated in the jwt.
-
-# @jwt.authentication_handler
-# def authenticate(username, password):
-#     """Try authenticating with given username and password."""
-#     user = User(uid=username, passwd=password)
-#     if user.active is not False:
-#         return user
-# 
-# @jwt.user_handler
-# def load_user(payload):
-#     """Return user object referred to in payload."""
-#     userid = payload["uid"] or None
-#     return User(uid=userid)
-# 
-# @jwt.payload_handler
-# def make_payload(user):
-#     """ Build JWT payload from user model."""
-#     return {
-#         'uid': user.uid,
-#         'name': user.name,
-#         'firstname': user.firstname,
-#         'lastname': user.lastname,
-#         'mail': user.mail,
-#         'roles': user.groups,
-#         'active': user.active
-#         }
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -190,7 +157,7 @@ def getAllAttributesJSON():
     return jsonify(**getAllAttributes())
 
 def getAllAttributes():
-    """Return value-less aobjects for project attributes, by table."""
+    """Return value-less objects for project attributes, by table."""
     attributes = {}
     attributes["csrf_token"] = {"name": "csrf_token",
                                 "format": "hidden"}
@@ -229,18 +196,17 @@ def getAttributesFromForm(form):
                                 "format": "hidden"}
     formly_attributes = form.formly_attributes()
     for field in formly_attributes:
-        attr = {"attributeID": field["attributeID"],
-                "choices": field["templateOptions"]["options"]
-                           if field["templateOptions"].has_key("options")
+        attr = {"choices": field["templateOptions"]["options"]
+                           if "options" in field["templateOptions"].keys()
                            else [],
-                "computed": field["read_only"],
-                "format": getFormatFromField(field),
+                "computed": field["type"] == "display",
+                "format": field["type"],
                 "help": field["templateOptions"]["description"],
                 "label": field["templateOptions"]["label"],
                 "multi": getMultiFromField(field),
                 "name": field["key"],
-                "required": field["required"],
-                "table": field["table"]
+                "required": field["templateOptions"]["required"],
+#                 "table": field["table"]
                 }
         attributes[field["key"]] = attr
 
@@ -1186,8 +1152,8 @@ def projectEdit(projectID, tableName):
         abort(401)
 
     if projectID:
-        p = alch.Description.query.join(alch.Portfolio).\
-                filter_by(projectID=projectID).first_or_404()
+        p = db.session.query(alch.Description).join(alch.Portfolio)
+        p = p.filter_by(projectID=projectID).first_or_404()
         lastModified = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         lastModifiedBy = current_identity.get_id()
 

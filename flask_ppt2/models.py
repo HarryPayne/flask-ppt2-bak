@@ -1,6 +1,6 @@
 """User model with LDAP authentication and authorization."""
 from flask_login import UserMixin
-from ldap3 import Server, Connection, ALL, SUBTREE
+from ldap3 import Server, Connection, ALL, SUBTREE, LDAPBindError
 
 from flask_ppt2 import app
 
@@ -41,12 +41,13 @@ def ldap_fetch(uid=None, name=None, passwd=None):
         return {
             'uid': r[0][LDAP_USER_OBJECTS_RDN][0],
             'name': r[0]['cn'][0],
-            "givenName": r[0]["givenname"][0],
+            "givenName": r[0]["givenname"][0] if "givenname" in r[0] else None,
             "sn": r[0]["sn"][0],
-            "mail": r[0]["mail"][0],
-            "groups": [item[LDAP_GROUP_RDN][0] for item in g]
+            "mail": r[0]["mail"][0] if "mail" in r[0] else None,
+            "groups": [item[LDAP_GROUP_RDN][0] for item in g 
+                       if LDAP_GROUP_RDN in item]
         }
-    except:
+    except LDAPBindError:
         return None
 
 class User(UserMixin):
