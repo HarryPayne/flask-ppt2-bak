@@ -18,7 +18,8 @@ site.addsitedir("/Applications/Eclipse.app/Contents/Eclipse/dropins/PyDev 5.0.0/
 
 install_angular:
 	git remote add angular-ppt https://github.com/HarryPayne/angular-ppt.git && \
-	git subtree add --prefix=flask_ppt2/static angular-ppt master
+	cp flask_ppt2/static/bower.json . && \
+	bower install
 	
 myinstall: install install_pydev
 	
