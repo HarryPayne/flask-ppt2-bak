@@ -45,6 +45,7 @@ Data attributes:
       getAttribute: getAttribute,
       getAllAttributes: getAllAttributes,
       getFormData: getFormData,
+      getFormlyOptions: getFormlyOptions,
       getFormlyFields: getFormlyFields,
       getKeys: getKeys,
       getProjectAttributes: getProjectAttributes,
@@ -207,6 +208,34 @@ Data attributes:
       return formData;
     };
 
+    /**
+     *   @name getFormlyOptions
+     *  @desc Return formly options for the current project tab mode
+     *  @param {String} mode  "view" for display mode otherwise a project 
+     *         subtab name like "description.edit"
+     *  @returns {Object} formly formState object
+     */
+    function getFormlyOptions(mode) {
+      if (mode == "view") {
+        return {
+          formState: {
+            horizontalLabelClass: 'col-sm-2',
+            horizontalFieldClass: 'col-sm-10',
+            readOnly: true
+          }
+        };
+      }
+      else {
+        return {
+          formState: {
+            horizontalLabelClass: 'col-sm-2',
+            horizontalFieldClass: 'col-sm-10',
+            readOnly: false
+          }
+        };
+      }
+    };
+    
     /**
      *  @name getFormlyFields
      *  @desc Return formly fields for the requested data table.

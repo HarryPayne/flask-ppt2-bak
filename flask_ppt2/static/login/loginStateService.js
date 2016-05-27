@@ -3,7 +3,7 @@
   /**
    *  @name loginStateService
    *  @desc A factory for a service that provides information about the user's
-   *        login status and roles.
+   *        login status and roles, as well as handling the login process.
    */
 
   "use strict";
@@ -70,6 +70,10 @@
       return Boolean(store.get('jwt'));
     }
     
+    /**
+     *  @name loginService
+     *  @desc Instantiate a service that opens a login modal popup.
+     */ 
     function login() {
       loginService();
     }

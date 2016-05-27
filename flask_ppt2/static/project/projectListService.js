@@ -439,7 +439,7 @@
      */
     function updateAllProjects(projectID) {
       var deferred = $q.defer();
-      $http.post('/getBriefDescriptions')
+      $http.get('/getBriefDescriptions')
         .then(function(response) {
           service.setAllProjectResults(response, projectID);
           deferred.resolve(projectID);

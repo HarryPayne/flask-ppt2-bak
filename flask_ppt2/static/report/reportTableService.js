@@ -113,7 +113,7 @@
      */
     function getReportResults(query_string) {
       var request = {
-        method: "POST",
+        method: "GET",
         url: "/getReportResults",
         data: {query_string: encodeURIComponent(query_string),
                tableColumns: service.tableColumns()}

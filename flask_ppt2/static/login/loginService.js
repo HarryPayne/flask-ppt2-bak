@@ -1,5 +1,10 @@
 (function() {
-  
+
+	/**
+   * 	@name loginService
+   *  @desc	A factory for a service that opens a Bootstrap modal that contains
+   *  			the login form.
+   */
   "use strict";
   
   angular
@@ -26,8 +31,10 @@
       if (response.status == 200) {
         store.set("jwt", response.data.access_token);
         var user = jwtHelper.decodeToken(response.data.access_token).identity;
-        $rootScope.currentUser = user;
-        return user;
+        if (typeof user != "undefined") {
+          $rootScope.currentUser = user;
+          return user;
+        }
       }
       return response;
     };

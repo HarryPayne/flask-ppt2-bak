@@ -1,24 +1,39 @@
 (function() {
   
-  "use strict";
+  /**
+   * 	@name loginApiService
+   * 	@desc	A factory for a service that sends login information to the server
+   * 				and returns the result. If successful, the result is a jwt that
+   * 				includes information about the current user, including roles for
+   * 				authorization.
+   */
+	
+	"use strict";
   
   angular
     .module("app.login")
-    .factory("loginApiService", loginApiService);
+    .factory("loginApiService", LoginApiService);
   
-  loginApiService.$inject = ["$http"];
+  LoginApiService.$inject = ["$http"];
   
-  function loginApiService($http) {
+  function LoginApiService($http) {
     var service = {login: login};
-
     return service;    
   
-    function login(username, password) {
+    function login(csrf_token, username, password) {
       return $http({
         url: "/auth",
         method: "POST",
-        data: {"username": username, 
-               "password": password}
+        headers: {
+          //"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+	      "Content-Type": "application/json; charset=UTF-8",
+	      "X-CSRFToken": csrf_token
+        },
+        data: {
+          //csrf_token: csrf_token,
+          username: username, 
+          password: password
+        }
       });
     };
   };
