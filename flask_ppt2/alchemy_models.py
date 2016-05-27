@@ -462,23 +462,17 @@ class Comment(Base):
     __tablename__ = "comment"
 
     commentID = Column(Integer, primary_key=True, nullable=True, 
-                       autoincrement=True,
-                       info={"attributeID": 335})
+                       autoincrement=True)
     projectID = Column(Integer, ForeignKey("description.projectID"), 
                        nullable=False, index=True,
-                       server_default=text("'0'"),
-                       info={"help": ""})
-    comment = Column(Text, nullable=False,
-                     info={"attributeID": 440})
+                       server_default=text("'0'"))
+    comment = Column(Text, nullable=False)
     commentAuthor = Column(String(100),
-                           info={"attributeID": 450},
                            nullable=True, index=True, 
                            server_default=text("''"))
     commentAuthored = Column(DateTime,
-                             info={"attributeID": 460},
                              nullable=True, index=True)
     commentEditor = Column(String(100),
-                           info={"attributeID": 470},
                            nullable=True, index=True, 
                            server_default=text("''"))
     commentEdited = Column(DateTime, info={"attributeID": 480},
@@ -492,75 +486,53 @@ class Description(Base):
 
     projectID = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False, index=True, 
-                  server_default=text("''"),
-                  info={"attributeID": 10})
-    abstract = Column(Text, index=True, info={"attributeID": 30})
-    rationale = Column(Text, info={"attributeID": 40})
-    businesscase = Column(Text, info={"attributeID": 50})
-    dependencies = Column(Text, info={"attributeID": 60})
+                  server_default=text("''"))
+    abstract = Column(Text, index=True)
+    rationale = Column(Text)
+    businesscase = Column(Text)
+    dependencies = Column(Text)
     maturityID = Column(Integer, ForeignKey(Maturitylist.maturityID),
-                        info={"attributeID": 70}, server_default=text("'0'"))
-    proposer = Column(String(100), server_default=text("''"),
-                      info={"attributeID": 80})
-    customer = Column(String(100),server_default=text("''"),
-                      info={"attributeID": 90})
+                        server_default=text("'0'"))
+    proposer = Column(String(100), server_default=text("''"))
+    customer = Column(String(100),server_default=text("''"))
     sponsorID = Column(Integer, ForeignKey(Sponsorlist.sponsorID),
-                       info={"attributeID": 100},
                        nullable=True, index=True, server_default=text("'0'"))
     fundingsourceID = Column(Integer, 
                              ForeignKey(Fundingsourcelist.fundingsourceID),
-                             info={"attributeID": 110},
                              nullable=True, server_default=text("'0'"))
     hostID = Column(Integer, ForeignKey(Hostlist.hostID),
                     nullable=True, index=True, server_default=text("'0'"))
     technologyID = Column(Integer, ForeignKey(Technologylist.technologyID),
-                          info={"coerce": int,
-                                "attributeID": 140},
+                          info={"coerce": int},
                           nullable=True, server_default=None)
     typeID = Column(Integer, ForeignKey(Typelist.typeID),
-                    info={"attributeID": 150},
                     nullable=True, server_default=text("'0'"))
-    created = Column(Date, nullable=True,
-                    info={"attributeID": 170})
-    ended = Column(Date, nullable=True,
-                   info={"attributeID": 180})
+    created = Column(Date, nullable=True)
+    ended = Column(Date, nullable=True)
     finalID = Column(Integer, ForeignKey(Finallist.finalID),
-                     info={"attributeID": 190},
                      nullable=True, index=True, server_default=text("'0'"))
 
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
     descriptionLastModified = Column(DateTime, nullable=True,
-                                     server_default=text("CURRENT_TIMESTAMP"),
-                                     info={"attributeID": 998})
+                                     server_default=text("CURRENT_TIMESTAMP"))
     descriptionLastModifiedBy = Column(String(100),
                                        nullable=True,
-                                       server_default=text("''"),
-                                       info={"attributeID": 999})
+                                       server_default=text("''"))
 
     # One to many relationships.
-    maturity = relationship("Maturitylist",
-                            info={"attributeID": 71})
-    sponsor = relationship("Sponsorlist",
-                           info={"attributeID": 100})
-    fundingsource = relationship("Fundingsourcelist",
-                                 info={"attributeID": 110})
-    host = relationship("Hostlist",
-                        info={"attributeID": 120})
-    technology = relationship("Technologylist",
-                          info={"attributeID": 140})
-    type = relationship("Typelist",
-                        info={"attributeID": 150})
-    final = relationship("Finallist",
-                         info={"attributeID": 190})
+    maturity = relationship("Maturitylist")
+    sponsor = relationship("Sponsorlist")
+    fundingsource = relationship("Fundingsourcelist")
+    host = relationship("Hostlist")
+    technology = relationship("Technologylist")
+    type = relationship("Typelist")
+    final = relationship("Finallist")
 
     # Many to many relationships.
-    childs = association_proxy("childID", "childlist",
-                               info={"attributeID": 200})
-    drivers = association_proxy("driverID", "driverlist",
-                                info={"attributeID": 120})
-    stakeholders = association_proxy("stakeholderID", "stakeholderlist",
-                                     info={"attributeID": 130})
+    childs = association_proxy("childID", "childlist")
+    drivers = association_proxy("driverID", "driverlist")
+    stakeholders = association_proxy("stakeholderID", "stakeholderlist")
     latest_dispositions = association_proxy("latest_dispositionID", "latest_list")
 
 class Disposition(Base):

@@ -561,13 +561,11 @@ class Portfolio(ModelForm, FormlyAttributes, DataSerializer):
 #                         info={"choices": FY_CHOICES,
 #                               "coerce": int,
 #                               "label": "budget",
-#                               "attributeID": 301,
 #                               "help": "For projects whose budget needs to be planned (e.g., ED-05), when will that happen?"},
 #                         nullable=True, index=True, server_default=None)
 #     budgetInQ = Column(Integer,
 #                        info={"choices": Q_CHOICES,
 #                              "label": "",
-#                              "attributeID": 305,
 #                              "help": ""},
 #                        nullable=True, index=True, server_default=text("'0'"))
     # We need a table-specific handle for these two generic columns since

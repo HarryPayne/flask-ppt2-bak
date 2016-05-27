@@ -48,6 +48,9 @@
   <body>
     <div id="page">
       <header ng-controller="Header as header">
+        <script type="text/javascript">
+          window.csrf_token = "{{ csrf_token() }}";
+        </script>
         <div class="container">
           <div id="logo" class="text-left;"><h2>Project Portfolio Tool</h2></div>
         </div>
