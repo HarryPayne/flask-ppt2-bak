@@ -41,7 +41,6 @@ class FormlyAttributes:
     to the front end. The objects are in angular-formly format and contain
     these properties:
 
-        attributeID    legacy attribute for sorting on the front end
         key            attribute name
         type           form field class name
         read_only      flag for computed attributes

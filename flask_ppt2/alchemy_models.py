@@ -475,8 +475,7 @@ class Comment(Base):
     commentEditor = Column(String(100),
                            nullable=True, index=True, 
                            server_default=text("''"))
-    commentEdited = Column(DateTime, info={"attributeID": 480},
-                           nullable=True, index=True)
+    commentEdited = Column(DateTime, nullable=True, index=True)
 
     # Relationship to base table.
     t_description = relationship("Description", backref="comments")
@@ -543,47 +542,28 @@ class Disposition(Base):
                        nullable=False, index=True, 
                        server_default=text("'0'"))
     disposedInFY = Column(Integer, primary_key=True,
-                          info={"attributeID": 310},
-                          nullable=False, index=True, 
+                          nullable=False, 
                           server_default=text("'0'"))
     disposedInQ = Column(Integer, primary_key=True,
-                         info={"attributeID": 315},
-                         nullable=False, index=True, 
+                         nullable=False, 
                          server_default=text("'0'"))
     dispositionID = Column(Integer, 
                            ForeignKey(Dispositionlist.dispositionID),
-                           info={"attributeID": 320},
                            index=True, server_default=text("'0'"))
-    explanation = Column(Text, nullable=True,
-                         info={"attributeID": 330})
-    reconsiderInFY = Column(Integer,
-                            info={"attributeID": 340},
-                            nullable=True, server_default=None)
-    reconsiderInQ = Column(Integer,
-                           info={"attributeID": 345},
-                           nullable=True, server_default=text("'0'"))
-    startInY = Column(Integer,
-                      info={"attributeID": 350},
-                      nullable=True, server_default=text("'0'"))
-    startInM = Column(Integer,
-                      info={"attributeID": 355},
-                      nullable=True, server_default=text("'0'"))
-    finishInY = Column(Integer,
-                       info={"attributeID": 360},
-                       nullable=True, server_default=text("'0'"))
-    finishInM = Column(Integer,
-                       info={"attributeID": 365},
-                       nullable=True, server_default=text("'0'"))
+    explanation = Column(Text, nullable=True)
+    reconsiderInFY = Column(Integer, nullable=True, server_default=None)
+    reconsiderInQ = Column(Integer, nullable=True, server_default=text("'0'"))
+    startInY = Column(Integer, nullable=True, server_default=text("'0'"))
+    startInM = Column(Integer, nullable=True, server_default=text("'0'"))
+    finishInY = Column(Integer, nullable=True, server_default=text("'0'"))
+    finishInM = Column(Integer, nullable=True, server_default=text("'0'"))
     dispositionLastModified = Column(DateTime, nullable=True,
-                                     server_default=text("CURRENT_TIMESTAMP"),
-                                     info={"attributeID": 998})
+                                     server_default=text("CURRENT_TIMESTAMP"))
     dispositionLastModifiedBy = Column(String(100), nullable=True,
-                                       server_default=text("''"),
-                                       info={"attributeID": 999})
+                                       server_default=text("''"))
 
     # Many to one relationship.
-    disposition = relationship("Dispositionlist",
-                               info={"attributeID": 320})
+    disposition = relationship("Dispositionlist")
 
     # Relationship to base table.
     t_description = relationship("Description", backref="dispositions")
@@ -600,25 +580,21 @@ class Disposition(Base):
 #     oldValue = Column(Integer, nullable=False, server_default=text("'0'"))
 #     newValue = Column(Integer, nullable=False, server_default=text("'0'"))
 #     lastModified = Column(DateTime, nullable=True, 
-#                           server_default=text("CURRENT_TIMESTAMP"),
-#                           info={"attributeID": 998})
+#                           server_default=text("CURRENT_TIMESTAMP"))
 #     lastModifiedBy = Column(String(100), nullable=True, 
-#                             server_default=text("''"),
-#                             info={"attributeID": 999})
+#                             server_default=text("''"))
 
 class Latest_disposition(Base):
     __tablename__ = "latest_disposition"
     projectID = Column(Integer, ForeignKey("description.projectID"), 
                        primary_key=True,
-                       nullable=False, index=True, 
+                       nullable=False, 
                        server_default=text("'0'"))
     disposedInFY = Column(Integer, primary_key=True,
-                          info={"attributeID": 310},
-                          nullable=False, index=True, 
+                          nullable=False, 
                           server_default=text("'0'"))
-    disposedInQ = Column(Integer,primary_key=True,
-                         info={"attributeID": 315},
-                         nullable=False, index=True, 
+    disposedInQ = Column(Integer, primary_key=True,
+                         nullable=False,  
                          server_default=text("'0'"))
 
     @hybrid_property
@@ -628,17 +604,11 @@ class Latest_disposition(Base):
 
     latest_dispositionID = Column("dispositionID", Integer,
                                   ForeignKey(Dispositionlist.dispositionID),
-                           info={"attributeID": 320},
                            nullable=True, index=True, 
                            server_default=text("'0'"))
-    explanation = Column(Text, nullable=True,
-                         info={"attributeID": 330})
-    reconsiderInFY = Column(Integer,
-                            info={"attributeID": 340},
-                            nullable=True, server_default=None)
-    reconsiderInQ = Column(Integer,
-                           info={"attributeID": 345},
-                           nullable=True, server_default=text("'0'"))
+    explanation = Column(Text, nullable=True)
+    reconsiderInFY = Column(Integer, nullable=True, server_default=None)
+    reconsiderInQ = Column(Integer, nullable=True, server_default=text("'0'"))
 
     @hybrid_property
     def reconsiderIn(self):
@@ -648,12 +618,8 @@ class Latest_disposition(Base):
                     if self.reconsiderInQ else ""
         return response
 
-    startInY = Column(Integer,
-                      info={"attributeID": 350},
-                      nullable=True, server_default=text("'0'"))
-    startInM = Column(Integer,
-                      info={"attributeID": 355},
-                      nullable=True, server_default=text("'0'"))
+    startInY = Column(Integer, nullable=True, server_default=text("'0'"))
+    startInM = Column(Integer, nullable=True, server_default=text("'0'"))
 #     startMChoice = relationship("Months",
 #                                    primaryjoin=startInM==Months.monthID,
 #                                    backref="latest_disposition_start")
@@ -665,12 +631,8 @@ class Latest_disposition(Base):
         response += " {}".format(str(self.startInY)) if self.startInY else ""
         return response
 
-    finishInY = Column(Integer,
-                       info={"attributeID": 360},
-                       nullable=True, server_default=text("'0'"))
-    finishInM = Column(Integer,
-                       info={"attributeID": 365},
-                       nullable=True, server_default=text("'0'"))
+    finishInY = Column(Integer, nullable=True, server_default=text("'0'"))
+    finishInM = Column(Integer, nullable=True, server_default=text("'0'"))
 #     finishMChoice = relationship("Months",
 #                                   backref="latest_disposition_finish")
 
@@ -684,15 +646,12 @@ class Latest_disposition(Base):
 
     latestDispositionLastModified = Column(DateTime,
         nullable=True,
-        server_default=text("CURRENT_TIMESTAMP"),
-        info={"attributeID": 998})
+        server_default=text("CURRENT_TIMESTAMP"))
     latestDispositionLastModifiedBy = Column(String(100),
-        nullable=True, server_default=text("''"),
-        info={"attributeID": 999})
+        nullable=True, server_default=text("''"))
 
 #     # Many to one relationship.
-#     latest_disposition = relationship("Dispositionlist",
-#                                       info={"attributeID": 320})
+#     latest_disposition = relationship("Dispositionlist")
 
 #     # Relationship to base table.
 #     t_description = relationship("Description", backref="disposition_latest")
@@ -713,87 +672,65 @@ class Portfolio(Base):
     projectID = Column(Integer, ForeignKey("description.projectID"),
                        primary_key=True)
     flavorID = Column(Integer, ForeignKey("flavorlist.flavorID"),
-                      info={"attribute": 200},
                       nullable=True, index=True, server_default=text("'0'"))
     initiativeID = Column(Integer, ForeignKey("initiativelist.initiativeID"),
-                          info={"attributeID": 230},
                           nullable=True, index=True, 
                           server_default=text("'0'"))
     scopeID = Column(Integer, ForeignKey("scopelist.scopeID"),
-                     info={"attributeID": 240},
                      nullable=True, index=True, server_default=text("'0'"))
     complexityID = Column(Integer, ForeignKey("complexitylist.complexityID"),
-                          info={"attributeID": 250},
                           nullable=True, index=True, 
                           server_default=text("'0'"))
     visibilityID = Column(Integer, ForeignKey("visibilitylist.visibilityID"),
-                          info={"attributeID": 260},
                           nullable=True, index=True, 
                           server_default=text("'0'"))
     risklevelID = Column(Integer,
                          ForeignKey("risklevellist.risklevelID"),
-                         info={"attributeID": 270},
                          nullable=True, index=True, 
                          server_default=text("'0'"))
     costlevelID = Column(Integer, ForeignKey("costlevellist.costlevelID"),
-                         info={"attributeID": 280},
                          nullable=True, index=True, 
                          server_default=text("'0'"))
     rpu = Column(Float, nullable=True,
-                 info={"attributeID": 290},
                  server_default=text("'0'"))
-    budgetIn = Column(DateRangeType,
-                      info={"attributeID": 300})
+    budgetIn = Column(DateRangeType)
     budgetInFY = Column(Integer,
-                        info={"coerce": int,
-                              "attributeID": 301},
+                        info={"coerce": int},
                         nullable=True, index=True, server_default=None)
-    budgetInQ = Column(Integer,
-                       info={"attributeID": 305},
-                       nullable=True, index=True, server_default=text("'0'"))
+    budgetInQ = Column(Integer, nullable=True, server_default=text("'0'"))
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
     portfolioLastModified = Column(DateTime, nullable=True,
-                                   server_default=text("CURRENT_TIMESTAMP"),
-                                   info={"attributeID": 998})
+                                   server_default=text("CURRENT_TIMESTAMP"))
     portfolioLastModifiedBy = Column(String(100),
                                      nullable=True, 
-                                     server_default=text("''"),
-                                     info={"attributeID": 999})
+                                     server_default=text("''"))
 
     # Many to one relationships.
     flavor = relationship("Flavorlist",
         backref=backref("portfolio",
-                        lazy="dynamic"),
-        info={"attributeID": 210})
+                        lazy="dynamic"))
     initiative = relationship("Initiativelist",
         backref=backref("portfolio",
-                        lazy="dynamic"),
-        info={"attributeID": 230})
+                        lazy="dynamic"))
     scope = relationship("Scopelist",
         backref=backref("portfolio",
-                        lazy="dynamic"),
-        info={"attributeID": 240})
+                        lazy="dynamic"))
     complexity = relationship("Complexitylist",
         backref=backref("portfolio",
-                        lazy="dynamic"),
-        info={"attributeID": 250})
+                        lazy="dynamic"))
     visibility = relationship("Visibilitylist",
         backref=backref("portfolio",
-                        lazy="dynamic"),
-        info={"attributeID": 260})
+                        lazy="dynamic"))
     risklevel = relationship("Risklevellist",
         backref=backref("portfolio",
-                        lazy="dynamic"),
-        info={"attributeID": 270})
+                        lazy="dynamic"))
     costlevel = relationship("Costlevellist",
         backref=backref("portfolio",
-                        lazy="dynamic"),
-        info={"attributeID": 280})
+                        lazy="dynamic"))
 
     # Many to many relationship.
-    strategys = association_proxy("strategyID", "strategylist",
-        info={"attributeID": 220})
+    strategys = association_proxy("strategyID", "strategylist")
 
     # Relationship to base table.
     descriptions = relationship("Description", backref="portfolio")
@@ -803,44 +740,30 @@ class Project(Base):
 
     projectID = Column(Integer, ForeignKey("description.projectID"),
                        primary_key=True, server_default=text("'0'"))
-    project_url = Column(String(255),
-                         info={"attributeID": 370},
-                         nullable=True, server_default=text("''"))
+    project_url = Column(String(255), nullable=True, server_default=text("''"))
     progressID = Column(Integer, ForeignKey("progresslist.progressID"),
-                        info={"attributeID": 380},
                         nullable=True, index=True, 
                         server_default=text("'0'"))
     proj_manager = Column(String(100),
-                          info={"attributeID": 390},
                           nullable=True, index=True,
                            server_default=text("''"))
     tech_manager = Column(String(100),
-                          info={"attributeID": 400},
                           nullable=True, index=True, 
                           server_default=text("''"))
     proj_visibilityID = Column(Integer, 
                                ForeignKey(
                                 "proj_visibilitylist.proj_visibilityID"),
-                               info={"attributeID": 410},
                                nullable=True, index=True, 
                                server_default=text("'0'"))
-    startedOn = Column(Date,
-                       info={"attributeID": 420},
-                       nullable=True, index=True)
-    finishedOn = Column(Date,
-                        info={"attributeID": 430},
-                        nullable=True, index=True)
-    projectLastModified = Column(DateTime, nullable=True,
-                          info={"attributeID": 998, "help": ""})
+    startedOn = Column(Date, nullable=True, index=True)
+    finishedOn = Column(Date, nullable=True, index=True)
+    projectLastModified = Column(DateTime, nullable=True)
     projectLastModifiedBy = Column(String(100), nullable=True, 
-                                   server_default=text("''"),
-                            info={"attributeID": 999, "help": ""})
+                                   server_default=text("''"))
 
     # Many to one relationships.
-    progress = relationship("Progresslist", backref="project",
-                            info={"attributeID": 380})
-    proj_visibility = relationship("Proj_visibilitylist", backref="project",
-                                   info={"attributeID": 410})
+    progress = relationship("Progresslist", backref="project")
+    proj_visibility = relationship("Proj_visibilitylist", backref="project")
 
     # Relationship to base table.
     t_description = relationship("Description", backref="project")

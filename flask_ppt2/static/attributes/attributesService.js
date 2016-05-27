@@ -275,7 +275,7 @@ Data attributes:
      */
     function getProjectAttributes(tableName) {
       try {
-        return _.sortBy(service.projectAttributes[tableName], "attributeID");
+        return service.projectAttributes[tableName];
       }
       catch(e) {
         //alert(e);
