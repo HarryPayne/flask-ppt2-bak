@@ -750,11 +750,4 @@ class Comment(ModelForm, FormlyAttributes, DataSerializer):
         read_only(self.commentEditor)
         read_only(self.commentEdited)
 
-# Other forms
-
-class LoginForm(Form):
-    username = StringField("Username", [validators.Length(min=2, max=25)])
-    password = PasswordField("Password", [validators.Required()])
-    remember_me = BooleanField("remember_me", default=False)
-
 

@@ -1,10 +1,20 @@
-"""User model with LDAP authentication and authorization."""
-from flask_login import UserMixin
+"""User model and login form for auth blueprint.
+
+This module defines a User class for auth information in ldap. Authorization
+information comes from ldap groups that the user is in. 
+
+It also defines a wtforms form for the login form. This ensures that login
+is protected against csrf attacks.
+
+@author: payne
+"""
 from ldap3 import Server, Connection, ALL, SUBTREE, LDAPBindError
-from sqlalchemy import (Column, Date, DateTime, ForeignKey,
-                        Float, Integer, String, Text, text)
+from sqlalchemy import (Column, String)
+from flask_login import UserMixin
+from wtforms import StringField, PasswordField, validators
 
 from flask_ppt2 import app, db
+from flask_ppt2.forms import ModelForm
 
 Base = db.Model
 
@@ -17,17 +27,17 @@ LDAP_GROUP_OBJECT_FILTER = config.get("LDAP_GROUP_OBJECT_FILTER")
 LDAP_GROUP_MEMBERS_FIELD = config.get("LDAP_GROUP_MEMBERS_FIELD")
 LDAP_GROUP_RDN = config.get("LDAP_GROUP_RDN")
 
-def ldap_fetch(uid=None, name=None, passwd=None):
+def ldap_fetch(username=None, name=None, passwd=None):
     try:
         server = Server(LDAP_HOST, get_info=ALL)
-        dn = "{0}={1},{2}".format(LDAP_USER_OBJECTS_RDN, uid, LDAP_SEARCH_BASE)
+        dn = "{0}={1},{2}".format(LDAP_USER_OBJECTS_RDN, username, LDAP_SEARCH_BASE)
 
-        if uid is not None and passwd is not None:
+        if username is not None and passwd is not None:
             conn = Connection(server, dn, passwd, auto_bind=True)
         else:
             conn = Connection(LDAP_HOST, auto_bind=True)
         conn.search(LDAP_SEARCH_BASE, 
-                    '({0}={1})'.format(LDAP_USER_OBJECTS_RDN, uid),
+                    '({0}={1})'.format(LDAP_USER_OBJECTS_RDN, username),
                     search_scope=SUBTREE,
                     attributes=[LDAP_USER_OBJECTS_RDN, 
                                 'cn', 'givenName', 'sn', 'mail'],
@@ -43,7 +53,7 @@ def ldap_fetch(uid=None, name=None, passwd=None):
         g = conn.entries
         
         return {
-            'uid': r[0][LDAP_USER_OBJECTS_RDN][0],
+            'username': r[0][LDAP_USER_OBJECTS_RDN][0],
             'name': r[0]['cn'][0],
             "givenName": r[0]["givenname"][0] if "givenname" in r[0] else None,
             "sn": r[0]["sn"][0],
@@ -55,19 +65,18 @@ def ldap_fetch(uid=None, name=None, passwd=None):
         return None
 
 class User(Base, UserMixin):
-    id = Column(Integer, primary_key=True)
-    uid = Column(String(64))
+    username = Column(String(64), primary_key=True)
     
-    def __init__(self, uid=None, name=None, passwd=None, groups=None, mail=None):
-        self.uid = uid
+    def __init__(self, username=None, name=None, passwd=None, groups=None, mail=None):
+        self.username = username
         self.name = name
         self.groups = groups
         self.mail = mail
         self.active = False
-        ldapres = ldap_fetch(uid=uid, name=name, passwd=passwd)
+        ldapres = ldap_fetch(username=username, name=name, passwd=passwd)
 
         if ldapres is not None:
-            self.uid = ldapres["uid"]
+            self.username = ldapres["username"]
             self.groups = ldapres["groups"]
             self.name = ldapres["name"]
             self.firstname = ldapres["givenName"]
@@ -77,12 +86,18 @@ class User(Base, UserMixin):
 
     def is_active(self):
         return self.active
+    
+    def is_anonymous(self):
+        return False
+    
+    def is_authenticated(self):
+        return True
 
     def get_id(self):
-        return self.uid
+        return self.username
     
     def get_user(self):
-        return {"uid": self.uid,
+        return {"username": self.username,
                 "name": self.name,
                 "firstname": self.firstname,
                 "lastname": self.lastname,
@@ -91,5 +106,10 @@ class User(Base, UserMixin):
                 "is_active": self.active}
 
     def __repr__(self):
-        return '<User %r>' % (self.uid)
+        return '<User %r>' % (self.username)
+
+class LoginForm(ModelForm):
+
+    username = StringField("Username", [validators.Length(min=2, max=64)])
+    password = PasswordField("Password", [validators.Required()])
 

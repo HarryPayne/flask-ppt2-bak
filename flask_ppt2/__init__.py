@@ -10,7 +10,7 @@ import wtforms_json
 
 app = Flask(__name__)
 
-# Make environment specific choice 
+# Make environment specific choice of configuration
 if os.environ["PPT_ENVIRONMENT"] == "prod":
     app.config.from_pyfile('../config/settings_prod.py')
 elif os.environ["PPT_ENVIRONMENT"] == "test":
@@ -20,8 +20,11 @@ else:
     
 app.secret_key = app.config["SECRET_KEY"]
 
-# csrf = CsrfProtect()
-# csrf.init_app(app)
+# CSRF protection is enabled here. It means that every time you want to do a
+# post you need to get a csrf_token first. 
+csrf = CsrfProtect()
+csrf.init_app(app)
+
 db = SQLAlchemy(app)
 lm = LoginManager()
 lm.init_app(app)
@@ -34,16 +37,17 @@ wtforms_json.init()
 # the user is in for use in role-based authorization on the front end (what to
 # show the user). We do check the directory again when handling each request.
 
+from flask_ppt2.auth.models import User
 def authenticate(username, password):
     """Try authenticating with given username and password."""
-    user = models.User(uid=username, passwd=password)
+    user = User(username=username, passwd=password)
     if user.active is not False:
         return user
 
 def identity(payload):
     """Return user object referred to in payload."""
-    userid = payload["uid"] or None
-    return models.User(uid=userid)
+    userid = payload["identity"]["username"] or None
+    return User(username=userid)
 
 jwt = JWT(app, authenticate, identity)
 
@@ -60,5 +64,7 @@ def make_payload(user):
             "nbf": nbf
         }
 
-from flask_ppt2 import models, views
+from flask_ppt2 import views
+from flask_ppt2.auth import auth
+app.register_blueprint(auth)
 

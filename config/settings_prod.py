@@ -29,6 +29,7 @@ LDAP_GROUP_RDN = "cn"
 # 10 hours
 # TODO: get renewal working?
 JWT_EXPIRATION_DELTA = timedelta(hours=10)
+JWT_AUTH_HEADER_PREFIX  = "bearer"
 
 # Offset to be added to calendar date to get FY date. Database dates are
 # calendar dates.
