@@ -113,8 +113,12 @@
      */
     function getReportResults(query_string) {
       var request = {
-        method: "GET",
+        method: "POST",
         url: "/getReportResults",
+        headers: {
+	      "Content-Type": "application/json; charset=UTF-8",
+	      "X-CSRFToken": window.csrf_token
+        },
         data: {query_string: encodeURIComponent(query_string),
                tableColumns: service.tableColumns()}
       };

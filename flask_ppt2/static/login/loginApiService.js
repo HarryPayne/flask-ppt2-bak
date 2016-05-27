@@ -25,12 +25,10 @@
         url: "/auth",
         method: "POST",
         headers: {
-          //"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
 	      "Content-Type": "application/json; charset=UTF-8",
 	      "X-CSRFToken": csrf_token
         },
         data: {
-          //csrf_token: csrf_token,
           username: username, 
           password: password
         }

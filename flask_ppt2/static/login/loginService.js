@@ -24,11 +24,12 @@
         controllerAs: "login"
       });
 
-      return instance.result.then(assignCurrentUser);
+      return instance.result
+        .then(assignCurrentUser);
     };
 
     function assignCurrentUser(response) {
-      if (response.status == 200) {
+      if (response && response.status == 200) {
         store.set("jwt", response.data.access_token);
         var user = jwtHelper.decodeToken(response.data.access_token).identity;
         if (typeof user != "undefined") {

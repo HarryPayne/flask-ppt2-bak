@@ -10,6 +10,7 @@
   
   function Header($rootScope, $state, projectListService, loginStateService) {
     var vm = this;
+    this.csrf_token = $rootScope.csrf_token;
     
     this.currentUser = $rootScope.currentUser;
     this.masterList = projectListService.getMasterList;
@@ -26,6 +27,10 @@
 
     this.jumpToNextProject = jumpToNextProject;
     this.jumpToPreviousProject = jumpToPreviousProject;
+
+    this.setCsrfToken = function(token) {
+      $rootScope.csrf_token = token;
+    }
     
     $rootScope.$on("$stateChangeSuccess", function(e, toState){
       vm.isActive = isActive;

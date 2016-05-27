@@ -73,6 +73,22 @@ Data attributes:
     if (typeof service.formlyFields == "undefined") {
       $timeout(function() {
         service.updateFormlyFields();
+        service.formlyOptions = {
+          view: {formState: {
+              horizontalLabelClass: 'col-sm-2',
+              horizontalFieldClass: 'col-sm-10',
+              readOnly: true
+            }
+          },
+          edit: {
+            formState: {
+              horizontalLabelClass: 'col-sm-2',
+              horizontalFieldClass: 'col-sm-10',
+              readOnly: false
+            }
+
+          }
+        }
       });
     }
     
@@ -217,22 +233,10 @@ Data attributes:
      */
     function getFormlyOptions(mode) {
       if (mode == "view") {
-        return {
-          formState: {
-            horizontalLabelClass: 'col-sm-2',
-            horizontalFieldClass: 'col-sm-10',
-            readOnly: true
-          }
-        };
+        return service.formlyOptions.view;
       }
       else {
-        return {
-          formState: {
-            horizontalLabelClass: 'col-sm-2',
-            horizontalFieldClass: 'col-sm-10',
-            readOnly: false
-          }
-        };
+        return service.formlyOptions.edit;
       }
     };
     
@@ -428,6 +432,7 @@ Data attributes:
       var data = angular.fromJson(sessionStorage.attributesService);
       if (data) {
         service.formlyFields = data.formlyFields;
+        service.formlyOptions = data.formlyOptions;
         service.currentState = data.currentState;
       }
     };
@@ -435,6 +440,7 @@ Data attributes:
     function SaveState() {
       var data = new Object;
       data.formlyFields = service.formlyFields;
+      data.formlyOptions = service.formlyOptions;
       data.currentState = service.currentState;
       sessionStorage.attributesService = angular.toJson(data);
     };

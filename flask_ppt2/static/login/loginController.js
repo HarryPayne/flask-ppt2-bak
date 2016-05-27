@@ -15,28 +15,35 @@
     .module("app.login")
     .controller("Login", Login);
   
-  Login.$inject = ["$http", "$scope", "loginApiService"];
+  Login.$inject = ["$http", "$scope", "$uibModalInstance", "loginApiService"];
   
-  function Login($http, $scope, loginApiService) {
+  function Login($http, $scope, $uibModalInstance, loginApiService) {
     var vm = this;
-    vm.csrf_token = "";
-	var request = {
-		method: "GET",
-		url: "/getLoginToken",
-		data: {username: ""}
-	}
-	$http(request)
-		.then(function(response) {
-			vm.csrf_token = response.data.csrf_token;
-		});
-	this.cancel = $scope.$dismiss;
+    if (typeof vm.csrf_token == "undefined") {
+		var request = {
+			method: "GET",
+			url: "/getLoginToken"
+		}
+		$http(request)
+			.then(function(response) {
+				vm.csrf_token = response.data.csrf_token;
+			});
+
+    };
+	this.cancel = $scope.dismiss;
 	this.submit = submitLogin;
 
 	function submitLogin(username, password) {
 	  if (vm.csrf_token != "") {
-		  loginApiService.login(vm.csrf_token, username, password).then(function (user) {
-			$scope.$close(user);
-		  });
+		loginApiService.login(vm.csrf_token, username, password)
+		  .then(
+		    function (user) {
+			  $uibModalInstance.close(user);
+		    },
+		    function () {
+		      $uibModalInstance.dismiss("cancelled");
+		    }
+		  );
 	  }
 	}
   };
