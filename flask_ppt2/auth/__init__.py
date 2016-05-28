@@ -28,16 +28,16 @@ def get_current_user():
 def load_user(username):
     return User(username=username)
 
-@auth.route('/', methods=['GET', 'POST'])
-@auth.route('/index', methods=['GET', 'POST'])
+@auth.route('/', methods=["POST"])
+@auth.route('/index', methods=["POST"])
 def index():
     """Render and return the only page sent from the back end."""
     return render_template('index.html',
                            title='Home',
                            minified=app.config["MINIFIED"])
 
-@auth.route('/getLoginToken', methods=['GET'])
-def login():
+@auth.route('/getLoginToken', methods=["POST"])
+def getLoginToken():
     """Return csrf token for login form"""
     # Instantiate the form and send back the csrf token for rendering
     # the form at the client end.

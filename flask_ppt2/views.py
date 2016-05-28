@@ -56,7 +56,7 @@ def index():
 # holds the data for the fields, and a "fields" attribute that holds a list
 # of formly attribute objects.
 
-@app.route("/getFormlyFields")
+@app.route("/getFormlyFields", methods=['POST'])
 def get_formly_fields():
     """Return a dictionary of angular-formly form definitions.
 
@@ -73,7 +73,7 @@ def get_formly_fields():
 
     return jsonify(**attributes)
 
-@app.route("/getBriefDescriptions", methods=["GET", "POST"])
+@app.route("/getBriefDescriptions", methods=["POST"])
 def getBriefDescriptions():
     """ return list of project brief descriptions
 
@@ -95,7 +95,7 @@ def getBriefDescriptions():
 # drop down to select an attribute and to return the breakdown results,
 # respectively.
 
-@app.route("/getBreakdownChoices")
+@app.route("/getBreakdownChoices", methods=['POST'])
 def getBreakdownChoices_JSON():
     """Return breakdown results as JSON"""
     # strip out query_factory functions to make field data serializable
@@ -124,7 +124,7 @@ def get_select_field_labels_from(form):
              "query_factory": item.query_factory}
             for item in form if item.type.startswith("QuerySelect")]
 
-@app.route("/getBreakdownByAttribute/<key>")
+@app.route("/getBreakdownByAttribute/<key>", methods=['POST'])
 def getBreakdownByAttribute(key):
     """Send annotated list of project counts for each allowed value of key.
 
@@ -476,7 +476,7 @@ def getReportTableJSON():
     response = get_report_rows_from_query(p, columns)
     return jsonify(**response)
 
-@app.route("/getReportResults", methods=["GET", "POST"])
+@app.route("/getReportResults", methods=["POST"])
 def getReportResults():
     """Get report data matching query_string from request.json."""
     default_columns = ["name", "abstract", "maturity", "drivers", 
@@ -883,7 +883,7 @@ def get_datatable_options(rows):
 # The idea is that the client will merge the project data generated here with
 # the list of attributes sent out once at the beginning of the session.
 
-@app.route("/getProjectAttributes/<projectID>")
+@app.route("/getProjectAttributes/<projectID>", methods=['POST'])
 def getProjectAttributesJSON(projectID):
     """Send attribute values for project as JSON."""
     attributes = getProjectAttributes(projectID)
@@ -965,7 +965,7 @@ def updateFromForm(model, result, lastModified, lastModifiedBy):
         errors = form.errors
     return form, errors
 
-@app.route("/projectEdit/<projectID>/<tableName>", methods=["GET", "POST"])
+@app.route("/projectEdit/<projectID>/<tableName>", methods=["POST"])
 @cross_origin(headers=['Content-Type', 'Authorization'])
 @jwt_required()
 def projectEdit(projectID, tableName):

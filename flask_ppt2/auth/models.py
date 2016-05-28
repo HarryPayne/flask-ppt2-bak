@@ -58,7 +58,7 @@ def ldap_fetch(username=None, name=None, passwd=None):
             "givenName": r[0]["givenname"][0] if "givenname" in r[0] else None,
             "sn": r[0]["sn"][0],
             "mail": r[0]["mail"][0] if "mail" in r[0] else None,
-            "groups": [item[LDAP_GROUP_RDN][0] for item in g 
+            "roles": [item[LDAP_GROUP_RDN][0] for item in g 
                        if LDAP_GROUP_RDN in item]
         }
     except LDAPBindError:
@@ -67,17 +67,17 @@ def ldap_fetch(username=None, name=None, passwd=None):
 class User(Base, UserMixin):
     username = Column(String(64), primary_key=True)
     
-    def __init__(self, username=None, name=None, passwd=None, groups=None, mail=None):
+    def __init__(self, username=None, name=None, passwd=None, roles=None, mail=None):
         self.username = username
         self.name = name
-        self.groups = groups
+        self.roles = roles
         self.mail = mail
         self.active = False
         ldapres = ldap_fetch(username=username, name=name, passwd=passwd)
 
         if ldapres is not None:
             self.username = ldapres["username"]
-            self.groups = ldapres["groups"]
+            self.roles = ldapres["roles"]
             self.name = ldapres["name"]
             self.firstname = ldapres["givenName"]
             self.lastname = ldapres["sn"]
@@ -102,7 +102,7 @@ class User(Base, UserMixin):
                 "firstname": self.firstname,
                 "lastname": self.lastname,
                 "mail": self.mail,
-                "groups": self.groups,
+                "roles": self.roles,
                 "is_active": self.active}
 
     def __repr__(self):
