@@ -1,5 +1,10 @@
 (function() {
-  
+
+	/**
+   * 	@name loginService
+   *  @desc	A factory for a service that opens a Bootstrap modal that contains
+   *  			the login form.
+   */
   "use strict";
   
   angular
@@ -19,15 +24,18 @@
         controllerAs: "login"
       });
 
-      return instance.result.then(assignCurrentUser);
+      return instance.result
+        .then(assignCurrentUser);
     };
 
     function assignCurrentUser(response) {
-      if (response.status == 200) {
+      if (response && response.status == 200) {
         store.set("jwt", response.data.access_token);
         var user = jwtHelper.decodeToken(response.data.access_token).identity;
-        $rootScope.currentUser = user;
-        return user;
+        if (typeof user != "undefined") {
+          $rootScope.currentUser = user;
+          return user;
+        }
       }
       return response;
     };

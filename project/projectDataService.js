@@ -110,7 +110,15 @@
        *  */
       var formData = attributesService.getFormData('description', []);
       /* start with a fresh csrf token */
-      $http.get("getProjectAttributes/0")
+      var request = {
+        method: "POST",
+        url: "/getProjectAttributes/0",
+        headers: {
+		      "Content-Type": "application/json; charset=UTF-8",
+		      "X-CSRFToken": window.csrf_token
+        }
+      };
+      $http(request)
         .then(function(response) {
           createProject(response, formData);
         });
@@ -233,7 +241,15 @@
     function getProjectData(params) {
       var deferred = $q.defer();
       if (parseInt(params.projectID) > -1) {
-        $http.get("getProjectAttributes/" + params.projectID)
+        var request = {
+          method: "POST",
+          url: "/getProjectAttributes/" + params.projectID,
+          headers: {
+  		      "Content-Type": "application/json; charset=UTF-8",
+  		      "X-CSRFToken": window.csrf_token
+          }
+        };
+        $http(request)
           .then(function(response) {
             service.setProjectData(response, params);
             /** get the details right */
@@ -269,7 +285,15 @@
     function getProjectDataValues(params) {
       var deferred = $q.defer();
       if (parseInt(params.projectID) > -1) {
-        $http.get("getProjectAttributes/" + params.projectID)
+        var request = {
+          method: "POST",
+          url: "/getProjectAttributes/" + params.projectID,
+          headers: {
+  		      "Content-Type": "application/json; charset=UTF-8",
+  		      "X-CSRFToken": window.csrf_token
+          }
+        };
+        $http(request)
           .then(function(response) {
             service.setProjectData(response, params);
             deferred.resolve(params);

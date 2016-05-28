@@ -12,7 +12,7 @@
     $state.transitionTo("select");
 
     if (store.get("jwt") && !jwtHelper.isTokenExpired(store.get("jwt"))) {
-      $rootScope.currentUser = jwtHelper.decodeToken(store.get("jwt"));
+      $rootScope.currentUser = jwtHelper.decodeToken(store.get("jwt")).identity;
     }
 
     $rootScope.$on("$stateChangeStart", loginIfRequiredByToState);

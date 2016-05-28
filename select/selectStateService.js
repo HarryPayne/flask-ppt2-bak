@@ -169,7 +169,15 @@
      *        chosen attribute.
      */
     function updateBreakdownByAttribute() {
-      $http.get("getBreakdownByAttribute/" + service.masterList.breakdownAttr.id)
+      var request = {
+        method: "POST",
+        url: "/getBreakdownByAttribute/" + service.masterList.breakdownAttr.id,
+        headers: {
+		      "Content-Type": "application/json; charset=UTF-8",
+		      "X-CSRFToken": window.csrf_token
+        }
+      };
+      $http(request)
         .then(setBreakdownByAttribute);
     }
 
@@ -179,7 +187,15 @@
      *        Break Down drop down menu.
      */
     function updateBreakdownChoices() {
-      $http.get("getBreakdownChoices")
+      var request = {
+        method: "POST",
+        url: "/getBreakdownChoices",
+        headers: {
+		      "Content-Type": "application/json; charset=UTF-8",
+		      "X-CSRFToken": window.csrf_token
+        }
+      };
+      $http(request)
         .then(setBreakdownChoices);
     }
     

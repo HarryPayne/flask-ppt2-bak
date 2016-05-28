@@ -9,15 +9,16 @@
   LoginInjector.$inject = ["$q", "$injector", "$timeout"];
 
   function LoginInjector($q, $injector, $timeout) {
-    var loginService, $http, $state;
+    //var loginService, $http, $state;
+    //var loginService;
 
     /* Avoid `Uncaught Error: [$injector:cdep] Circular dependency found` */
-    /* http://brewhouse.io/blog/2014/12/09/authentication-made-simple-in-single-page-angularjs-applications.html 
+    /* http://brewhouse.io/blog/2014/12/09/authentication-made-simple-in-single-page-angularjs-applications.html */ 
     $timeout(function () { 
-      loginService = $injector.get("loginService");
-      $http = $injector.get("$http");
-      $state = $injector.get("$state");
-    }); */
+      var loginService = $injector.get("loginService");
+      var $http = $injector.get("$http");
+      var $state = $injector.get("$state");
+    }); 
 
     var service = {
       responseError: responseError
@@ -32,16 +33,21 @@
 
       var deferred = $q.defer();
 
-      loginService()
-        .then(
-          function () {
-            deferred.resolve( $http(rejection.config) );
-          },
-          function () {
-            $state.go("select.home");
-            deferred.reject(rejection);
-          }
-        );
+      if (typeof loginService != "undefined") {
+        loginService()
+          .then(
+            function () {
+              deferred.resolve( $http(rejection.config) );
+            },
+            function () {
+              //$state.go("select.home");
+              deferred.reject(rejection);
+            }
+          );
+      }
+      else {
+        deferred.reject(rejection);
+      }
 
       return deferred.promise;
     };

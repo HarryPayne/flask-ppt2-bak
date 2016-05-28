@@ -45,6 +45,7 @@ Data attributes:
       getAttribute: getAttribute,
       getAllAttributes: getAllAttributes,
       getFormData: getFormData,
+      getFormlyOptions: getFormlyOptions,
       getFormlyFields: getFormlyFields,
       getKeys: getKeys,
       getProjectAttributes: getProjectAttributes,
@@ -72,6 +73,22 @@ Data attributes:
     if (typeof service.formlyFields == "undefined") {
       $timeout(function() {
         service.updateFormlyFields();
+        service.formlyOptions = {
+          view: {formState: {
+              horizontalLabelClass: 'col-sm-2',
+              horizontalFieldClass: 'col-sm-10',
+              readOnly: true
+            }
+          },
+          edit: {
+            formState: {
+              horizontalLabelClass: 'col-sm-2',
+              horizontalFieldClass: 'col-sm-10',
+              readOnly: false
+            }
+
+          }
+        }
       });
     }
     
@@ -208,6 +225,22 @@ Data attributes:
     };
 
     /**
+     *   @name getFormlyOptions
+     *  @desc Return formly options for the current project tab mode
+     *  @param {String} mode  "view" for display mode otherwise a project 
+     *         subtab name like "description.edit"
+     *  @returns {Object} formly formState object
+     */
+    function getFormlyOptions(mode) {
+      if (mode == "view") {
+        return service.formlyOptions.view;
+      }
+      else {
+        return service.formlyOptions.edit;
+      }
+    };
+    
+    /**
      *  @name getFormlyFields
      *  @desc Return formly fields for the requested data table.
      *  @param {String} tableName - name of the requested table.
@@ -242,7 +275,7 @@ Data attributes:
      */
     function getProjectAttributes(tableName) {
       try {
-        return _.sortBy(service.projectAttributes[tableName], "attributeID");
+        return service.projectAttributes[tableName];
       }
       catch(e) {
         //alert(e);
@@ -399,6 +432,7 @@ Data attributes:
       var data = angular.fromJson(sessionStorage.attributesService);
       if (data) {
         service.formlyFields = data.formlyFields;
+        service.formlyOptions = data.formlyOptions;
         service.currentState = data.currentState;
       }
     };
@@ -406,6 +440,7 @@ Data attributes:
     function SaveState() {
       var data = new Object;
       data.formlyFields = service.formlyFields;
+      data.formlyOptions = service.formlyOptions;
       data.currentState = service.currentState;
       sessionStorage.attributesService = angular.toJson(data);
     };
@@ -518,7 +553,15 @@ Data attributes:
      */
     function updateAllAttributes() {
       var deferred = $q.defer();
-      $http.get("/getAllAttributes")
+      var request = {
+          method: "POST",
+          url: "/getAllAttributes",
+          headers: {
+	  	      "Content-Type": "application/json; charset=UTF-8",
+	  	      "X-CSRFToken": window.csrf_token
+          }
+      }
+      $http(request)
         .then(function(response) {
           service.setAllAttributes(response);
           deferred.resolve();
@@ -561,7 +604,15 @@ Data attributes:
      */
     function updateFormlyFields() {
       var deferred = $q.defer();
-      $http.get("/getFormlyFields")
+      var request = {
+        method: "POST",
+        url: "/getFormlyFields",
+        headers: {
+		      "Content-Type": "application/json; charset=UTF-8",
+		      "X-CSRFToken": window.csrf_token
+        }
+      };
+      $http(request)
         .then(function(response) {
           service.formlyFields = response.data;
           deferred.resolve();
