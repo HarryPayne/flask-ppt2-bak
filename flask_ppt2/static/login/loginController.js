@@ -21,8 +21,12 @@
     var vm = this;
     if (typeof vm.csrf_token == "undefined") {
 		var request = {
-			method: "GET",
-			url: "/getLoginToken"
+			method: "POST",
+			url: "/getLoginToken",
+      headers: {
+	      "Content-Type": "application/json; charset=UTF-8",
+	      "X-CSRFToken": window.csrf_token
+      }
 		}
 		$http(request)
 			.then(function(response) {

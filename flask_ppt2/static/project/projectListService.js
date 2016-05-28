@@ -439,7 +439,15 @@
      */
     function updateAllProjects(projectID) {
       var deferred = $q.defer();
-      $http.get('/getBriefDescriptions')
+      var request = {
+          method: "POST",
+          url: "/getBriefDescriptions",
+          headers: {
+	  	      "Content-Type": "application/json; charset=UTF-8",
+	  	      "X-CSRFToken": window.csrf_token
+          }
+      }
+      $http(request)
         .then(function(response) {
           service.setAllProjectResults(response, projectID);
           deferred.resolve(projectID);

@@ -140,6 +140,10 @@
       var request = {
         method: "POST",
         url: "/getReportTableJSON",
+        headers: {
+  	      "Content-Type": "application/json; charset=UTF-8",
+  	      "X-CSRFToken": window.csrf_token
+        },
         data: {projectID: projectListService.getSelectedIds(),
                tableColumns: service.tableColumns()}
       };

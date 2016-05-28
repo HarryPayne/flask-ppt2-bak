@@ -25,8 +25,8 @@
         url: "/auth",
         method: "POST",
         headers: {
-	      "Content-Type": "application/json; charset=UTF-8",
-	      "X-CSRFToken": csrf_token
+  	      "Content-Type": "application/json; charset=UTF-8",
+  	      "X-CSRFToken": window.csrf_token
         },
         data: {
           username: username, 

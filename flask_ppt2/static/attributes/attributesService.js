@@ -553,7 +553,15 @@ Data attributes:
      */
     function updateAllAttributes() {
       var deferred = $q.defer();
-      $http.get("/getAllAttributes")
+      var request = {
+          method: "POST",
+          url: "/getAllAttributes",
+          headers: {
+	  	      "Content-Type": "application/json; charset=UTF-8",
+	  	      "X-CSRFToken": window.csrf_token
+          }
+      }
+      $http(request)
         .then(function(response) {
           service.setAllAttributes(response);
           deferred.resolve();
@@ -596,7 +604,15 @@ Data attributes:
      */
     function updateFormlyFields() {
       var deferred = $q.defer();
-      $http.get("/getFormlyFields")
+      var request = {
+        method: "POST",
+        url: "/getFormlyFields",
+        headers: {
+		      "Content-Type": "application/json; charset=UTF-8",
+		      "X-CSRFToken": window.csrf_token
+        }
+      };
+      $http(request)
         .then(function(response) {
           service.formlyFields = response.data;
           deferred.resolve();
