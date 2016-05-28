@@ -27,15 +27,17 @@ LDAP_GROUP_OBJECT_FILTER = config.get("LDAP_GROUP_OBJECT_FILTER")
 LDAP_GROUP_MEMBERS_FIELD = config.get("LDAP_GROUP_MEMBERS_FIELD")
 LDAP_GROUP_RDN = config.get("LDAP_GROUP_RDN")
 
+# Open a connection to the directory and try to authenticate with the given
+# username and password. If you get in, search for attributes from your user
+# record, and search again for the names of the groups you are in, if those
+# groups are in the right place in the directory.
+
 def ldap_fetch(username=None, name=None, passwd=None):
     try:
         server = Server(LDAP_HOST, get_info=ALL)
         dn = "{0}={1},{2}".format(LDAP_USER_OBJECTS_RDN, username, LDAP_SEARCH_BASE)
 
-        if username is not None and passwd is not None:
-            conn = Connection(server, dn, passwd, auto_bind=True)
-        else:
-            conn = Connection(LDAP_HOST, auto_bind=True)
+        conn = Connection(server, dn, passwd, auto_bind=True)
         conn.search(LDAP_SEARCH_BASE, 
                     '({0}={1})'.format(LDAP_USER_OBJECTS_RDN, username),
                     search_scope=SUBTREE,
@@ -64,7 +66,10 @@ def ldap_fetch(username=None, name=None, passwd=None):
     except LDAPBindError:
         return None
 
-class User(Base, UserMixin):
+# The user model, which returns some user attributes and the names of groups
+# you are in, which corresponds to the roles you have.
+
+class User(Base):
     username = Column(String(64), primary_key=True)
     
     def __init__(self, username=None, name=None, passwd=None, roles=None, mail=None):
@@ -85,7 +90,7 @@ class User(Base, UserMixin):
             self.active = True
 
     def is_active(self):
-        return self.active
+        return True
     
     def is_anonymous(self):
         return False
