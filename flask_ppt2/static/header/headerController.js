@@ -6,9 +6,11 @@
     .module("app.header")
     .controller("Header", Header);
   
-  Header.$inject = ["$rootScope", "$state", "projectListService", "loginStateService"];
+  Header.$inject = ["$rootScope", "$state", "projectListService", 
+                    "loginApiService", "loginStateService"];
   
-  function Header($rootScope, $state, projectListService, loginStateService) {
+  function Header($rootScope, $state, projectListService, loginApiService,
+                  loginStateService) {
     var vm = this;
     this.csrf_token = $rootScope.csrf_token;
     
@@ -23,7 +25,7 @@
 
     this.loggedIn = loginStateService.loggedIn;
     this.login = loginStateService.login;
-    this.logout = loginStateService.logout;
+    this.logout = loginApiService.logout;
 
     this.jumpToNextProject = jumpToNextProject;
     this.jumpToPreviousProject = jumpToPreviousProject;

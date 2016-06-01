@@ -87,8 +87,7 @@
               attributesService.updateProjAttrsFromRawItem('comment', 
                 [{name: 'commentID', value: {id: 0}}]);
             }
-          }
-        ]
+          }]
       })
       .state("project.comment.edit", {
         /** state for the project editing Comment sub-tab */

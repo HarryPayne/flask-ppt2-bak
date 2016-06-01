@@ -173,8 +173,8 @@
         method: "POST",
         url: "/getBreakdownByAttribute/" + service.masterList.breakdownAttr.id,
         headers: {
-		      "Content-Type": "application/json; charset=UTF-8",
-		      "X-CSRFToken": window.csrf_token
+          "Content-Type": "application/json; charset=UTF-8",
+          "X-CSRFToken": window.csrf_token
         }
       };
       $http(request)
@@ -191,8 +191,8 @@
         method: "POST",
         url: "/getBreakdownChoices",
         headers: {
-		      "Content-Type": "application/json; charset=UTF-8",
-		      "X-CSRFToken": window.csrf_token
+          "Content-Type": "application/json; charset=UTF-8",
+          "X-CSRFToken": window.csrf_token
         }
       };
       $http(request)

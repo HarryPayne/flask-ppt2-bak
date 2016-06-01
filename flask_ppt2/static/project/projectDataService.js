@@ -114,8 +114,8 @@
         method: "POST",
         url: "/getProjectAttributes/0",
         headers: {
-		      "Content-Type": "application/json; charset=UTF-8",
-		      "X-CSRFToken": window.csrf_token
+          "Content-Type": "application/json; charset=UTF-8",
+          "X-CSRFToken": window.csrf_token
         }
       };
       $http(request)
@@ -235,7 +235,7 @@
      *  @param {Object} params - a $stateParams object or a custom object
      *        with the same attributes, passed to the callback function.
      *  @callback setProjectData
-	   *  @returns {Object} - a promise that is resolved once the response 
+     *  @returns {Object} - a promise that is resolved once the response 
      *        from the back end has been saved.
      */
     function getProjectData(params) {
@@ -245,8 +245,8 @@
           method: "POST",
           url: "/getProjectAttributes/" + params.projectID,
           headers: {
-  		      "Content-Type": "application/json; charset=UTF-8",
-  		      "X-CSRFToken": window.csrf_token
+            "Content-Type": "application/json; charset=UTF-8",
+            "X-CSRFToken": window.csrf_token
           }
         };
         $http(request)
@@ -289,8 +289,8 @@
           method: "POST",
           url: "/getProjectAttributes/" + params.projectID,
           headers: {
-  		      "Content-Type": "application/json; charset=UTF-8",
-  		      "X-CSRFToken": window.csrf_token
+            "Content-Type": "application/json; charset=UTF-8",
+            "X-CSRFToken": window.csrf_token
           }
         };
         $http(request)

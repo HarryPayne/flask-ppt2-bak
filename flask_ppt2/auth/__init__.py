@@ -56,8 +56,8 @@ def getLoginToken():
 #     abort(400)
 
 @app.route("/logout", methods=["GET", "POST"])
-@login_required
+@jwt_required()
 def logout():
     """ Logout handler."""
     logout_user()
-    return redirect(url_for("index"))
+    return "You are logged out"

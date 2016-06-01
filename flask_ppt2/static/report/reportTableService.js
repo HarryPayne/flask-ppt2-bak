@@ -116,8 +116,8 @@
         method: "POST",
         url: "/getReportResults",
         headers: {
-	      "Content-Type": "application/json; charset=UTF-8",
-	      "X-CSRFToken": window.csrf_token
+          "Content-Type": "application/json; charset=UTF-8",
+          "X-CSRFToken": window.csrf_token
         },
         data: {query_string: encodeURIComponent(query_string),
                tableColumns: service.tableColumns()}
@@ -141,8 +141,8 @@
         method: "POST",
         url: "/getReportTableJSON",
         headers: {
-  	      "Content-Type": "application/json; charset=UTF-8",
-  	      "X-CSRFToken": window.csrf_token
+          "Content-Type": "application/json; charset=UTF-8",
+          "X-CSRFToken": window.csrf_token
         },
         data: {projectID: projectListService.getSelectedIds(),
                tableColumns: service.tableColumns()}

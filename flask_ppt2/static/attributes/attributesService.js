@@ -557,8 +557,8 @@ Data attributes:
           method: "POST",
           url: "/getAllAttributes",
           headers: {
-	  	      "Content-Type": "application/json; charset=UTF-8",
-	  	      "X-CSRFToken": window.csrf_token
+            "Content-Type": "application/json; charset=UTF-8",
+            "X-CSRFToken": window.csrf_token
           }
       }
       $http(request)
@@ -608,8 +608,8 @@ Data attributes:
         method: "POST",
         url: "/getFormlyFields",
         headers: {
-		      "Content-Type": "application/json; charset=UTF-8",
-		      "X-CSRFToken": window.csrf_token
+          "Content-Type": "application/json; charset=UTF-8",
+          "X-CSRFToken": window.csrf_token
         }
       };
       $http(request)

@@ -41,10 +41,10 @@
           function($scope, $uibModalInstance) {
             $scope.modalOptions = currentOptions;
             $scope.modalOptions.ok = function(result) {
-            	$uibModalInstance.close(result);
+              $uibModalInstance.close(result);
             };
             $scope.modalOptions.close = function(result) {
-            	$uibModalInstance.dismiss("cancel");
+              $uibModalInstance.dismiss("cancel");
             };
           }
         ];

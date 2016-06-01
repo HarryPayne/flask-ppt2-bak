@@ -17,6 +17,10 @@
   stateLocationRun.$inject = ["$rootScope", "$state", "stateLocationService"];
 
   function stateLocationRun($rootScope, $state, stateLocationService) {
+    $rootScope.$on('$stateChangeStart', function(event, toState, toParams) {
+      $state;
+    });
+
     $rootScope.$on('$stateChangeSuccess', function(event, toState, toParams) {
       stateLocationService.stateChange();
     });

@@ -9,9 +9,6 @@
   LoginInjector.$inject = ["$q", "$injector", "$timeout"];
 
   function LoginInjector($q, $injector, $timeout) {
-    //var loginService, $http, $state;
-    //var loginService;
-
     /* Avoid `Uncaught Error: [$injector:cdep] Circular dependency found` */
     /* http://brewhouse.io/blog/2014/12/09/authentication-made-simple-in-single-page-angularjs-applications.html */ 
     $timeout(function () { 
@@ -40,7 +37,6 @@
               deferred.resolve( $http(rejection.config) );
             },
             function () {
-              //$state.go("select.home");
               deferred.reject(rejection);
             }
           );

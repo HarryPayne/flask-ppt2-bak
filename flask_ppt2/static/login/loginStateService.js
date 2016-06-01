@@ -12,10 +12,10 @@
     .module("app.login")
     .factory("loginStateService", loginStateService);
   
-  loginStateService.$inject = ["$rootScope", "$http", "store", "jwtHelper", 
+  loginStateService.$inject = ["$rootScope", "$http", "$state", "store", "jwtHelper", 
                                "loginService"];
   
-  function loginStateService($rootScope, $http, store, jwtHelper, loginService) {
+  function loginStateService($rootScope, $http, $state, store, jwtHelper, loginService) {
     var service = {
       can_edit_roles: ["Curator", "Manager"],
       can_add_project_roles: ["Curator"],
@@ -25,7 +25,6 @@
       hasRole: hasRole,
       loggedIn: loggedIn,
       login: login,
-      logout: logout,
       SaveState: SaveState,
       RestoreState: RestoreState
     };
@@ -71,16 +70,26 @@
     }
     
     /**
-     *  @name loginService
+     *  @name login
      *  @desc Instantiate a service that opens a login modal popup.
-     */ 
+     */
     function login() {
-      loginService();
-    }
-
-    function logout() {
-      store.remove('jwt');
-      delete $rootScope.currentUser;
+      var currentState = $state.current;
+      var currentParams = $state.params;
+      loginService()
+        .then(
+          function () {
+            $state.go(currentState, currentParams);
+          },
+          function () {
+            if (currentState && currentState.data.loginRequired) {
+              $state.go("select.home");
+            }
+            else if (currentState) {
+              $state.go(currentState, currentParams)
+            }
+          }
+        );
     }
 
     function SaveState() {

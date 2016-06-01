@@ -1,9 +1,9 @@
 (function() {
 
-	/**
-   * 	@name loginService
-   *  @desc	A factory for a service that opens a Bootstrap modal that contains
-   *  			the login form.
+/**
+   *  @name loginService
+   *  @desc A factory for a service that opens a Bootstrap modal that contains
+   *        the login form.
    */
   "use strict";
   

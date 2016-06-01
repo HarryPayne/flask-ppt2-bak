@@ -443,8 +443,8 @@
           method: "POST",
           url: "/getBriefDescriptions",
           headers: {
-	  	      "Content-Type": "application/json; charset=UTF-8",
-	  	      "X-CSRFToken": window.csrf_token
+            "Content-Type": "application/json; charset=UTF-8",
+            "X-CSRFToken": window.csrf_token
           }
       }
       $http(request)

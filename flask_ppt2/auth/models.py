@@ -37,7 +37,10 @@ def ldap_fetch(username=None, name=None, passwd=None):
         server = Server(LDAP_HOST, get_info=ALL)
         dn = "{0}={1},{2}".format(LDAP_USER_OBJECTS_RDN, username, LDAP_SEARCH_BASE)
 
-        conn = Connection(server, dn, passwd, auto_bind=True)
+        if username is not None and passwd is not None:
+            conn = Connection(server, dn, passwd, auto_bind=True)
+        else:
+            return None
         conn.search(LDAP_SEARCH_BASE, 
                     '({0}={1})'.format(LDAP_USER_OBJECTS_RDN, username),
                     search_scope=SUBTREE,
