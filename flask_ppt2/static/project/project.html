@@ -63,20 +63,38 @@
       <p class="form-control-static">{{model[options.key]}}</p>
       </div>
     </script>
+    <script type="text/ng-template" id="textarea-template.html">
+    <div>
+      <textarea ng-if="!formState.readOnly" class="form-control" ng-bind="model[options.key]"></textarea>
+      <p ng-if="formState.readOnly" class="form-control-static">{{model[options.key]}}</p>
+      </div>
+    </script>
     <script type="text/ng-template" id="displayTextArea-template.html">
-    <div
+    <div>
       <p class="form-control-static">{{model[options.key].split("\n\n").join("<br><br>")}}</p>
       </div>
     </script>
     <script type="text/ng-template" id="displayDate-template.html">
-    <div
-      <p class="form-control-static">{{model[options.key]}}</p>
+    <div>
+      <p class="form-control-static">{{model[options.key].toLocaleDateString()}}</p>
+      </div>
+    </script>
+    <script type="text/ng-template" id="displayDaterange-template.html">
+    <div>
+      <p class="form-control-static">FY{{model[options.key].start.get("year")}} Q{{model[options.key].end.get("quarter")}} 
+      </p>
       </div>
     </script>
     <script type="text/ng-template" id="displayTimestamp-template.html">
-    <div
-      <p class="form-control-static">{{Date(model[options.key]).toShortDateString()}} {{(Date(model[options.key])).toLongTimeString()}} 
+    <div>
+      <p class="form-control-static">{{model[options.key] | date:"medium"}} 
       </p>
+      </div>
+    </script>
+    <script type="text/ng-template" id="input-template.html">
+    <div>
+      <input ng-if="!formState.readOnly" class="form-control" ng-model="model[options.key]">
+      <p ng-if="formState.readOnly" class="form-control-static">{{model[options.key]}}</p>
       </div>
     </script>
     <script type="text/ng-template" id="input-template.html">

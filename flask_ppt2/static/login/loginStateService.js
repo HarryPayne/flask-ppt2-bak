@@ -32,14 +32,14 @@
     return service;    
     
     function canAddComments() {
-      if (service.loggedIn()) {
+      if ($rootScope.currentUser) {
         return true;
       }
       return false;
     }
 
     function canAddProjects() {
-      if (service.loggedIn()) {
+      if ($rootScope.currentUser) {
         if (_.intersection($rootScope.currentUser.roles, service.can_add_project_roles)) {
           return true;
         }
@@ -48,7 +48,7 @@
     }
 
     function canEditProjects() {
-      if (service.loggedIn()) {
+      if ($rootScope.currentUser) {
         if (_.intersection($rootScope.currentUser.roles, service.can_edit_roles)) {
           return true;
         }
@@ -57,7 +57,7 @@
     }
 
     function hasRole(role) {
-      if (service.loggedIn()) {
+      if ($rootScope.currentUser) {
         if (_.contains($rootScope.currentUser.roles, role)) {
           return true;
         }

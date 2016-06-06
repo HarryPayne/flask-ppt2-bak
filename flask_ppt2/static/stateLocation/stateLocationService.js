@@ -69,7 +69,7 @@
       //var hashless_loc = location.substring(0, _.lastIndexOf(location, "#"));
       var entry = stateHistoryService.get(location);
       if (entry == null) {
-        return; //var entry = service.getStateFromLocation();
+        return;   //entry = service.getStateFromLocation();
       }
       //if ("projectID" in entry.params) {
       //  projectListService.setProjectID(entry.params.projectID);
@@ -116,7 +116,6 @@
           state.params.projectID = parseInt(path[0]);
         }
       }
-
       else if (base == "filter") {
         if (path[1] == "attributes") {
           state.name = "filter.builder.attributes";
@@ -193,6 +192,9 @@
         url = $location.hash(hash);
       }
       else if (tab == "report") {
+        url = $location.hash(hash);
+      }
+      else if (tab == "home") {
         url = $location.hash(hash);
       }
       if (typeof url == "object") {

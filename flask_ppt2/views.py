@@ -7,8 +7,9 @@ import sys
 
 from flask import (abort, flash, g, json, jsonify, redirect,
                    render_template, request, url_for)
-from flask_jwt import current_identity, jwt_required
 from flask_cors import cross_origin
+from flask_jwt import current_identity, jwt_required
+from flask_principal import Permission, RoleNeed
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.urls import url_decode, url_unquote
 
@@ -22,6 +23,13 @@ import flask_ppt2.alchemy_models as alch
 # from migrate.versioning.schemadiff import ColDiff
 # from sqlalchemy.util import symbol
 # from flask_ppt2.alchemy_models import DBmetadata
+
+# Create a flask_principal permission that requires the user to have 
+# the "Curator" role. Used to protect all methods that change data on
+# the back end.
+
+curator_permission = Permission(RoleNeed("Curator"))
+curator_permission.description = "User must be a Curator"
 
 # Don't mess with the user table, defined in the auth module.
 TABLE_MODELS = [getattr(alch, t.name.capitalize())
@@ -56,7 +64,7 @@ def index():
 # holds the data for the fields, and a "fields" attribute that holds a list
 # of formly attribute objects.
 
-@app.route("/getFormlyFields", methods=['POST'])
+@app.route("/getFormlyFields", methods=["GET", 'POST'])
 def get_formly_fields():
     """Return a dictionary of angular-formly form definitions.
 
@@ -883,7 +891,7 @@ def get_datatable_options(rows):
 # The idea is that the client will merge the project data generated here with
 # the list of attributes sent out once at the beginning of the session.
 
-@app.route("/getProjectAttributes/<projectID>", methods=['POST'])
+@app.route("/getProjectAttributes/<projectID>", methods=["GET", 'POST'])
 def getProjectAttributesJSON(projectID):
     """Send attribute values for project as JSON."""
     attributes = getProjectAttributes(projectID)
@@ -893,7 +901,7 @@ def getProjectAttributesJSON(projectID):
 def getProjectAttributes(projectID, table_name=None):
     """Return database data as JSON."""
     # Get data from database.
-    p = alch.Description.query.filter_by(projectID=projectID).first()
+    p = db.session.query(alch.Description).filter_by(projectID=projectID).first()
     if not p:
         # send back forms with no data (for creating a new project)
         p = alch.Description()
@@ -966,14 +974,10 @@ def updateFromForm(model, result, lastModified, lastModifiedBy):
     return form, errors
 
 @app.route("/projectEdit/<projectID>/<tableName>", methods=["POST"])
-@cross_origin(headers=['Content-Type', 'Authorization'])
 @jwt_required()
+@curator_permission.require(http_exception=403)
 def projectEdit(projectID, tableName):
     """ Update specified table for specified project."""
-    if 'Curator' not in current_identity.groups:
-        # Must be a Curator to edit project.
-        abort(401)
-
     if projectID:
         p = db.session.query(alch.Description).join(alch.Portfolio)
         p = p.filter_by(projectID=projectID).first()
@@ -1061,6 +1065,7 @@ def projectEdit(projectID, tableName):
 @app.route("/projectCreate", methods=["POST"])
 @cross_origin(headers=['Content-Type', 'Authorization'])
 @jwt_required()
+@curator_permission.require()
 def projectCreate():
     """Create new project."""
     if 'Curator' not in current_identity.groups:

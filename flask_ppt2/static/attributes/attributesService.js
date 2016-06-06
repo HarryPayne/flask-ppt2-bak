@@ -45,8 +45,12 @@ Data attributes:
       getAttribute: getAttribute,
       getAllAttributes: getAllAttributes,
       getFormData: getFormData,
+      getFormlyContainerNames: getFormlyContainerNames,
       getFormlyOptions: getFormlyOptions,
+      getFormlyField: getFormlyField,
       getFormlyFields: getFormlyFields,
+      getFormlyFieldsDict: getFormlyFieldsDict,
+      getFormlyFormNames: getFormlyFormNames,
       getKeys: getKeys,
       getProjectAttributes: getProjectAttributes,
       getRawAttributes: getRawAttributes,
@@ -54,6 +58,8 @@ Data attributes:
       getServerError: getServerError,
       getToken: getToken, 
       hasAValue: hasAValue,
+      hasFormlyFields: hasFormlyFields,
+      make_ordered_hash: make_ordered_hash,
       makeProjectLink: makeProjectLink,
       mergeAttributeWithValue: mergeAttributeWithValue,
       newProjectAttributes: newProjectAttributes,
@@ -71,8 +77,10 @@ Data attributes:
 
     service.RestoreState();
     if (typeof service.formlyFields == "undefined") {
-      $timeout(function() {
         service.updateFormlyFields();
+    }
+    
+    if (typeof service.formlyOptions == "undefined") {
         service.formlyOptions = {
           view: {formState: {
               horizontalLabelClass: 'col-sm-2',
@@ -89,7 +97,6 @@ Data attributes:
 
           }
         }
-      });
     }
     
     $rootScope.$on("savestate", service.SaveState);
@@ -191,15 +198,15 @@ Data attributes:
     };
     
     /**
-     * @name getFormData
-     * @desc Return an object with data from the edit form for the specified
+     *  @name getFormData
+     *  @desc Return an object with data from the edit form for the specified
      *        table. This object is suitable for being serialized and sent back
      *        to the server to update the table.
-     * @param {string} tableName - the name of the table being edited/inserted
-     * @param {Object[]} keys - a list of {name, value} objects used to 
+     *  @param {string} tableName - the name of the table being edited/inserted
+     *  @param {Object[]} keys - a list of {name, value} objects used to 
      *        identify the entity of interest in tables that are many-to-one
      *        with projectID.
-     * @returns {Object} formData - an object where keys are attribute names
+     *  @returns {Object} formData - an object where keys are attribute names
      *        and values are :
      *          {value: {id: number}} if attr.value has an "id" attribute, or
      *          {value: string||number||date||datetime} if it does not.
@@ -223,9 +230,23 @@ Data attributes:
       }
       return formData;
     };
+    
+    /**
+     *  @name getFormlyContainerNames
+     *  @desc Return a list of keys which, by naming convention, would contain
+     *        a list objects representing a form/database table. The convention
+     *        is to append an "s" to the end of the name. So "comments" would
+     *        contain "comment" objects and "strategys" would hold strategy
+     *        objects.
+     *  @returns {Object[]} a list of strings
+     */
+    function getFormlyContainerNames() {
+      var table_names = service.getFormlyFormNames();
+      return _.map(table_names, function(name){return name+"s";})
+    }
 
     /**
-     *   @name getFormlyOptions
+     *  @name getFormlyOptions
      *  @desc Return formly options for the current project tab mode
      *  @param {String} mode  "view" for display mode otherwise a project 
      *         subtab name like "description.edit"
@@ -239,6 +260,16 @@ Data attributes:
         return service.formlyOptions.edit;
       }
     };
+
+    /**
+     *  @name getFormlyField
+     *  @desc Return the formlyField whose key is given.
+     *  @param {string} key - name ("key" actually) of the requested field
+     *  @return {Object} - a formlyField object
+     */
+    function getFormlyField(key) {
+      return service.formlyFieldsDict[key];
+    }
     
     /**
      *  @name getFormlyFields
@@ -248,6 +279,25 @@ Data attributes:
      */
     function getFormlyFields(tableName) {
       return service.formlyFields[tableName];
+    }
+
+    /**
+     *  @name getFormlyFieldsDict
+     *  @desc Return the object whose keys are the names of formly fields
+     *        and whose values are the fields themselves.
+     *  @returns {Object} service.formlyFieldsDict
+     */
+    function getFormlyFieldsDict() {
+      return service.formlyFieldsDict
+    }
+
+    /**
+     *  @name getFormlyFormNames
+     *  @desc Return a list of from names, which is the list of keys on the
+     *        object that holds list of from fields by table name.
+     */
+    function getFormlyFormNames() {
+      return Object.keys(service.formlyFields);
     }
 
     /**
@@ -370,10 +420,28 @@ Data attributes:
       else return false;
     }
 
+    function hasFormlyFields() {
+      if (typeof service.formlyFields != "undefined" && service.formlyFields.length > 0) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+
     function getToken() {
       return service.csrf_token;
     }
     
+    /**
+     *  @name make_ordered_hash 
+     *  @desc Return an ordered hash/dictionary object 
+     *  
+     */
+    function make_ordered_hash() {
+      return;
+    }   
+       
     function makeProjectLink(projectID) {
       return "project link here";
     };
@@ -433,6 +501,7 @@ Data attributes:
       if (data) {
         service.formlyFields = data.formlyFields;
         service.formlyOptions = data.formlyOptions;
+        service.formlyFieldsDict = data.formlyFieldsDict;
         service.currentState = data.currentState;
       }
     };
@@ -441,6 +510,7 @@ Data attributes:
       var data = new Object;
       data.formlyFields = service.formlyFields;
       data.formlyOptions = service.formlyOptions;
+      data.formlyFieldsDict = service.formlyFieldsDict;
       data.currentState = service.currentState;
       sessionStorage.attributesService = angular.toJson(data);
     };
@@ -615,7 +685,15 @@ Data attributes:
       $http(request)
         .then(function(response) {
           service.formlyFields = response.data;
-          deferred.resolve();
+          service.formlyFieldsDict = new Object;
+          /* Loop over all fields in all forms and insert them into a hash for
+           * looking up fields elsewhere in the app. */
+          _.each(Object.keys(service.formlyFields), function(key) {
+            _.each(response.data[key], function(field) {
+              service.formlyFieldsDict[field.key] = field;
+            });
+          });
+          deferred.resolve([formlyFields, formlyFieldsDict]);
         });
       return deferred.promise;
     }

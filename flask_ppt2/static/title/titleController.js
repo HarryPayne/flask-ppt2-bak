@@ -17,7 +17,10 @@
     $rootScope.$on("$locationChangeSuccess", function(e, toState){
       var state = stateLocationService.getStateFromLocation();
       var tab = _.first(state.name.split("."));
-      if (tab == "select") {
+      if (tab == "home") {
+        vm.pageTitle = "PPT: Home";
+      }
+      else if (tab == "select") {
         vm.pageTitle = "PPT: Select";
       }
       else if (tab == "filter") {

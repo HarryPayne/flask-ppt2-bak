@@ -8,7 +8,6 @@ SECRET_KEY = '$66i#]Wbxf;289kTdijVr+RFFgGkKFsafAXWjkjsPPBTaKLqKy'
 WTF_CSRF_ENABLED = True
 WTF_CSRF_SECRET_KEY = SECRET_KEY
 
-#SQLALCHEMY_DATABASE_URI = "mysql://root:stormy@localhost/projects"
 SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://payne:stormy@localhost/ppt"
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, '..', 'db_repository')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -16,7 +15,6 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 # LDAP authentication and authorization by group roles
 # Users whose user name matches a distinguished name under LDAP_SEARCH_BASE and
 # are the right kind of member of the right kind of group are granted the role
-# 
 LDAP_HOST = "localhost"
 LDAP_SEARCH_BASE = "ou=people,o=test"
 LDAP_USER_OBJECTS_RDN = "uid"
@@ -26,7 +24,7 @@ LDAP_GROUP_MEMBERS_FIELD = "uniquemember"
 LDAP_GROUP_RDN = "cn"
 
 # JWT options
-# 10 hours
+# Expire after 10 hours
 # TODO: get renewal working?
 JWT_EXPIRATION_DELTA = timedelta(hours=10)
 JWT_AUTH_HEADER_PREFIX  = "bearer"

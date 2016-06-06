@@ -65,6 +65,8 @@
             </div>
             <div class="collapse navbar-collapse headerNavCollapse">
                 <ul class="nav navbar-nav">
+                  <!-- li role="presentation" ng-class="{active:header.isActive('home')}">
+                    <a ui-sref="home.index">Home</a></li -->
                   <li role="presentation" ng-class="{active:header.isActive('select')}">
                     <a ui-sref="select.home">Select</a></li>
                   <li role="presentation" ng-class="{active:header.isActive('filter')}">
@@ -134,6 +136,9 @@
     <script type="text/javascript" src="/static/vendor/api-check/dist/api-check.min.js"></script>
     <script type="text/javascript" src="/static/vendor/angular-formly/dist/formly.js"></script>
     <script type="text/javascript" src="/static/vendor/angular-formly-templates-bootstrap/dist/angular-formly-templates-bootstrap.js"></script>
+    <script type="text/javascript" src="/static/vendor/moment/moment.js"></script>
+    <script type="text/javascript" src="/static/vendor/angular-moment/angular-moment.min.js"></script>
+    <script type="text/javascript" src="/static/vendor/moment-range/dist/moment-range.js"></script>
 
     {% if minified %}
     <script type="text/javascript" src="/static/min/flask-ppm-tool.min.js"></script>
@@ -179,6 +184,11 @@
 
     <script type="text/javascript" src="/static/header/app.header.js"></script>
     <script type="text/javascript" src="/static/header/headerController.js"></script>
+    
+    <!-- script type="text/javascript" src="/static/home/app.home.js"></script>
+    <script type="text/javascript" src="/static/home/homeConfig.js"></script>
+    <script type="text/javascript" src="/static/home/homeController.js"></script>
+    <script type="text/javascript" src="/static/home/homeSubHeadingsDirective.js"></script -->
 
     <script type="text/javascript" src="/static/login/app.login.js"></script>
     <script type="text/javascript" src="/static/login/loginApiService.js"></script>

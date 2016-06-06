@@ -29,13 +29,15 @@
     .module("app.project")
     .factory("projectDataService", projectDataService);
   
-  projectDataService.$inject = ["$rootScope", "$http", "$state", "$stateParams", "$q",
-                                "$location", "$timeout", "attributesService", "loginStateService", 
+  projectDataService.$inject = ["$rootScope", "$http", "$state", "$stateParams", 
+                                "$q", "$location", "$timeout", "moment",
+                                "attributesService", "loginStateService", 
                                 "projectListService", "stateLocationService"];
   
   function projectDataService($rootScope, $http, $state, $stateParams, $q,
-                              $location, $timeout, attributesService, loginStateService,
-                              projectListService, stateLocationService) {
+                              $location, $timeout, moment, attributesService, 
+                              loginStateService, projectListService, 
+                              stateLocationService) {
     
     /** service to be returned by this factory */
     var service = {
@@ -47,15 +49,18 @@
       currentMode: currentMode,
       currentSubtab: currentSubtab,
       editMode: editMode,
+      //getFieldDataFromResult: getFieldDataFromResult,
       getProjectData: getProjectData,
       getProjectDataValues: getProjectDataValues,
       getProjectAttributes: attributesService.getProjectAttributes,
       getProjectDataFromLocation: getProjectDataFromLocation,
       hideDetails: hideDetails,
       initService: initService,
+      jsonToModel: jsonToModel,
       jumpToAtachFile: jumpToAtachFile,
       jumpToAddForm: jumpToAddForm,
       jumpToNewProject: jumpToNewProject,
+      modelToJSON: modelToJSON,
       printValue: attributesService.printValue,
       RestoreState: RestoreState,
       saveProject: saveProject,
@@ -64,13 +69,15 @@
       showDetails: showDetails,
       showEditSuccess: showEditSuccess,
       stateParams: $stateParams,
+      tableToJSON: tableToJSON,
+      valueToJSON: valueToJSON,
       viewUrl: $state.current.data ? $state.current.data.viewUrl : "",
     };
     
-    service.RestoreState();
-    if (typeof service.getProjectAttributes() == "undefined" && service.restoredParams) {
-      service.getProjectDataValues(service.restoredParams);
-    }
+//    service.RestoreState();
+//    if (typeof service.getProjectAttributes() == "undefined" && service.restoredParams) {
+//      service.getProjectDataValues(service.restoredParams);
+//    }
     
     $rootScope.$on("savestate", service.SaveState);
     $rootScope.$on("restorestate", service.RestoreState);
@@ -83,6 +90,9 @@
           /** then the list of project brief descriptions is empty. Get it */
           projectListService.updateAllProjects()
             .then(service.initService);
+        }
+        if (!attributesService.hasFormlyFields()) {
+          attributesService.getFormlyFields();
         }
         service.RestoreState();
         if (typeof service.projectID == "undefined" || 
@@ -259,14 +269,6 @@
               var keys = [commentID];
               attributesService.updateProjAttrsFromRawItem("comment", keys);
             }
-            else if ("disposedInFY" in params || "disposedInQ" in params) {
-              var disposedInFY = attributesService.getAttribute("disposedInFY");
-              disposedInFY.value.id = params.disposedInFY;
-              var disposedInQ = attributesService.getAttribute("disposedInQ");
-              disposedInQ.value.id = params.disposedInQ;
-              var keys = [disposedInFY, disposedInQ];
-              attributesService.updateProjAttrsFromRawItem("disposition", keys);
-            }
             deferred.resolve(params);
         });
       }
@@ -298,6 +300,7 @@
             service.setProjectData(response, params);
             deferred.resolve(params);
         });
+        return deferred.promise;
       }
     }
     
@@ -325,14 +328,14 @@
      *        sub-tab, respectively. Add a Comment users may not have a role
      *        that gives them access to the edit view, in which case they are
      *        taken back to view mode/state project.detail.
-     * @param {string} tableName - "comment" for Add a Comment, "disposition" 
+     * @param {string} table_name - "comment" for Add a Comment, "disposition" 
      *        for Add a Disposition.
      * @param {Object[]} keys - 
      */
-    function hideDetails(tableName, keys) {
-      var selected = attributesService.updateProjAttrsFromRawItem(tableName, keys);
+    function hideDetails(table_name, keys) {
+      var selected = attributesService.updateProjAttrsFromRawItem(table_name, keys);
       if (loginStateService.canEditProjects()) {
-        $state.go("project." + tableName + ".edit", {projectID: $state.params.projectID});
+        $state.go("project." + table_name + ".edit", {projectID: $state.params.projectID});
       }
       else {
         $state.go("project.detail", {projectID: $state.params.projectID});
@@ -386,6 +389,61 @@
     };
     
     /**
+     *  @name jsonToModel
+     *  @desc Scan the json for ISO 8601 strings and turn them into objects.
+     *        Changes are made in place and nothing is returned. Original from:
+     *          http://aboutcode.net/2013/07/27/json-date-parsing-angularjs.html
+     *
+     *        Modified for date range, which is two date strings joined by "/". 
+     *        Requires moment and moment-range.
+     *  @param {Object} json object to be scanned.
+     *  @returns {Object} - a fully copy of the input json, with date strings
+     *        turned into date, datetime, or date range objects.
+     */
+    function jsonToModel(json) {
+      // No processing for things that are not objects.
+      if (typeof json !== "object") return json;
+
+      var model = new Object;
+      _.each(Object.keys(json), function(key) {
+        if (!json.hasOwnProperty(key)) return;
+
+        var json_value = json[key];
+        var match;
+        
+        // Check for string value that looks like a date.
+        if (typeof json_value === "string" && (match = json_value.match(/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/))) {
+          var milliseconds = Date.parse(match[0])
+          if (!isNaN(milliseconds)) {
+            model[key] = moment(match[0]).utc();
+          }
+        } 
+        
+        // Otherwise check for daterange strings
+        else if (typeof json_value === "string" && json_value.split("/").length == 2) {
+          var values = json_value.split("/");
+          var dates = new Object;
+          dates.value0 = values[0];
+          dates.value1 = values[1];
+
+          var range_model = jsonToModel(dates);
+          if ((range_model.value0 != values[0] || values[0] == "") && 
+              (range_model.value1 != values[1] || values[1] == "")) {
+             model[key] = moment.range(range_model.value0, range_model.value1);
+          }
+        } 
+        else if (json_value !== null && typeof json_value === "object") {
+          // Recurse into object
+          model[key] = jsonToModel(json_value);
+        }
+        else {
+          model[key] = json_value;
+        }
+      });
+      return model;
+    }
+
+    /**
      *  @name jumpToAddForm
      *  @desc Prepare for adding a comment or disposition by nulling out the
      *        project attribute values for the corresponding table. To make
@@ -393,29 +451,47 @@
      *        cannot be true for primary key columns. After clearing out the
      *        data, 
      */
-    function jumpToAddForm(tableName, keys) {
-      attributesService.updateProjAttrsFromRawItem(tableName, keys);
-      if (_.contains(["comment", "disposition"], tableName)) {
-        $state.go("project." + tableName + ".edit", {projectID: $state.params.projectID});
+    function jumpToAddForm(table_name, keys) {
+      attributesService.updateProjAttrsFromRawItem(table_name, keys);
+      if (_.contains(["comment", "disposition"], table_name)) {
+        $state.go("project." + table_name + ".edit", {projectID: $state.params.projectID});
       }
-      $state.go("project." + tableName + ".add", {projectID: $state.params.projectID});
-    };
+      $state.go("project." + table_name + ".add", {projectID: $state.params.projectID});
+    }
 
     /**
      * @name jumpToNewProject
      * @desc After a new project has been created, jump to the edit view of 
-     *        that project
+     *        that project.
      */
     function jumpToNewProject(projectID) {
       projectListService.updateAllProjects(projectID);
       $state.go("project.description.edit", {projectID: projectID});
+    }
+    
+    /**
+     * @name modelToJSON
+     * @desc Convert the service's project model, which contains Javascript
+     *       date objects, into JSON suitable for saving and restoring.
+     */
+    function modelToJSON(model) {
+      if (typeof model == "undefined") return;
+      var json = new Object;
+      var keys = Object.keys(model);
+      
+      _.each(keys, function(key) {
+        var value = model[key];
+        json[key] = valueToJSON(key, value);
+      });
+      return json;
     }
 
     function RestoreState() {
       if (typeof sessionStorage.projectDataServiceAttributes != "undefined") {
         var data = angular.fromJson(sessionStorage.projectDataServiceAttributes);
         service.restoredParams = data.params;
-        service.projectModel = data.projectModel;
+        service.csrf_token = data.csrf_token;
+        service.projectModel = service.jsonToModel(data.projectModel);
       }
     };
 
@@ -424,55 +500,44 @@
      * @desc Save edits made to the specified table by sending data back to the
      *        server. Revised data for that table (and a fresh csrf token) are
      *        returned, along with success or error messages.
-     * @param {string} tableName - the name of the table being updated.
+     * @param {string} table_name - the name of the table being updated.
      * @param {Object[]} keys - list of primary key values used to identify the
      *        record of interest if the table is one-to-many with projectID.
      */
-    function saveProject(tableName, keys) {
-      //var formData = attributesService.getFormData(tableName, keys);
-      var formData = new Object;
-
-      /* Copy data values from the model to the formData object, using only
-       * the fields for the requested table. Integer values of option ids
-       * mess up SQLAlchemy on the back end, preventing it from finding 
-       * matching list table objects. The last modification data need to
-       * be added in the backend, for security. */
-      _.each(attributesService.getFormlyFields(tableName), function(field) {
-        if (field.key.match(/lastModified\b/ig)) return;
-        if (field.key.match(/lastModifiedBy\b/ig)) return;
-        var data = service.projectModel[field.key]
-        formData[field.key] = typeof data != "number" ? data : data.toString(); 
-      });
-      formData.csrf_token = service.csrf_token;
+    function saveProject(table_name, keys) {
+      //var formData = attributesService.getFormData(table_name, keys);
       var projectID = $state.params.projectID ? $state.params.projectID : "";
       var request = {
         method: "POST",
-        url: "/projectEdit/" + projectID + "/" + tableName,
+        url: "/projectEdit/" + projectID + "/" + table_name,
         headers: {
-          //"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
           "Content-Type": "application/json; charset=UTF-8",
           "X-CSRFToken": service.csrf_token
         },
-        //data: jQuery.param(formData, true)
-        data: formData // jQuery.param(formData, true)
+        data: tableToJSON(table_name, service.projectModel) 
       };
-      $http(request)
-        .then(function (request) {
-          service.setProjectData(request, keys);
-          service.noCheck = true;
-          var stateName = tableName;
-          if (tableName == "project") {
-            stateName = "projectMan";
+       $http(request)
+        .then(function (response) {
+          if (response.status == 200) {
+              service.setProjectData(response, keys);
+              service.noCheck = true;
+              var stateName = table_name;
+              if (table_name == "project") {
+                stateName = "projectMan";
+              }
+              $state.go("project." + stateName + ".edit", {projectID: $state.params.projectID, noCheck: true});
           }
-          $state.go("project." + stateName + ".edit", {projectID: $state.params.projectID, noCheck: true});
         });
-    };
+    }
 
     function SaveState() {
+      if (typeof service.projectModel == "undefined") return;
+      
       var data = new Object;
       data.params = stateLocationService.getStateFromLocation().params;
-      data.projectModel = service.projectModel
-      sessionStorage.projectDataServiceAttributes = angular.toJson(data);
+      data.csrf_token = service.csrf_token;
+      data.projectModel = service.projectModel; 
+      sessionStorage.projectDataServiceAttributes = angular.toJson(service.modelToJSON(data));
     };
       
     /**
@@ -482,25 +547,23 @@
      *        and handle success/error messages.
      */
     function setProjectData(result, params) {
-      //return;
-      service.projectID = projectListService.getProjectID();
+      service.projectID = result.data.projectID;
       service.csrf_token = result.data.csrf_token;
+      service.success = result.data.success;
+      service.error = result.data.error;
+
       if (typeof service.projectModel == "undefined") {
-        service.projectModel = result.data.formData;
+        service.projectModel = jsonToModel(result.data.formData);
       }
       else {
-        _.each(Object.keys(result.data.formData), function(key){
-          service.projectModel[key] = result.data.formData[key];
-        });
+        Object.assign(service.projectModel, jsonToModel(result.data.formData))
       }
+
+      service.SaveState();
 
       // Make the project sent back be the current project:
       projectListService.setProjectID(result.data.projectID);
-      //attributesService.updateProjectAttributes(result, params);
-      service.success = result.data.success;
-      service.error = attributesService.server_error;
-      service.SaveState();
-      //attributesService.SaveState();
+
       /** mark the form as $pristine. Only the controller can do that so give
           it a ping. */
       $rootScope.$broadcast("setProjectFormPristine");
@@ -515,16 +578,16 @@
      *        linked to those edit buttons. The data for the selected item is
      *        copied into the project attributes for this project and then
      *        handled like a table that is one-to-one with projectID.
-     * @param {string} tableName
+     * @param {string} table_name
      * @param {Object} keys
      */
-    function showDetails(tableName, keys) {
-      var selected = attributesService.updateProjAttrsFromRawItem(tableName, keys);
-      if (tableName == 'comment') {
+    function showDetails(table_name, keys) {
+      var selected = attributesService.updateProjAttrsFromRawItem(table_name, keys);
+      if (table_name == 'comment') {
         $state.go("project.comment.edit.detail", 
                   {projectID: service.projectID, commentID: selected.commentID});
       }
-      if (tableName == 'disposition') {
+      if (table_name == 'disposition') {
         $state.go("project.disposition.edit.detail", 
                   {projectID: projectListService.getProjectID(), 
                    disposedInFY: selected.disposedInFY.id,
@@ -541,6 +604,107 @@
      */
     function showEditSuccess() {
       return Boolean(_.contains(projectForm.classList, "ng-pristine") && service.success);
+    }
+    
+    /**
+     *  @name tableToJSON
+     *  @desc Take a form model for a specified table (where dates are 
+     *        represented by javascript Date objects) and return pure JSON. We 
+     *        need this for sending form data to the back end. 
+     *        Companion to jsonToModel. 
+     *  @params {Object} model - model with Date objects.
+     *  @returns {Object} JSON object
+     */
+    function tableToJSON(table_name, model) {
+      var fields = attributesService.getFormlyFields(table_name);
+      var form_data = new Object;
+      form_data.csrf_token = service.csrf_token;
+      
+      // Iterate over table fields
+      _.each(fields, function (field) {
+        var key = field.key;
+        var value = model[field.key];
+        form_data[key] = valueToJSON(key, value);
+      });
+      return form_data;
+    }
+        
+    /**
+     * @name valueToJSON
+     * @desc Convert a value in the project model to JSON. The primary use is
+     *       to convert Date objects back into JSON for storage on the back
+     *       end, in a format appropriate to a picky back end. Our back end
+     *       (SQLAlchemy) is picky, so the JSON for a Date column cannot have
+     *       a time in it. We use momentJS to get the control we need, and
+     *       moment-range for Daterange columns. Our back end also requires 
+     *       us to turn integers into strings. 
+     *       
+     *       This method is called iteratively to traverse all sub-objects
+     *       of the one passed in.
+     *  @params {Object} model - model with Date objects.
+     *  @returns {Object} JSON object
+     */
+    function valueToJSON(key, value) {
+      // Ignore things that are not objects.
+      if (typeof value != "object") return value;
+
+      // Get the formly field for guidance. If there is no field then move on.
+      var field = attributesService.getFormlyField(key);
+      
+      // Don't do anything fancy with null values.
+      if (value === null) {
+        return null;
+      }
+
+      else if (typeof value == "number") {
+        return value.toString();
+      }
+
+      // Convert date-like objects.
+      else if (field && (field.type == "date" || field.type =="datepicker")) { 
+        return moment(value).format("YYYY-MM-DD");
+      }
+      else if (field && field.type == "timestamp") {
+        return value.toISOString();
+      }
+      else if (field && field.type == "daterange") {
+        var range = moment.range(value[0], value[1]);
+        return range.toString();
+      }
+      else if (value._isAMomentObject) {
+        return value.toISOString();
+      }
+      
+      // Dive into remaining objects.
+      else if (typeof value == "object") {
+        /* Should we keep going or not? That is the question. */
+
+        // Is it one of the attributes we know about?
+        if (typeof field != "undefined") {
+          return modelToJSON(value);
+        }
+
+        // Is it one of the tables we know about?
+        else if (_.contains(attributesService.getFormlyFormNames(), key)) {
+          return tableToJSON(key, value);
+        }
+
+        /* Is it a container for a list of tables we know about?
+         * By naming convention, items in this category will have a key that 
+         * is a table name with "s" appended to the end. So "comments" would
+         * contain a list of comment objects. Return a list of converted
+         * sub-objects. */
+        else if (_.contains(attributesService.getFormlyContainerNames(), key)) {
+          var table_name = key.replace(/s$/, "");
+          var item_keys = Object.keys(value);
+          return _.map(item_keys, function(item_key) {
+            return tableToJSON(table_name, value[item_key]);
+          });
+        }
+      }
+      
+      // No processing required.
+      return value;
     }
   }
 

@@ -10,7 +10,8 @@
         "ui.router",
         "formly",
         "formlyBootstrap",
-        "ngSanitize"
+        "ngSanitize",
+        "angularMoment"
       ]);
   
 }());

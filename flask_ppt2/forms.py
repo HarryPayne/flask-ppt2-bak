@@ -1,7 +1,9 @@
 import calendar
 from collections import OrderedDict
 from datetime import datetime, date
+from dateutil.relativedelta import relativedelta
 from intervals import DateInterval
+from intervals.interval import inf
 import re
 from operator import itemgetter
 
@@ -198,13 +200,16 @@ class FormlyAttributes:
         if field.type == "StringField":
             if self._field_is_readonly(field):
                 attr["type"] = "display"
+                del opt["description"]
             else:
                 attr["type"] = "input"
                 opt["type"] = "text"
         elif field.type == "TextAreaField":
             if self._field_is_readonly(field):
-                attr["type"] = "display"
+                attr["type"] = "displayTextArea"
+                del opt["description"]
             else:
+                attr["type"] = "input"
                 attr["type"] = "textarea"
                 opt["rows"] = 8
                 opt["cols"] = 80
@@ -214,12 +219,14 @@ class FormlyAttributes:
         elif field.type == "DateTimeField":
             if self._field_is_readonly(field):
                 attr["type"] = "displayTimestamp"
+                del opt["description"]
             else:
-                attr["type"] = "input"
-                opt["type"] = "datetime"
+                attr["type"] = "timestamp"
+                opt["type"] = "timestamp"
         elif field.type == "DateField":
             if self._field_is_readonly(field):
-                attr["type"] = "displayDate"
+                attr["type"] = "date"
+                del opt["description"]
             else:
                 attr["type"] = "datepicker"
                 opt["type"] = "text"
@@ -234,7 +241,7 @@ class FormlyAttributes:
             attr["type"] = "input"
             opt["type"] = "number"
         elif field.type == "DateIntervalField":
-            attr["type"] = "input"
+            attr["type"] = "daterange"
             opt["type"] = "daterange"
         
         return attr
@@ -254,6 +261,9 @@ class DataSerializer:
 
         Similar treatment for lists of objects for QuerySelectField's
         (not multiple). Name changed from "fooID" to "foo".
+        
+        Dates in the database are assumed to be UTC. Send them out as
+        found and convert to local time on the client.
         """
         output = {}
         for key in self._fields.keys():
@@ -265,8 +275,11 @@ class DataSerializer:
             elif type(self.data[key]) == date:
                 data = self.data[key].isoformat()
             elif type(self.data[key]) == DateInterval:
-                data = [self.data[key].lower.isoformat(),
-                        self.data[key].upper.isoformat()]
+                interval = self.data[key]
+                if (interval.upper == inf):
+                    interval.upper = interval.lower + relativedelta(years=1)
+                data = "{}/{}".format(interval.lower.isoformat(),
+                                      interval.upper.isoformat())
             elif type(self.data[key]) == _AssociationList:
                 # Then the value is a list of list table objects from some
                 # table other than the one key is from. List value can be
@@ -556,17 +569,6 @@ class Portfolio(ModelForm, FormlyAttributes, DataSerializer):
     budgetIn = DateIntervalField(u"budget in",
         description=u"For projects whose budget needs to be planned (e.g., "
                      "ED-05), when will that happen?")
-#     budgetInFY = Column(Integer,
-#                         info={"choices": FY_CHOICES,
-#                               "coerce": int,
-#                               "label": "budget",
-#                               "help": "For projects whose budget needs to be planned (e.g., ED-05), when will that happen?"},
-#                         nullable=True, index=True, server_default=None)
-#     budgetInQ = Column(Integer,
-#                        info={"choices": Q_CHOICES,
-#                              "label": "",
-#                              "help": ""},
-#                        nullable=True, index=True, server_default=text("'0'"))
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
     portfolioLastModified = DateTimeField(u"last updated")
@@ -639,7 +641,7 @@ class Disposition(ModelForm, FormlyAttributes, DataSerializer):
     class Meta:
         model = alch.Disposition
         include_primary_keys = True
-        only = ["explanation",
+        only = ["explanation", "disposedIn", "reconsiderIn", "plannedFor",
                 "dispositionLastModified", "dispositionLastModifiedBy"]
 
     disposedIn = DateIntervalField(u"disposed",
@@ -647,14 +649,6 @@ class Disposition(ModelForm, FormlyAttributes, DataSerializer):
                      "Changing this date and pressing save will create a new "
                      "disposition record.  If you don't change the date, then "
                      "you will update the record you are looking at.")
-#     disposedInFY = QuerySelectField(u"disposed",
-#         query_factory=fiscal_years,
-#         description=u"In which planning cycle was this disposition made? "
-#                      "Changing this date and pressing save will create a new "
-#                      "disposition record.  If you don't change the date, then "
-#                      "you will update the record you are looking at.")
-#     disposedInQ = QuerySelectField(u"",
-#         query_factory=quarters)
     disposition = QuerySelectField(u"disposition",
         query_factory=disposition_choices,
         description=u"What decision was made during the planning cycle with "
@@ -664,32 +658,11 @@ class Disposition(ModelForm, FormlyAttributes, DataSerializer):
     reconsiderIn = DateIntervalField(u"reconsider",
         description=u"For a deferred project, when will it be considered "
                      "again?")
-#     reconsiderInFY = QuerySelectField(u"reconsider",
-#         query_factory=fiscal_years,
-#         description=u"For a deferred project, when will it be considered "
-#                      "again?")
-#     reconsiderInQ = QuerySelectField(u"",
-#         query_factory=quarters)
-    startIn = DateIntervalField(u"start",
-        description=u"This date, and the next, are the dates agreed to by "
-                     "the project's host division during the sequencing "
-                     "stage. They are high-level, estimated dates for the "
-                     "start and finish of work on the project.")
-#     startInY = QuerySelectField(u"start",
-#         query_factory=years,
-#         description=u"This date, and the next, are the dates agreed to by "
-#                      "the project's host division during the sequencing "
-#                      "stage. They are high-level, estimated dates for the "
-#                      "start and finish of work on the project.")
-#     startInM = QuerySelectField(u"",
-#         query_factory=months)
+    plannedFor = DateIntervalField(u"start",
+        description=u"Estimated dates for the  start and finish of work on the "
+                     "project.")
     finishIn = DateIntervalField(u"finish",
         description=u"What finishing month was estimated in the scheduling phase?")
-#     finishInY = QuerySelectField(u"finish",
-#         query_factory=years,
-#         description=u"What finishing month was estimated in the scheduling phase?")
-#     finishInM = QuerySelectField(u"",
-#         query_factory=months)
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
     dispositionLastModified = DateTimeField(label=u"last updated")
@@ -704,10 +677,8 @@ class Latest_disposition(Disposition):
     class Meta:
         model = alch.Latest_disposition
         include_primary_keys = True
-        only = ["explanation", "disposedInFY",
-                "disposedInQ", "reconsiderInFY", "reconsiderInQ", "startInY",
-                "startInM", "finishInY", "finishInM",
-                "latestDispositionLastModified",
+        only = ["explanation", "disposedIn", "reconsiderIn", "plannedFor",
+                "latestDispositionLastModified", 
                 "latestDispositionLastModifiedBy"]
 
     # We need a table-specific handle for these two generic columns since

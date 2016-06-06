@@ -10,12 +10,10 @@
     .module("PPT")
     .config(PPTConfig);
   
-  PPTConfig.$inject = ["$urlRouterProvider"];
+  PPTConfig.$inject = ["$urlRouterProvider", "$httpProvider"];
   
-  /**
-   * Make "/select/home" the default ui.router state.
-   */
-  function PPTConfig($urlRouterProvider) {
+  function PPTConfig($urlRouterProvider, $httpProvider) {
+    /* Make "/select/home" the default ui.router state. */
     $urlRouterProvider.otherwise('/select/home');
   };
   

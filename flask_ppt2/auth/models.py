@@ -39,8 +39,10 @@ def ldap_fetch(username=None, name=None, passwd=None):
 
         if username is not None and passwd is not None:
             conn = Connection(server, dn, passwd, auto_bind=True)
+            success = True
         else:
-            return None
+            conn = Connection(server, auto_bind=True)
+            success = False
         conn.search(LDAP_SEARCH_BASE, 
                     '({0}={1})'.format(LDAP_USER_OBJECTS_RDN, username),
                     search_scope=SUBTREE,
@@ -112,6 +114,9 @@ class User(Base):
                 "mail": self.mail,
                 "roles": self.roles,
                 "is_active": self.active}
+    
+    def get_roles(self):
+        return self.roles
 
     def __repr__(self):
         return '<User %r>' % (self.username)

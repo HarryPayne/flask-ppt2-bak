@@ -2,7 +2,7 @@
   
   /**
    *  @name filterConfig
-   *  @desc Configuration for app.filter module
+   *  @desc Configuration for app.filter module.
    */
   
   "use strict";

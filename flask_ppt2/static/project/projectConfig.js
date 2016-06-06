@@ -238,11 +238,53 @@
 
     /* Replace formlyBootstrap input field type to implement read-only forms. */
     formlyConfigProvider.setType({
-      name: 'input',
-      templateUrl: 'input-template.html',
-      wrapper: ['bootstrapLabel', 'bootstrapHasError'],
-      overwriteOk: true
-    });
+        name: 'input',
+        templateUrl: 'input-template.html',
+        wrapper: ['bootstrapLabel', 'bootstrapHasError'],
+        overwriteOk: true
+      })
+    formlyConfigProvider.setType({
+        name: "display",
+        templateUrl: "display-template.html",
+        wrapper: ['bootstrapLabel', 'bootstrapHasError'],
+        overwriteOk: true
+      })
+    formlyConfigProvider.setType({
+        name: "displayTextArea",
+        templateUrl: "displayTextArea-template.html",
+        wrapper: ['bootstrapLabel', 'bootstrapHasError'],
+        overwriteOk: true
+      })
+    formlyConfigProvider.setType({
+        name: "textarea",
+        templateUrl: "textarea-template.html",
+        wrapper: ['bootstrapLabel', 'bootstrapHasError'],
+        overwriteOk: true
+      })
+    formlyConfigProvider.setType({
+        name: "date",
+        templateUrl: "displayDate-template.html",
+        wrapper: ['bootstrapLabel', 'bootstrapHasError'],
+        overwriteOk: true
+      });
+    formlyConfigProvider.setType({
+        name: "timestamp",
+        templateUrl: "displayTimestamp-template.html",
+        wrapper: ['bootstrapLabel', 'bootstrapHasError'],
+        overwriteOk: true
+      });
+    formlyConfigProvider.setType({
+        name: "displayTimestamp",
+        templateUrl: "displayTimestamp-template.html",
+        wrapper: ['bootstrapLabel', 'bootstrapHasError'],
+        overwriteOk: true
+      });
+    formlyConfigProvider.setType({
+        name: "daterange",
+        templateUrl: "displayDaterange-template.html",
+        wrapper: ['bootstrapLabel', 'bootstrapHasError'],
+        overwriteOk: true
+      });
 
     /* Declare a datepicker type. */
     var attributes = [
@@ -310,27 +352,6 @@
           $scope.datepicker.opened = !$scope.datepicker.opened;
         };
       }]
-    });
-
-    formlyConfigProvider.setType({
-      name: "display",
-      templateUrl: "display-template.html",
-      wrapper: ['bootstrapLabel', 'bootstrapHasError']
-    });
-    formlyConfigProvider.setType({
-      name: "displayTextArea",
-      templateUrl: "displayTextArea-template.html",
-      wrapper: ['bootstrapLabel', 'bootstrapHasError']
-    });
-    formlyConfigProvider.setType({
-      name: "displayDate",
-      templateUrl: "displayDate-template.html",
-      wrapper: ['bootstrapLabel', 'bootstrapHasError']
-    });
-    formlyConfigProvider.setType({
-      name: "displayTimestamp",
-      templateUrl: "displayTimestamp-template.html",
-      wrapper: ['bootstrapLabel', 'bootstrapHasError']
     });
 
     function camelize(string) {
