@@ -27,6 +27,21 @@
         data: {
           requiresLogin: false,
           viewUrl: "/static/project/project.html"
+        },
+        resolve: {
+          attributesPromise: ["attributesService", 
+            function(attributesService) {
+              // Make sure formlyFields and project list are available for init.
+              if (!attributesService.hasFormlyFields()) {
+                return attributesService.updateFormlyFields();
+              }
+            }],
+          projectListPromise: ["projectListService",
+            function(projectListService) {
+              if (!projectListService.hasProjects()) {
+                return projectListService.updateAllProjects();
+              }
+            }]
         }
       }) 
       .state("project.add",  {

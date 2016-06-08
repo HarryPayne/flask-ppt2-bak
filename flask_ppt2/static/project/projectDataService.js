@@ -74,26 +74,15 @@
       viewUrl: $state.current.data ? $state.current.data.viewUrl : "",
     };
     
-//    service.RestoreState();
-//    if (typeof service.getProjectAttributes() == "undefined" && service.restoredParams) {
-//      service.getProjectDataValues(service.restoredParams);
-//    }
+    RestoreState();
     
-    $rootScope.$on("savestate", service.SaveState);
+    //$rootScope.$on("savestate", service.SaveState);
     $rootScope.$on("restorestate", service.RestoreState);
     $rootScope.$on("$locationChangeSuccess", function() {
 
       /** if we landed under the Project tab ... */
       if (_.first($state.current.name.split(".")) == "project") {
 
-        if (!projectListService.hasProjects()) {
-          /** then the list of project brief descriptions is empty. Get it */
-          projectListService.updateAllProjects()
-            .then(service.initService);
-        }
-        if (!attributesService.hasFormlyFields()) {
-          attributesService.getFormlyFields();
-        }
         service.RestoreState();
         if (typeof service.projectID == "undefined" || 
             parseInt($state.params.projectID) != service.projectID) {
@@ -102,7 +91,6 @@
       }
     });
 
-    service.SaveState();
     return service;
     
     /**
@@ -351,6 +339,7 @@
      */
     function initService() {
       
+      RestoreState();
       var deferred = $q.defer();
 
       /** project id from state params */
@@ -377,6 +366,7 @@
         /** data were wiped out. Perhaps just came from the Add project tab, 
             so ... */
         service.getProjectDataValues($stateParams);
+        SaveState();
       }
       else {
         deferred.resolve();
@@ -390,12 +380,15 @@
     
     /**
      *  @name jsonToModel
-     *  @desc Scan the json for ISO 8601 strings and turn them into objects.
-     *        Changes are made in place and nothing is returned. Original from:
+     *  @desc Return a model that contains date objects built from a json
+     *        object with ISO 8601 strings. Original from:
      *          http://aboutcode.net/2013/07/27/json-date-parsing-angularjs.html
      *
      *        Modified for date range, which is two date strings joined by "/". 
-     *        Requires moment and moment-range.
+     *
+     *        Requires moment and moment-range. We use moment because if we
+     *        instantiate an object with a date string (YYY-MM_DD), we need to
+     *        send a date string back to the server when we submit the model.
      *  @param {Object} json object to be scanned.
      *  @returns {Object} - a fully copy of the input json, with date strings
      *        turned into date, datetime, or date range objects.
@@ -413,28 +406,40 @@
         
         // Check for string value that looks like a date.
         if (typeof json_value === "string" && (match = json_value.match(/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/))) {
-          var milliseconds = Date.parse(match[0])
-          if (!isNaN(milliseconds)) {
-            model[key] = moment(match[0]).utc();
-          }
+          model[key] = moment.utc(match[0]);
         } 
         
         // Otherwise check for daterange strings
         else if (typeof json_value === "string" && json_value.split("/").length == 2) {
+          /* Split on "/", send both to jsonToModel, and check that what we get
+           * back is a list of moment objects and/or empty strings. */
           var values = json_value.split("/");
-          var dates = new Object;
-          dates.value0 = values[0];
-          dates.value1 = values[1];
+          _.map(values, function(val) {
+              if (val == "") {return null;}
+              else {return val;}
+          });
+          if (values[0] == "") values[0] = null;
+          if (values[1] == "") values[1] = null;
+          var range_model = jsonToModel(values);
 
-          var range_model = jsonToModel(dates);
-          if ((range_model.value0 != values[0] || values[0] == "") && 
-              (range_model.value1 != values[1] || values[1] == "")) {
-             model[key] = moment.range(range_model.value0, range_model.value1);
+          if ((range_model[0].hasOwnProperty("_isAMomentObject") || values[0] == null) && 
+              (range_model[1].hasOwnProperty("_isAMomentObject") || values[1] == null)) {
+
+             model[key] = moment.range(range_model[0], range_model[1]);
           }
         } 
         else if (json_value !== null && typeof json_value === "object") {
-          // Recurse into object
-          model[key] = jsonToModel(json_value);
+          if (_.isArray(json_value)) {
+            var array = [];
+            _.each(json_value, function(item) {
+                array.push(jsonToModel(item));
+              });
+            model[key] = array;
+          }
+          else {
+            // Recurse into object's attributes
+            model[key] = jsonToModel(json_value);
+          }
         }
         else {
           model[key] = json_value;
@@ -490,6 +495,7 @@
       if (typeof sessionStorage.projectDataServiceAttributes != "undefined") {
         var data = angular.fromJson(sessionStorage.projectDataServiceAttributes);
         service.restoredParams = data.params;
+        service.projectID = data.params.projectID;
         service.csrf_token = data.csrf_token;
         service.projectModel = service.jsonToModel(data.projectModel);
       }
@@ -531,7 +537,7 @@
     }
 
     function SaveState() {
-      if (typeof service.projectModel == "undefined") return;
+      if (Object.keys(service.projectModel).length == 0) return;
       
       var data = new Object;
       data.params = stateLocationService.getStateFromLocation().params;
@@ -618,14 +624,46 @@
     function tableToJSON(table_name, model) {
       var fields = attributesService.getFormlyFields(table_name);
       var form_data = new Object;
-      form_data.csrf_token = service.csrf_token;
       
       // Iterate over table fields
       _.each(fields, function (field) {
         var key = field.key;
+
+        // Last modified information needs to come from the back end, not here.
+        if (key.search(/astModified$/) > -1) return;
+        if (key.search(/astModifiedBy$/) > -1) return;
+        
         var value = model[field.key];
-        form_data[key] = valueToJSON(key, value);
+        var json = valueToJSON(key, value);
+
+        // My back end wants strings instead of numbers.
+        if (typeof json == "number") {
+          json = json.toString();
+        }
+        else if (field.type == "select") {
+          // Convert all integer values to strings
+          var target = []
+          _.map(json, function(item) {
+              if (typeof item != "undefined") {
+                return item.toString();
+              }
+              else {
+                return item;
+              }
+            });
+          json = target;
+        }
+
+        // My back end wants dates without milliseconds
+        else if (_.contains(["timestamp", "displayTimestamp"], field.type)) {
+          // Take off the microseconds, to make the back end happy.
+          if (json !== null && json.length > 0) {
+            json = json.replace(/\.000Z$/, "Z");
+          }
+        }
+        form_data[key] = json;
       });
+      
       return form_data;
     }
         
@@ -668,8 +706,9 @@
         return value.toISOString();
       }
       else if (field && field.type == "daterange") {
-        var range = moment.range(value[0], value[1]);
-        return range.toString();
+        // My backend wants 2 date strings separated by " - "
+        return [value.start.format("YYYY-MM-DD"), 
+                value.end.format("YYYY-MM-DD")].join(" - ");
       }
       else if (value._isAMomentObject) {
         return value.toISOString();
@@ -679,10 +718,15 @@
       else if (typeof value == "object") {
         /* Should we keep going or not? That is the question. */
 
-        // Is it one of the attributes we know about?
-        if (typeof field != "undefined") {
+        // Is this the project model?
+        if (key == "projectModel") {
           return modelToJSON(value);
         }
+
+        // Is it one of the attributes we know about?
+        //if (typeof field != "undefined") {
+        //  return modelToJSON(value);
+        //}
 
         // Is it one of the tables we know about?
         else if (_.contains(attributesService.getFormlyFormNames(), key)) {

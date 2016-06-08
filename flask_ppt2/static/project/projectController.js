@@ -13,10 +13,12 @@
     .controller("Project", Project);
   
   Project.$inject = ["$scope", "$state", "projectDataService", "projectListService", 
-                     "attributesService", "modalConfirmService", "loginStateService"];
+                     "attributesService", "modalConfirmService", "loginStateService",
+                     "attributesPromise", "projectListPromise"];
   
   function Project($scope, $state, projectDataService, projectListService, 
-                   attributesService, modalConfirmService, loginStateService){
+                   attributesService, modalConfirmService, loginStateService,
+                   attributesPromise, projectListPromise){
     
     this.as = attributesService;
     this.ds = projectDataService;
@@ -33,7 +35,10 @@
     this.masterList = this.ls.getMasterList;
     this.success = this.ds.success;
     this.viewUrl = projectDataService.viewUrl;
-    
+
+    this.attributesPromise = attributesPromise;
+    this.projectListPromise = projectListPromise;
+
     /* angular-formly options for Bootstrap horizontal layout and for 
      * readonly display on the view page. */
     this.viewOptions = {

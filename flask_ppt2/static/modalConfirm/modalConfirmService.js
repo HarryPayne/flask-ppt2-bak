@@ -50,7 +50,7 @@
         ];
       }
       
-      return $modal.open(currentDefaults).result;
+      return $uibModal.open(currentDefaults).result;
     };
 
     function showModal(customDefaults, customOptions) {

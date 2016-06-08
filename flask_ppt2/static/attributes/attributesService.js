@@ -79,7 +79,7 @@ Data attributes:
     if (typeof service.formlyFields == "undefined") {
         service.updateFormlyFields();
     }
-    
+
     if (typeof service.formlyOptions == "undefined") {
         service.formlyOptions = {
           view: {formState: {
@@ -421,7 +421,8 @@ Data attributes:
     }
 
     function hasFormlyFields() {
-      if (typeof service.formlyFields != "undefined" && service.formlyFields.length > 0) {
+      if (typeof service.formlyFields != "undefined" && 
+          Object.keys(service.formlyFields).length > 0) {
         return true;
       }
       else {
@@ -502,7 +503,6 @@ Data attributes:
         service.formlyFields = data.formlyFields;
         service.formlyOptions = data.formlyOptions;
         service.formlyFieldsDict = data.formlyFieldsDict;
-        service.currentState = data.currentState;
       }
     };
 
@@ -693,7 +693,8 @@ Data attributes:
               service.formlyFieldsDict[field.key] = field;
             });
           });
-          deferred.resolve([formlyFields, formlyFieldsDict]);
+          SaveState();
+          deferred.resolve();
         });
       return deferred.promise;
     }

@@ -76,7 +76,7 @@
     </script>
     <script type="text/ng-template" id="displayDate-template.html">
     <div>
-      <p class="form-control-static">{{model[options.key].toLocaleDateString()}}</p>
+      <p class="form-control-static">{{model[options.key] | date:"medium"}}</p>
       </div>
     </script>
     <script type="text/ng-template" id="displayDaterange-template.html">
