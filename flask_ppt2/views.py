@@ -5,29 +5,21 @@ from sqlalchemy.inspection import inspect
 from sqlalchemy.sql.expression import or_
 import sys
 
-from flask import (abort, flash, g, json, jsonify, redirect,
-                   render_template, request, url_for)
+from flask import (abort, g, json, jsonify, 
+                   render_template, request)
 from flask_cors import cross_origin
 from flask_jwt import current_identity, jwt_required
 from flask_principal import Permission, RoleNeed
 from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.urls import url_decode, url_unquote
 
-from flask_ppt2 import app, db, lm, jwt, wtforms_json
-# from app import csrf
+from flask_ppt2 import app, db
 from flask_ppt2 import forms
 import flask_ppt2.alchemy_models as alch
-
-# from copy import deepcopy
-# from flask_jwt import jwt_required, current_user
-# from migrate.versioning.schemadiff import ColDiff
-# from sqlalchemy.util import symbol
-# from flask_ppt2.alchemy_models import DBmetadata
 
 # Create a flask_principal permission that requires the user to have 
 # the "Curator" role. Used to protect all methods that change data on
 # the back end.
-
 curator_permission = Permission(RoleNeed("Curator"))
 curator_permission.description = "User must be a Curator"
 
@@ -948,20 +940,29 @@ def getProjectAttributes(projectID, table_name=None):
 # roles before doing anything. CSRF token checking happens at form validation
 # time.
 
-def updateFromForm(model, result, lastModified, lastModifiedBy):
+def update_result_last_modified(result, lastModifiedBy):
+    """Apply last modified data to database result.
+    
+    Insert last modified user into the result. We made the column read_only
+    so that users cannot change it on the front end. But on the back end that
+    means the value in the request gets thrown away. So we have to put it
+    in the database result.
+    
+    The last modified column will insert a UTC timestamp, but only if the
+    object passed back to the database has no value for it.
+    
+    Column names are related to the table name by a naming convention.
+    """
+    last_modified_col = "{}LastModified".format(lastModifiedBy["tableName"])
+    last_modified_by_col = "{}LastModifiedBy".format(lastModifiedBy["tableName"])
+    setattr(result, last_modified_by_col, lastModifiedBy["id"])
+    setattr(result, last_modified_col, datetime.utcnow())
+
+def updateFromForm(model, result, lastModifiedBy):
     """Utility for updating db model from json and query result."""
     errors = []
-    form = model.from_json(request.json)
-    lastModifiedKey = [field.name for field in form 
-                       if field.name.endswith("LastModified")
-                       or field.name.endswith("lastModified")]
-    lastModifiedByKey = [field.name for field in form 
-                         if field.name.endswith("LastModifiedBy")
-                         or field.name.endswith("lastModifiedBy")]
-    if len(lastModifiedKey):
-        form[lastModifiedKey[0]].data = lastModified
-    if len(lastModifiedByKey):
-        form[lastModifiedByKey[0]].data = lastModifiedBy
+    update_result_last_modified(result, lastModifiedBy)
+    form = model.from_json(request.json, request)
     if form.validate_on_submit():
         try:
             form.populate_obj(result)
@@ -981,41 +982,40 @@ def projectEdit(projectID, tableName):
     if projectID:
         p = db.session.query(alch.Description).join(alch.Portfolio)
         p = p.filter_by(projectID=projectID).first()
-        lastModified = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        lastModifiedBy = current_identity.get_id()
+        lastModifiedBy = {"tableName": tableName,
+                          "id": current_identity.get_id()}
 
         if tableName == "description":
-            form, errors = updateFromForm(forms.Description, p, lastModified, lastModifiedBy)
+            form, errors = updateFromForm(forms.Description, p, lastModifiedBy)
             if not errors:
                 success = "Project description was updated."
 
         elif tableName == "portfolio":
-            form, errors = updateFromForm(forms.Portfolio, p.portfolio[0], lastModified, lastModifiedBy)
+            form, errors = updateFromForm(forms.Portfolio, p.portfolio[0], lastModifiedBy)
             if not errors:
                 success = "Project portfolio entry was updated."
 
         elif tableName == "project":
-            form, errors = updateFromForm(forms.Project, p.project[0], lastModified, lastModifiedBy)
+            form, errors = updateFromForm(forms.Project, p.project[0], lastModifiedBy)
             if not errors:
                 success = "Project management entry was updated."
 
         elif tableName == "disposition":
             request.json["projectID"] = int(projectID)
             request.json["lastModifiedBy"] = current_identity.get_id()
-            request.json["lastModified"] = p.lastModified
             disposedInFY = request.json["disposedInFY"]
             disposedInQ = request.json["disposedInQ"]
-            d = alch.Disposition.query.\
-                    filter_by(projectID=projectID).\
-                    filter_by(disposedInFY=disposedInFY).\
-                    filter_by(disposedInQ=disposedInQ).first()
+            d = db.session.query(alch.Disposition)                  \
+                    .filter_by(projectID=projectID)                 \
+                    .filter_by(disposedInFY=disposedInFY)           \
+                    .filter_by(disposedInQ=disposedInQ).first()
             if not d:
                 d = alch.Disposition(projectID=projectID)
                 d_success = "A new disposition was created for cycle "
             else:
                 d_success = "Updated disposition for cycle "
 
-            form, errors = updateFromForm(forms.Disposition, d, lastModified, lastModifiedBy)
+            form, errors = updateFromForm(forms.Disposition, d, lastModifiedBy)
             if not errors:
                 disposedInFY = form["disposedInFY"].data
                 FY = [item[1] for item in form["disposedInFY"].choices 
@@ -1038,12 +1038,11 @@ def projectEdit(projectID, tableName):
                 c = alch.Comment(projectID=projectID)
                 request.json["commentID"] = None
                 request.json["commentAuthor"] = current_identity.get_id()
-                request.json["commentAuthored"] = p.lastModified
                 request.json["commentEditor"] = None
                 request.json["commentEdited"] = None
                 c_success = "A new comment was created."
 
-            form, errors = updateFromForm(forms.Comment, c, lastModified, lastModifiedBy)
+            form, errors = updateFromForm(forms.Comment, c, lastModifiedBy)
             if not errors:
                 success = c_success
 

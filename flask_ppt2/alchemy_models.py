@@ -80,7 +80,6 @@ from a list/controlled vocabulary:
 from sqlalchemy import (Column, Date, DateTime, ForeignKey,
                         Float, Integer, String, Text, text)
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, backref
 import sqlalchemy.types as types
 from sqlalchemy_utils import DateRangeType
@@ -482,12 +481,11 @@ class Comment(Base):
     commentAuthor = Column(String(100),
                            nullable=True, index=True, 
                            server_default=text("''"))
-    commentAuthored = Column(DateTime,
-                             nullable=True, index=True)
+    commentAuthored = Column(DateTime, onupdate=datetime.utcnow)
     commentEditor = Column(String(100),
                            nullable=True, index=True, 
                            server_default=text("''"))
-    commentEdited = Column(DateTime, nullable=True, index=True)
+    commentEdited = Column(DateTime, onupdate=datetime.utcnow)
 
     # Relationship to base table.
     t_description = relationship("Description", backref="comments")
@@ -525,11 +523,8 @@ class Description(Base):
 
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
-    descriptionLastModified = Column(DateTime, nullable=True,
-                                     server_default=text("CURRENT_TIMESTAMP"))
-    descriptionLastModifiedBy = Column(String(100),
-                                       nullable=True,
-                                       server_default=text("''"))
+    descriptionLastModified = Column(DateTime, onupdate=datetime.utcnow)
+    descriptionLastModifiedBy = Column(String(100))
 
     # One to many relationships.
     maturity = relationship("Maturitylist")
@@ -558,10 +553,8 @@ class Disposition(Base):
                            index=True, server_default=text("'0'"))
     explanation = Column(Text, nullable=True)
     plannedFor = Column(DateRangeType)
-    dispositionLastModified = Column(DateTime, nullable=True,
-                                     server_default=text("CURRENT_TIMESTAMP"))
-    dispositionLastModifiedBy = Column(String(100), nullable=True,
-                                       server_default=text("''"))
+    dispositionLastModified = Column(DateTime, onupdate=datetime.utcnow)
+    dispositionLastModifiedBy = Column(String(100))
 
     # Many to one relationship.
     disposition = relationship("Dispositionlist")
@@ -581,11 +574,8 @@ class Latest_disposition(Base):
                                   server_default=text("'0'"))
     explanation = Column(Text, nullable=True)
     plannedFor = Column(DateRangeType)
-    latestDispositionLastModified = Column(DateTime,
-        nullable=True,
-        server_default=text("CURRENT_TIMESTAMP"))
-    latestDispositionLastModifiedBy = Column(String(100),
-        nullable=True, server_default=text("''"))
+    latestDispositionLastModified = Column(DateTime, onupdate=datetime.utcnow)
+    latestDispositionLastModifiedBy = Column(String(100))
 
     # Really a rich version of a child table, like Driver or Stakeholder
     
@@ -631,11 +621,8 @@ class Portfolio(Base):
     budgetInQ = Column(Integer, nullable=True, server_default=text("'0'"))
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
-    portfolioLastModified = Column(DateTime, nullable=True,
-                                   server_default=text("CURRENT_TIMESTAMP"))
-    portfolioLastModifiedBy = Column(String(100),
-                                     nullable=True, 
-                                     server_default=text("''"))
+    portfolioLastModified = Column(DateTime, onupdate=datetime.utcnow)
+    portfolioLastModifiedBy = Column(String(100))
 
     # Many to one relationships.
     flavor = relationship("Flavorlist",
@@ -688,9 +675,8 @@ class Project(Base):
                                server_default=text("'0'"))
     startedOn = Column(Date, nullable=True, index=True)
     finishedOn = Column(Date, nullable=True, index=True)
-    projectLastModified = Column(DateTime, nullable=True)
-    projectLastModifiedBy = Column(String(100), nullable=True, 
-                                   server_default=text("''"))
+    projectLastModified = Column(DateTime, onupdate=datetime.utcnow)
+    projectLastModifiedBy = Column(String(100))
 
     # Many to one relationships.
     progress = relationship("Progresslist", backref="project")

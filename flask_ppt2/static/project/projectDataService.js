@@ -63,6 +63,7 @@
       modelToJSON: modelToJSON,
       printValue: attributesService.printValue,
       RestoreState: RestoreState,
+      rootScope: $rootScope,
       saveProject: saveProject,
       SaveState: SaveState,
       setProjectData: setProjectData,
@@ -74,7 +75,7 @@
       viewUrl: $state.current.data ? $state.current.data.viewUrl : "",
     };
     
-    RestoreState();
+    initService();
     
     //$rootScope.$on("savestate", service.SaveState);
     $rootScope.$on("restorestate", service.RestoreState);
@@ -355,18 +356,10 @@
         service.getProjectDataValues($stateParams);
       }
       else if (saved_projectID && saved_projectID == state_projectID
-               &&  typeof service.getProjectAttributes('description') == "undefined") {
+               &&  typeof service.projectModel == "undefined") {
         /** we should be good to go but there are no saved data, 
          *  so ... */
         service.getProjectDataValues($stateParams);
-      }
-      else if (saved_projectID && saved_projectID == state_projectID &&
-               (typeof attributesService.getAttribute("name") == "undefined"
-                || attributesService.getAttribute("name").value == "")) {
-        /** data were wiped out. Perhaps just came from the Add project tab, 
-            so ... */
-        service.getProjectDataValues($stateParams);
-        SaveState();
       }
       else {
         deferred.resolve();
@@ -628,16 +621,19 @@
       // Iterate over table fields
       _.each(fields, function (field) {
         var key = field.key;
-
-        // Last modified information needs to come from the back end, not here.
-        if (key.search(/astModified$/) > -1) return;
-        if (key.search(/astModifiedBy$/) > -1) return;
-        
         var value = model[field.key];
         var json = valueToJSON(key, value);
 
+        // Last modified information is added on the back end.
+        if (key.search(/astModified$/) > -1) {
+          return;
+        }
+        else if (key.search(/astModifiedBy$/) > -1) {
+          return;
+        }
+        
         // My back end wants strings instead of numbers.
-        if (typeof json == "number") {
+        else if (typeof json == "number") {
           json = json.toString();
         }
         else if (field.type == "select") {
@@ -657,7 +653,7 @@
         // My back end wants dates without milliseconds
         else if (_.contains(["timestamp", "displayTimestamp"], field.type)) {
           // Take off the microseconds, to make the back end happy.
-          if (json !== null && json.length > 0) {
+          if (typeof json != "undefined" && json != null && json.length > 0) {
             json = json.replace(/\.000Z$/, "Z");
           }
         }

@@ -76,7 +76,7 @@
     </script>
     <script type="text/ng-template" id="displayDate-template.html">
     <div>
-      <p class="form-control-static">{{model[options.key] | date:"medium"}}</p>
+      <p class="form-control-static">{{model[options.key] | amDateFormat:"MMM DD, YYYY"}}</p>
       </div>
     </script>
     <script type="text/ng-template" id="displayDaterange-template.html">
@@ -87,7 +87,7 @@
     </script>
     <script type="text/ng-template" id="displayTimestamp-template.html">
     <div>
-      <p class="form-control-static">{{model[options.key] | date:"medium"}} 
+      <p class="form-control-static">{{model[options.key] | amUtc | amLocal | amCalendar:referenceTime:formats}} 
       </p>
       </div>
     </script>
