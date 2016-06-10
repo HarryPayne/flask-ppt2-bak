@@ -340,7 +340,6 @@
      */
     function initService() {
       
-      RestoreState();
       var deferred = $q.defer();
 
       /** project id from state params */
@@ -397,13 +396,8 @@
         var json_value = json[key];
         var match;
         
-        // Check for string value that looks like a date.
-        if (typeof json_value === "string" && (match = json_value.match(/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/))) {
-          model[key] = moment.utc(match[0]);
-        } 
-        
-        // Otherwise check for daterange strings
-        else if (typeof json_value === "string" && json_value.split("/").length == 2) {
+        // Check for daterange strings, which contain two date strings joined by "/"
+        if (typeof json_value === "string" && json_value.split("/").length == 2) {
           /* Split on "/", send both to jsonToModel, and check that what we get
            * back is a list of moment objects and/or empty strings. */
           var values = json_value.split("/");
@@ -421,6 +415,11 @@
              model[key] = moment.range(range_model[0], range_model[1]);
           }
         } 
+        // Check for string value that looks like a single date.
+        else if (typeof json_value === "string" && (match = json_value.match(/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/))) {
+          model[key] = moment.utc(match[0]);
+        } 
+        
         else if (json_value !== null && typeof json_value === "object") {
           if (_.isArray(json_value)) {
             var array = [];
@@ -657,6 +656,14 @@
             json = json.replace(/\.000Z$/, "Z");
           }
         }
+
+        // My back end wants this date range format.
+        else if (field.type == "daterange") {
+          if (json !==null && typeof json != "undefined") {
+            var dates = json.split("/");
+            json = "["+ json +"]";      
+          }
+        }
         form_data[key] = json;
       });
       
@@ -702,9 +709,9 @@
         return value.toISOString();
       }
       else if (field && field.type == "daterange") {
-        // My backend wants 2 date strings separated by " - "
+        // My backend wants 2 date strings separated by "/"
         return [value.start.format("YYYY-MM-DD"), 
-                value.end.format("YYYY-MM-DD")].join(" - ");
+                value.end.utc().format("YYYY-MM-DD")].join("/");
       }
       else if (value._isAMomentObject) {
         return value.toISOString();

@@ -2,8 +2,8 @@ import calendar
 from collections import OrderedDict
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
+from infinity import inf
 from intervals import DateInterval
-from intervals.interval import inf
 import re
 from operator import itemgetter
 

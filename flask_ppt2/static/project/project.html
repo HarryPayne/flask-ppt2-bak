@@ -81,7 +81,9 @@
     </script>
     <script type="text/ng-template" id="displayDaterange-template.html">
     <div>
-      <p class="form-control-static">FY{{model[options.key].start.get("year")}} Q{{model[options.key].end.get("quarter")}} 
+      <p class="form-control-static">
+        <span ng-show="model[options.key].start">FY</span>{{model[options.key].start | amDateFormat:"YYYY"}} 
+        <span ng-show="model[options.key].end">Q</span>{{model[options.key].end | amDateFormat:"Q"}} 
       </p>
       </div>
     </script>

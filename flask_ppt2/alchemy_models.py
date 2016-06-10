@@ -77,6 +77,7 @@ from a list/controlled vocabulary:
     And finally, if foo is one of the five main/working tables then the
     matching form in the forms module will be "Foo".
 """
+from datetime import datetime
 from sqlalchemy import (Column, Date, DateTime, ForeignKey,
                         Float, Integer, String, Text, text)
 from sqlalchemy.ext.associationproxy import association_proxy

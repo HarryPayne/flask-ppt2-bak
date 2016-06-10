@@ -450,32 +450,6 @@ def truncate_gracefully(text_string, max_length):
     else:
         return text_string
 
-# @app.route("/getReportTableJSON", methods=["POST"])
-# def getReportTableJSON():
-#     """Generate JSON for the DataTables data on the Report tab.
-# 
-#     POST parameters:
-#         projectID       a list of projectIDs of projects to be displayed
-#         tableColumns    a list of table columns. Only data for these columns
-#                         are returned (in order, not that it matters).
-#     """
-#     projectIDList = request.json.get("projectID", [])
-#     tableColumns = request.json.get("tableColumns", [])
-# 
-#     # Find out everything about the specified table columns
-#     allAttrsFromDB = getAllAttributes()
-#     columns = []
-#     for col_name in tableColumns:
-#         if col_name in allAttrsFromDB.keys():
-#             columns.append(allAttrsFromDB[col_name])
-# 
-#     # Query for all projects in specified list
-#     filter = alch.Description.projectID.in_(projectIDList)
-#     p = alch.Description.query.filter(filter).all()
-# 
-#     response = get_report_rows_from_query(p, columns)
-#     return jsonify(**response)
-
 @app.route("/getReportResults", methods=["POST"])
 def getReportResults():
     """Get report data matching query_string from request.json."""
@@ -962,7 +936,7 @@ def updateFromForm(model, result, lastModifiedBy):
     """Utility for updating db model from json and query result."""
     errors = []
     update_result_last_modified(result, lastModifiedBy)
-    form = model.from_json(request.json, request)
+    form = model.from_json(request.json)
     if form.validate_on_submit():
         try:
             form.populate_obj(result)
