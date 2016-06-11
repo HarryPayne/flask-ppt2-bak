@@ -896,7 +896,7 @@ def getProjectAttributes(projectID, table_name=None):
     if table_name in ("disposition", None):
         latest = alch.Disposition.disposedIn
         dispositions = db.session.query(alch.Disposition)    \
-                        .filter_by(projectID=projectID)         \
+                        .filter_by(projectID=projectID)      \
                         .order_by(desc(latest))              \
                         .all()
         form_data["dispositions"] = [
@@ -906,7 +906,7 @@ def getProjectAttributes(projectID, table_name=None):
     if table_name in ("comment", None):
         latest = alch.Comment.commentAuthored
         comments = db.session.query(alch.Comment)            \
-                        .filter_by(projectID=projectID)         \
+                        .filter_by(projectID=projectID)      \
                         .order_by(desc(latest))              \
                         .all()
         form_data["comments"] = [

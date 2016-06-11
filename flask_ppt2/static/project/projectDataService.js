@@ -637,9 +637,9 @@
         else if (field.type == "select") {
           // Convert all integer values to strings
           var target = []
-          _.map(json, function(item) {
+          _.map(value, function(item) {
               if (typeof item != "undefined") {
-                return item.toString();
+                target.push(item.toString());
               }
               else {
                 return item;

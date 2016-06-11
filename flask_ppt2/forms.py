@@ -465,6 +465,7 @@ class Description(ModelForm, FormlyAttributes, DataSerializer):
         super(Description, self).__init__(*args, **kwargs)
         read_only(self.created)
         read_only(self.ended)
+        read_only(self.latest_dispositions)
         read_only(self.descriptionLastModified)
         read_only(self.descriptionLastModifiedBy)
 
@@ -643,8 +644,6 @@ class Disposition(ModelForm, FormlyAttributes, DataSerializer):
     plannedFor = DateIntervalField(u"start",
         description=u"Estimated dates for the  start and finish of work on the "
                      "project.")
-    finishIn = DateIntervalField(u"finish",
-        description=u"What finishing month was estimated in the scheduling phase?")
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
     dispositionLastModified = DateTimeField(label=u"last updated")

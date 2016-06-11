@@ -600,9 +600,9 @@ class Latest_disposition(Base):
 
     # Really a rich version of a child table, like Driver or Stakeholder
     
-    description = relationship("Description", viewonly=True,
+    description = relationship("Description",
                                backref=backref("latest_dispositionID"))
-    latest_list = relationship("Dispositionlist", viewonly=True)
+    latest_list = relationship("Dispositionlist")
     
     def __init__(self, latest_list=None, description=None):
         self.latest_list = latest_list
