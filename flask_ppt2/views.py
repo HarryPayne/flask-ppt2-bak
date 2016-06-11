@@ -894,14 +894,24 @@ def getProjectAttributes(projectID, table_name=None):
         form_data.update(project_form.serialize_data())
 
     if table_name in ("disposition", None):
+        latest = alch.Disposition.disposedIn
+        dispositions = db.session.query(alch.Disposition)    \
+                        .filter_by(projectID=projectID)         \
+                        .order_by(desc(latest))              \
+                        .all()
         form_data["dispositions"] = [
             forms.Disposition(ImmutableMultiDict({}), d).serialize_data()
-            for d in p.dispositions]
+            for d in dispositions]
 
     if table_name in ("comment", None):
+        latest = alch.Comment.commentAuthored
+        comments = db.session.query(alch.Comment)            \
+                        .filter_by(projectID=projectID)         \
+                        .order_by(desc(latest))              \
+                        .all()
         form_data["comments"] = [
             forms.Comment(ImmutableMultiDict({}), c).serialize_data()
-            for c in p.comments]
+            for c in comments]
         
     return {"projectID": projectID,
             "csrf_token": csrf_token,
@@ -977,8 +987,6 @@ def projectEdit(projectID, tableName):
         elif tableName == "disposition":
             request.json["projectID"] = int(projectID)
             request.json["lastModifiedBy"] = current_identity.get_id()
-            disposedInFY = request.json["disposedInFY"]
-            disposedInQ = request.json["disposedInQ"]
             d = db.session.query(alch.Disposition)                  \
                     .filter_by(projectID=projectID)                 \
                     .filter_by(disposedInFY=disposedInFY)           \

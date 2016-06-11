@@ -118,7 +118,6 @@ class FormlyAttributes:
     def _get_attr_base(self, key, field, model):
         """Start building a formly attribute, omitting options."""
         attr = dict()
-        info = self._find_info(key, field, model)
         attr["key"] = key
         opt = dict()
         opt["label"] = field.label.text if hasattr(field, "label") else key
@@ -263,59 +262,44 @@ class DataSerializer:
         (not multiple). Name changed from "fooID" to "foo".
         
         Dates in the database are assumed to be UTC. Send them out as
-        found and convert to local time on the client.
+        found and convert to local time on the client. Add a "Z" to
+        the output from isoformat() to tell the client to treat the
+        strings as UTC.
         """
         output = {}
         for key in self._fields.keys():
-            name = key
             if key == "csrf_token":
                 continue
-            if type(self.data[key]) == datetime:
-                data = self.data[key].isoformat()
-            elif type(self.data[key]) == date:
-                data = self.data[key].isoformat()
-            elif type(self.data[key]) == DateInterval:
-                interval = self.data[key]
-                if (interval.upper == inf):
-                    interval.upper = interval.lower + relativedelta(years=1)
+            name = key
+            data = self.data[key]
+            
+            if type(data) == datetime:
+                data = "{}Z".format(data.isoformat())
+            elif type(data) == date:
+                data = "{}".format(data.isoformat())
+            elif type(data) == DateInterval:
+                interval = data
                 data = "{}/{}".format(interval.lower.isoformat(),
                                       interval.upper.isoformat())
-            elif type(self.data[key]) == _AssociationList:
+            elif (getattr(self, key).type == "QuerySelectMultipleField"):
                 # Then the value is a list of list table objects from some
                 # table other than the one key is from. List value can be
                 # None.
-                if len(self.data[key]) and self.data[key][0]:
-                    # Inspect object and pull out data
-                    obj = self.data[key][0]
-                    data_tablename = obj.__class__.__tablename__
-                    root = re.sub("list\\b", "", data_tablename)
-                    id_name = "{}ID".format(root)
-                    desc_name = "{}Desc".format(root)
-                    data = [getattr(d, id_name) for d in self.data[key]]
-                    name = "{}s".format(root)
-                else:
-                    # If there is no object, there is no choice. So
-                    # association objects get removed properly even though
-                    # we can't say where.
-                    data = [[]]
-            else:
-                data = self.data[key]
-
-            if getattr(self, key).type == "QuerySelectField":
-                # Promote integer value to choice selection
-                choices = getattr(self, key).query_factory().all()
-                selected = [item for item in choices
-                                  if item == data]
-                if len(selected) == 1:
-                    data = self.get_options_from_list(key, selected)
-                    data = data[0]["id"] if data else None
+                if len(data):
+                    options = self.get_options_from_list(key, data)
+                    data = [option["id"] for option in options]
                 else:
                     data = None
 
-#             output.append({"name": name,
-#                            "value": data})
-            output[name] = data
+            elif getattr(self, key).type == "QuerySelectField":
+                # Promote integer value to choice selection
+                if data:
+                    options = self.get_options_from_list(key, [data])
+                    data = options[0]["id"] if len(options) > 0 else None
+                else:
+                    data = None
 
+            output[name] = data
         return output
 
 # Classes to provide choices for select field choices
@@ -452,12 +436,10 @@ class Description(ModelForm, FormlyAttributes, DataSerializer):
 
     created = DateField(u"created",
         description=u"The date on which the original idea was entered into "
-                     "the tool. This is a computed value.",
-        format="%m/%d/%Y")
+                     "the tool. This is a computed value.")
     ended = DateField(u"ended",
         description=u"The date on which the project was marked as ended. "
-                     "This is a computed value.",
-        format="%m/%d/%Y")
+                     "This is a computed value.")
     final = QuerySelectField(u"final state",
         query_factory=final_choices,
         description=u"If this project has come to an end, one way or the "
@@ -469,7 +451,7 @@ class Description(ModelForm, FormlyAttributes, DataSerializer):
                       "surviving project. For a split project, enter the "
                       "project IDs of the child projects.")
 
-    latest_dispositions = QuerySelectField(u"disposition",
+    latest_dispositions = QuerySelectMultipleField(u"disposition",
         query_factory=disposition_choices,
         description=u"What decision was made during the planning cycle with "
                      "respect to this project?")

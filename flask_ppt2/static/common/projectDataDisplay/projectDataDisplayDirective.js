@@ -110,7 +110,7 @@
      *  @name details
      *  @desc Return the results from the detailDatasource attribute function
      *        as a list of attributes.
-     *  @returns {Object[]}
+     *  @return {Object[]}
      */
     function details() {
       if (typeof this.attributes == "undefined" || this.attributes.length == 0) {
@@ -137,7 +137,7 @@
      *  @desc Return the results from the detailDatasource attribute function
      *        as an object with attribute name as the key, and attributes as
      *        the values.
-     * @returns {Object}
+     * @return {Object}
      */
     function detailsObj(name) {
       if (typeof this.attributesObj == "undefined" || Object.keys(this.attributesObj).length == 0) {
@@ -158,7 +158,7 @@
      *        knowledge of the database. Not considering that a problem right
      *        now.)
      *  @param {string} table - table name
-     *  @returns {string} ("one"||"comments"||"dispositions")
+     *  @return {string} ("one"||"comments"||"dispositions")
      */
     function getDataModelFromTable(table) {
       var oneToOneTables = ["'description'", "'portfolio'", "'project'"];

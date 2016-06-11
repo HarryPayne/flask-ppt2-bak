@@ -78,6 +78,7 @@ from a list/controlled vocabulary:
     matching form in the forms module will be "Foo".
 """
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from sqlalchemy import (Column, Date, DateTime, ForeignKey,
                         Float, Integer, String, Text, text)
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -93,7 +94,7 @@ DBmetadata = db.metadata
 # A column type for fiscal epoch, useful for knowing which quarter you are in.
 
 FISCAL_YEAR_OFFSET = app.config.get("FISCAL_YEAR_OFFSET")
-class FiscalEpochType(types.TypeDecorator):
+class FiscalQuarterType(types.TypeDecorator):
     """Convert db epoch (UTC) to Fiscal epoch for display.
     
     Add an offset on the way out and subtract it on the way in. Actual dates
@@ -104,19 +105,38 @@ class FiscalEpochType(types.TypeDecorator):
     impl = DateRangeType
     
     def process_result_value(self, value, dialect):
+        # FIXME:
+        # There is a problem in intervals which prevents it from noticing that
+        # our intervals in Postgresql are closed_open, and should drop the last
+        # day before returning an interval that is closed on both ends. For now
+        # we hardwire it.
         if value:
+            value.upper_inc = False
             if value.lower:
                 value.lower += FISCAL_YEAR_OFFSET
-            if value.upper:
-                value.upper += FISCAL_YEAR_OFFSET
+                if value.lower:
+                    value.upper = value.lower + relativedelta(months=3)
+                else:
+                    value.upper = value.lower + relativedelta(years=1)
+            if not value.lower_inc:
+                value.lower += relativedelta(days=1)
+            if not value.upper_inc:
+                value.upper -= relativedelta(days=1)
         return value
     
     def process_bind_param(self, value, dialect):
         if value:
+            value.upper_inc = False
             if value.lower:
                 value.lower -= FISCAL_YEAR_OFFSET
-            if value.upper:
-                value.upper -= FISCAL_YEAR_OFFSET
+                if value.upper:
+                    value.upper = value.lower + relativedelta(months=3)
+                else:
+                    value.upper = value.lower + relativedelta(years=1)
+            if not value.lower_inc:
+                value.lower -= relativedelta(days=1)
+            if not value.upper_inc:
+                value.upper += relativedelta(days=1)
         return value
 
 
@@ -547,8 +567,8 @@ class Disposition(Base):
 
     projectID = Column(Integer, ForeignKey("description.projectID"), 
                        primary_key=True)
-    disposedIn = Column(FiscalEpochType, primary_key=True)
-    reconsiderIn = Column(FiscalEpochType)
+    disposedIn = Column(FiscalQuarterType, primary_key=True)
+    reconsiderIn = Column(FiscalQuarterType)
     dispositionID = Column(Integer, 
                            ForeignKey(Dispositionlist.dispositionID),
                            index=True, server_default=text("'0'"))
@@ -561,15 +581,15 @@ class Disposition(Base):
     disposition = relationship("Dispositionlist")
 
     # Relationship to base table.
-    t_description = relationship("Description", backref="dispositions")
+    #t_description = relationship("Description", backref="dispositions")
 
 
 class Latest_disposition(Base):
     __tablename__ = "latest_disposition"
     projectID = Column(Integer, ForeignKey("description.projectID"), 
                        primary_key=True)
-    disposedIn = Column(FiscalEpochType)
-    reconsiderIn = Column(FiscalEpochType)
+    disposedIn = Column(FiscalQuarterType)
+    reconsiderIn = Column(FiscalQuarterType)
     latest_dispositionID = Column("dispositionID", Integer,
                                   ForeignKey(Dispositionlist.dispositionID),
                                   server_default=text("'0'"))
@@ -580,9 +600,9 @@ class Latest_disposition(Base):
 
     # Really a rich version of a child table, like Driver or Stakeholder
     
-    description = relationship("Description",
+    description = relationship("Description", viewonly=True,
                                backref=backref("latest_dispositionID"))
-    latest_list = relationship("Dispositionlist")
+    latest_list = relationship("Dispositionlist", viewonly=True)
     
     def __init__(self, latest_list=None, description=None):
         self.latest_list = latest_list
@@ -615,7 +635,7 @@ class Portfolio(Base):
                          server_default=text("'0'"))
     rpu = Column(Float, nullable=True,
                  server_default=text("'0'"))
-    budgetIn = Column(FiscalEpochType)
+    budgetIn = Column(FiscalQuarterType)
     budgetInFY = Column(Integer,
                         info={"coerce": int},
                         nullable=True, index=True, server_default=None)

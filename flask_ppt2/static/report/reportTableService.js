@@ -279,7 +279,7 @@
      *  @name tableColumns
      *  @desc Return a list of column names by extracting the "data" attribute
      *        from each item in the dtColumns list.
-     *  @returns {string[]}
+     *  @return {string[]}
      */
     function tableColumns() {
       return _.pluck(service.master.dtColumns, "data");

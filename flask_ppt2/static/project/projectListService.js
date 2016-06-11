@@ -97,7 +97,7 @@
     /**
      *  @name allProjectsCount
      *  @desc Return the total number of available projects
-     *  @returns {Number}
+     *  @return {Number}
      */
     function allProjectsCount() {
       return service.getMasterList().allProjects.length;
@@ -106,7 +106,7 @@
     /**
      *  @name getIDListFromAllProjects
      *  @desc Return the list of projectIDs for all available projects
-     *  @returns {Number[]}
+     *  @return {Number[]}
      */
     function getIDListFromAllProjects() {
       return _.map(service.masterList.allProjects, function(item) {
@@ -116,7 +116,7 @@
     /**
      *  @name getMasterList
      *  @desc Getter for service.masterList
-     *  @returns {Object}
+     *  @return {Object}
      */
     function getMasterList() {
       return service.masterList;
@@ -125,7 +125,7 @@
     /**
      *  @name getNextID
      *  @desc Getter for service.masterList.next
-     *  @returns {Number} projectID
+     *  @return {Number} projectID
      */
     function getNextID() {
       return service.masterList.next;
@@ -134,7 +134,7 @@
     /**
      *  @name getPreviousID
      *  @desc Getter for service.masterList.previous
-     *  @returns {Number} projectID
+     *  @return {Number} projectID
      */
     function getPreviousID() {
       return service.masterList.previous;
@@ -143,7 +143,7 @@
     /**
      *  @name getProjectID
      *  @desc Getter for service.masterList.projectID
-     *  @returns {Number}
+     *  @return {Number}
      */
     function getProjectID() {
       return service.masterList.projectID;
@@ -152,7 +152,7 @@
     /**
      *  @name getSelectedIds
      *  @desc Getter for service.masterList.selectedIds
-     *  @returns {Number[]}
+     *  @return {Number[]}
      */
     function getSelectedIds() {
       return service.masterList.selectedIds;
@@ -161,7 +161,7 @@
     /**
      *  @name getSelectedProjects
      *  @desc Return the brief descriptions for all of the selected projects
-     *  @returns {Object[]}
+     *  @return {Object[]}
      */
     function getSelectedProjects() {
       return service.masterList.selectedProjects;
@@ -170,7 +170,7 @@
     /**
      *  @name getSql
      *  @desc Getter for service.masterList.sql
-     *  @returns {string}
+     *  @return {string}
      */
     function getSql() {
       return service.masterList.sql;
@@ -189,7 +189,7 @@
      *  @name hasProjects
      *  @desc Return the validity of the statement "there are available 
      *        projects in service.masterList.allProjects"
-     *  @returns {Boolean}
+     *  @return {Boolean}
      */
     function hasProjects() {
       return Boolean(service.allProjectsCount() > 0);

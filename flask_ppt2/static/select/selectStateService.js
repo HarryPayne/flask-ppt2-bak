@@ -92,7 +92,7 @@
      * @name getBreakdownTotal
      * @desc Return the sum of all the project counts in the breakdown by
      *        attribute results table.
-     * @returns {number} total
+     * @return {number} total
      */
     function getBreakdownTotal() {
       var total = 0;

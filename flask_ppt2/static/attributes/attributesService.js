@@ -182,7 +182,7 @@ Data attributes:
      * @name getAttribute
      * @desc Retrieve a data attribute object by name
      * @param {string} name - name of object to be retrieved
-     * @returns {Object} data attribute object
+     * @return {Object} data attribute object
      */
     function getAttribute(name) {
       return service.allAttributes[name];
@@ -191,7 +191,7 @@ Data attributes:
     /** 
      * @name getAllAttributes
      * @desc Retrieve the list of all data attribute objects
-     * @returns {Object[]} list of data attribute objects
+     * @return {Object[]} list of data attribute objects
      */
     function getAllAttributes() {
       return service.allAttributes;
@@ -206,7 +206,7 @@ Data attributes:
      *  @param {Object[]} keys - a list of {name, value} objects used to 
      *        identify the entity of interest in tables that are many-to-one
      *        with projectID.
-     *  @returns {Object} formData - an object where keys are attribute names
+     *  @return {Object} formData - an object where keys are attribute names
      *        and values are :
      *          {value: {id: number}} if attr.value has an "id" attribute, or
      *          {value: string||number||date||datetime} if it does not.
@@ -238,7 +238,7 @@ Data attributes:
      *        is to append an "s" to the end of the name. So "comments" would
      *        contain "comment" objects and "strategys" would hold strategy
      *        objects.
-     *  @returns {Object[]} a list of strings
+     *  @return {Object[]} a list of strings
      */
     function getFormlyContainerNames() {
       var table_names = service.getFormlyFormNames();
@@ -250,7 +250,7 @@ Data attributes:
      *  @desc Return formly options for the current project tab mode
      *  @param {String} mode  "view" for display mode otherwise a project 
      *         subtab name like "description.edit"
-     *  @returns {Object} formly formState object
+     *  @return {Object} formly formState object
      */
     function getFormlyOptions(mode) {
       if (mode == "view") {
@@ -275,7 +275,7 @@ Data attributes:
      *  @name getFormlyFields
      *  @desc Return formly fields for the requested data table.
      *  @param {String} tableName - name of the requested table.
-     *  @returns {Object[]} - a list of formly field objects
+     *  @return {Object[]} - a list of formly field objects
      */
     function getFormlyFields(tableName) {
       return service.formlyFields[tableName];
@@ -285,7 +285,7 @@ Data attributes:
      *  @name getFormlyFieldsDict
      *  @desc Return the object whose keys are the names of formly fields
      *        and whose values are the fields themselves.
-     *  @returns {Object} service.formlyFieldsDict
+     *  @return {Object} service.formlyFieldsDict
      */
     function getFormlyFieldsDict() {
       return service.formlyFieldsDict
@@ -337,7 +337,7 @@ Data attributes:
      * @desc Return all project data in one of the one-to-many database tables.
      * @param {string} tableName - name of table of interest ("comment" or
      *        "disposition")
-     * @returns {Object[]} - a list of choice objects of form 
+     * @return {Object[]} - a list of choice objects of form 
      *        {id: number: desc: string}
      */
     function getRawAttributes(tableName) {
@@ -354,7 +354,7 @@ Data attributes:
      * @desc For both single and multiple select fields, compare field
      *        choices (vocabulary) with database values and return selected
      *        choices.
-     * @returns {Object[]} - list of select widget choices 
+     * @return {Object[]} - list of select widget choices 
      */
     function getSelectedChoices(merged) {
       if (merged.multi) {
@@ -377,7 +377,7 @@ Data attributes:
      * @desc Return the server error from the most recent http request to the
      *        back end. These are for requests that fail, not those that were
      *        successful but reported form validation or database errors.
-     * @returns {string}
+     * @return {string}
      */
     function getServerError() {
       return service.server_error;
@@ -410,7 +410,7 @@ Data attributes:
      * @name hasAValue
      * @desc Decide whether a given project attribute has a value, so that the
      *        project view screen can show only attributes that have a value.
-     * @returns {Boolean}
+     * @return {Boolean}
      */
     function hasAValue(attr) {
       if ((typeof attr.value != "undefined" && attr.value != null && attr.value != "" && attr.value != []) ||
@@ -618,7 +618,7 @@ Data attributes:
      * @desc Request the full list of attribute objects from the server. Each 
      *        object has all of the information required to render an input
      *        field for a particular project attribute, except for a value.
-     * @returns {Object} - promise resolved after data have been received and
+     * @return {Object} - promise resolved after data have been received and
      *        saved
      */
     function updateAllAttributes() {
@@ -669,7 +669,7 @@ Data attributes:
      * @name updateFormlyFields
      * @desc Request a full list of formly field objects from the server
      *       and save them
-     * @returns {Object} - promise resolved after data have been received and
+     * @return {Object} - promise resolved after data have been received and
      *        saved
      */
     function updateFormlyFields() {

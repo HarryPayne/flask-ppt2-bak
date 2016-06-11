@@ -189,7 +189,7 @@
     /**
      *  @name currentMode
      *  @desc return the current mode
-     *  @returns {string} "view" if state name is "project.detail" else state 
+     *  @return {string} "view" if state name is "project.detail" else state 
      *        name
      */
     function currentMode() {
@@ -205,7 +205,7 @@
     /**
      *  @name currentSubtab
      *  @desc return the current project edit subtab
-     *  @returns {string} "view" if state name is "project.detail" else state 
+     *  @return {string} "view" if state name is "project.detail" else state 
      *        name
      */
     function currentSubtab() {
@@ -217,7 +217,7 @@
     /**
      *  @name editMode
      *  @desc return the answer to the question "am I in edit mode?"
-     *  @returns {Boolean}
+     *  @return {Boolean}
      */    
     function editMode() {
       if ($state.current.name.indexOf("edit") > -1) {
@@ -234,7 +234,7 @@
      *  @param {Object} params - a $stateParams object or a custom object
      *        with the same attributes, passed to the callback function.
      *  @callback setProjectData
-     *  @returns {Object} - a promise that is resolved once the response 
+     *  @return {Object} - a promise that is resolved once the response 
      *        from the back end has been saved.
      */
     function getProjectData(params) {
@@ -270,7 +270,7 @@
      *       save them.
      * @param {Object} params - a $stateParams object or a custom object
      *       with the same attributes, passed to the callback function.
-     * @returns {Object} - a promise that is resolved once the response 
+     * @return {Object} - a promise that is resolved once the response 
      *       from the back end has been saved.
      */
     function getProjectDataValues(params) {
@@ -335,7 +335,7 @@
      *  @name initService
      *  @desc called onEnter from projectConfig.js to ensure that data for the
      *        report from the backend are already in hand (or promised).
-     * @returns {Object} promise - a promise that is resolved after project 
+     * @return {Object} promise - a promise that is resolved after project 
      *        have been received and saved.
      */
     function initService() {
@@ -382,7 +382,7 @@
      *        instantiate an object with a date string (YYY-MM_DD), we need to
      *        send a date string back to the server when we submit the model.
      *  @param {Object} json object to be scanned.
-     *  @returns {Object} - a fully copy of the input json, with date strings
+     *  @return {Object} - a fully copy of the input json, with date strings
      *        turned into date, datetime, or date range objects.
      */
     function jsonToModel(json) {
@@ -503,7 +503,6 @@
      *        record of interest if the table is one-to-many with projectID.
      */
     function saveProject(table_name, keys) {
-      //var formData = attributesService.getFormData(table_name, keys);
       var projectID = $state.params.projectID ? $state.params.projectID : "";
       var request = {
         method: "POST",
@@ -548,7 +547,7 @@
       service.projectID = result.data.projectID;
       service.csrf_token = result.data.csrf_token;
       service.success = result.data.success;
-      service.error = result.data.error;
+      service.error = result.data.errors;
 
       if (typeof service.projectModel == "undefined") {
         service.projectModel = jsonToModel(result.data.formData);
@@ -598,7 +597,7 @@
      * @desc Return the truth of the statement "I have a success message that I
      *        I should be showing right now." Returns true if there is a 
      *        success message and the form is in its pristine state.
-     * @returns {Boolean} 
+     * @return {Boolean} 
      */
     function showEditSuccess() {
       return Boolean(_.contains(projectForm.classList, "ng-pristine") && service.success);
@@ -610,8 +609,8 @@
      *        represented by javascript Date objects) and return pure JSON. We 
      *        need this for sending form data to the back end. 
      *        Companion to jsonToModel. 
-     *  @params {Object} model - model with Date objects.
-     *  @returns {Object} JSON object
+     *  @param {Object} model - model with Date objects.
+     *  @return {Object} JSON object
      */
     function tableToJSON(table_name, model) {
       var fields = attributesService.getFormlyFields(table_name);
@@ -660,7 +659,6 @@
         // My back end wants this date range format.
         else if (field.type == "daterange") {
           if (json !==null && typeof json != "undefined") {
-            var dates = json.split("/");
             json = "["+ json +"]";      
           }
         }
@@ -682,8 +680,8 @@
      *       
      *       This method is called iteratively to traverse all sub-objects
      *       of the one passed in.
-     *  @params {Object} model - model with Date objects.
-     *  @returns {Object} JSON object
+     *  @param {Object} model - model with Date objects.
+     *  @return {Object} JSON object
      */
     function valueToJSON(key, value) {
       // Ignore things that are not objects.
@@ -703,18 +701,20 @@
 
       // Convert date-like objects.
       else if (field && (field.type == "date" || field.type =="datepicker")) { 
-        return moment(value).format("YYYY-MM-DD");
+        // My back end does not like a time in the value for a date field.
+        return value.format("YYYY-MM-DD");
       }
       else if (field && field.type == "timestamp") {
         return value.toISOString();
       }
       else if (field && field.type == "daterange") {
         // My backend wants 2 date strings separated by "/"
-        return [value.start.format("YYYY-MM-DD"), 
+        return [value.start.utc().format("YYYY-MM-DD"),
                 value.end.utc().format("YYYY-MM-DD")].join("/");
       }
       else if (value._isAMomentObject) {
-        return value.toISOString();
+        // My backend does not like milliseconds
+        return value.toJSON();
       }
       
       // Dive into remaining objects.
