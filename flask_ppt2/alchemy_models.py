@@ -81,6 +81,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import (Column, Date, DateTime, ForeignKey,
                         Float, Integer, String, Text, text)
+from sqlalchemy.dialects.postgresql import DATERANGE
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship, backref
 import sqlalchemy.types as types
@@ -105,19 +106,15 @@ class FiscalQuarterType(types.TypeDecorator):
     impl = DateRangeType
     
     def process_result_value(self, value, dialect):
-        # FIXME:
-        # There is a problem in intervals which prevents it from noticing that
-        # our intervals in Postgresql are closed_open, and should drop the last
-        # day before returning an interval that is closed on both ends. For now
-        # we hardwire it.
         if value:
-            value.upper_inc = False
             if value.lower:
                 value.lower += FISCAL_YEAR_OFFSET
-                if value.lower:
-                    value.upper = value.lower + relativedelta(months=3)
+                if value.upper:
+                    value.upper = (value.lower + relativedelta(months=3) 
+                                   - relativedelta(days=1))
                 else:
-                    value.upper = value.lower + relativedelta(years=1)
+                    value.upper = (value.lower + relativedelta(years=1) 
+                                   - relativedelta(days=1))
             if not value.lower_inc:
                 value.lower += relativedelta(days=1)
             if not value.upper_inc:
@@ -126,13 +123,14 @@ class FiscalQuarterType(types.TypeDecorator):
     
     def process_bind_param(self, value, dialect):
         if value:
-            value.upper_inc = False
             if value.lower:
                 value.lower -= FISCAL_YEAR_OFFSET
                 if value.upper:
-                    value.upper = value.lower + relativedelta(months=3)
+                    value.upper = (value.lower + relativedelta(months=3) 
+                                   - relativedelta(days=1))
                 else:
-                    value.upper = value.lower + relativedelta(years=1)
+                    value.upper = (value.lower + relativedelta(years=1) 
+                                   - relativedelta(days=1))
             if not value.lower_inc:
                 value.lower -= relativedelta(days=1)
             if not value.upper_inc:
