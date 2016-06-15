@@ -61,6 +61,8 @@
       this.cancel = cancel;
       this.details = details;
       this.detailsObj = detailsObj;
+      this.flatten = flatten;
+      this.form;
       this.hasAValue = hasAValue;
       this.hasCancel = hasCancel;
       this.hideDetails = hideDetails;
@@ -96,6 +98,7 @@
       bindToController: true,
       link: function(scope, element, attributes, ctrl) {
         scope.submit = ctrl.save;
+        ctrl.form = scope.$parent.projectForm;
       },
       templateUrl: getTemplateForDataModel
     };
@@ -153,6 +156,26 @@
       if (name in this.attributesObj) {
         return this.attributesObj[name];
       }
+    }
+
+    /**
+     * @name flatten
+     * @desc Flatten the data for one choice of sub-object by assigning those 
+     *       values to this.datasource. Parameters specify which list of
+     *       many-to-one items with respect to a project, and which item in
+     *       that list, by index is to be flattened.
+     * @param {string} list_name    The name of the attribute in datasource()
+     *                              chosen for flattening ("comments", or 
+     *                              "dispositions").
+     * @param {number} index        The index of the selected item.
+     */
+    function flatten(list_name, index) {
+      var selected = this.datasource[list_name][index];
+      _.each(Object.keys(selected), function(key) {
+        if (key == "$$hashKey") return;
+        this[key] = selected[key];
+      }, this.datasource);
+      return this.datasource;
     }
 
     /**
@@ -280,7 +303,7 @@
         return false;
       }
       var selected = false;
-      var item = this.datasource[index];
+      var item = this.datasource[table_name][index];
       if (typeof item != "undefined") {
         _.each(this.keys, function(key){
           var state_value = this.stateParams[key];
@@ -294,6 +317,10 @@
             selected = false;
           }
         }, this);
+      }
+      // If this is the one, flatten the data source
+      if (selected) {
+        this.flatten(table_name, index);
       }
       return selected;
     }

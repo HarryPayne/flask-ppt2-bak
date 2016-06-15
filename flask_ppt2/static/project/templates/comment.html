@@ -1,8 +1,8 @@
-<div project-data-display
-  datasource="project.ds.projectModel.comments"
+<!-- div project-data-display
+  datasource="project.ds.projectModel"
   detailDatasource="project.as.getFormlyFields('comment')"
   error="project.ds.error"
-  fields="[project.fields['comment'][0]]"
+  fields="project.fields['comment']"
   header="'Comments'"
   hide="project.ds.hideDetails"
   keys="['commentID']"
@@ -12,4 +12,98 @@
   show-success="project.ds.showEditSuccess()"
   success="project.ds.success"
   table="'comment'"
-  ></div>
+  ></div-->
+
+<div>
+  <div ng-show="project.ds.showEditSuccess()" class="col-sm-offset-2 col-sm-10 alert alert-success alert-dismissible">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">×</button>
+  <span ng-bind="project.ds.success"></span>
+</div>
+<span ng-show="project.ds.error" class="col-sm-offset-2 col-sm-10 alert alert-danger alert-dismissible">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">×</button>
+  <span ng-bind="project.ds.error"></span>
+</span>
+
+<div ng-if="project.ds.currentMode() == 'view' || project.ds.currentMode() == 'edit' || project.ds.currentMode() == 'edit.detail'">
+  <h4 class="col-sm-12" ng-bind="'Comments'"></h4>
+</div>
+<div ng-if="project.ds.currentMode() == 'add'">
+  <h4 class="col-sm-12">Add a comment </h4>
+</div>
+
+<div ng-if="project.ds.currentMode() == 'add'">
+  <div project-data-comment-detail></div>
+</div>
+
+<div class="form-group" ng-repeat="comment in project.ds.projectModel['comments']">
+
+  <div ng-if="(project.ds.currentMode() == 'edit.detail' && project.ds.isSelected(comment, 'comments', ['commentID'], $index))">
+      <div ng-hide="project.ds.currentMode() == 'add'">
+        <label ng-bind="comment['commentAuthor']" class="col-sm-2 control-label"></label>
+      </div>
+      <div ng-show="project.ds.currentMode() == 'add'" class="col-sm-2"></div>
+  
+      <div ng-hide="project.ds.currentMode() == 'add'"
+        class="col-sm-10" style="padding-top: 7px;">
+        <span ng-bind="comment['comment']"></span><br/>
+        Entered <span ng-bind-html="comment['commentAuthored'] | amUtc | amLocal | amCalendar:referenceTime:formats"></span>
+        <span ng-show="comment['commentEditor'].length"><br/>
+          Last edited by <span ng-bind="comment['commentEditor']"></span> 
+          on <span ng-bind="comment['commentEdited'] | amUtc | amLocal | amCalendar:referenceTime:formats"></span>
+        </span>
+        <button type="button" 
+          ng-show="project.ds.currentMode() == 'edit'"
+          ng-click="project.ds.showDetails('comment', [{name: 'commentID', id: comment['commentID']}])"> Edit </button>
+        <button type="button" 
+          ng-show="project.ds.currentMode() == 'edit.detail'"
+          ng-click="project.ds.hideDetails('comment', [{name: 'commentID', id: comment['commentID']}])"> Cancel </button>
+      </div>
+  
+      <div class="col-sm-offset-2 col-sm-10" style="background-color: #f8f8f8; border-color: #e7e7e7;">
+        <h5 ng-hide="project.ds.currentMode() == 'add'">Edit this comment:</h5>
+  
+      <textarea ng-model="comment.comment" ng-bind="comment.comment" 
+        class="form-control"></textarea>
+      </div>
+  
+      <div style="background-color: #f8f8f8; border-color: #e7e7e7;"
+        class="col-sm-offset-2 col-sm-10">
+        <formly-form model="comment"
+          fields="project.fields['comment']" 
+          form="projectForm">
+        </formly-form>
+      </div>
+  
+      <div class="col-sm-offset-2">
+        <div ng-hide="project.ds.currentMode() == 'add' || project.ds.currentMode() == 'edit.detail'" class="col-sm-4">
+          Entered <span ng-bind="comment['commentAuthored'] | amUtc | amLocal | amCalendar:referenceTime:formats"></span>
+          <span ng-show="comment['commentEditor'].length"><br/>
+            Last edited by <span ng-bind="comment['commentEditor']"></span>
+            on <span ng-bind="comment['commentEdited'] | amUtc | amLocal | amCalendar:referenceTime:formats"></span></span><br/>
+        </div class="col-sm-4">
+        <button type="button" ng-click="project.ds.saveProject('comment', {model: comment, field_name: 'comments'})"> Save </button>
+        <button type="button" ng-click="project.ds.hideDetails('comment', [{name: 'commentID', id: comment['commentID']}])"> Cancel </button>
+      </div>
+  
+      <div ng-show="project.ds.currentMode() == 'add'" class="col-sm-12">
+        <h4> Earlier Comments </h4>
+      </div>
+  </div>
+  <div ng-if="!(project.ds.currentMode() == 'edit.detail' && project.ds.isSelected(comment, 'comments', ['commentID'], $index))">
+    <!--div project-data-comment></div-->
+    <div>
+      <label ng-bind="comment['commentAuthor']" class="col-sm-2 control-label"></label>
+    </div>
+    <div class="col-sm-10" style="padding-top: 7px;">
+      <span ng-bind-html="comment['comment']"></span><br/>
+      Entered {{comment['commentAuthored'] | amUtc | amLocal | amCalendar:referenceTime:formats}}.
+      <span ng-show="comment['commentEditor']">
+        <br/>Last edited by <span ng-bind="comment['commentEditor']"></span> 
+        on {{comment['commentEdited'] | amUtc | amLocal | amCalendar:referenceTime:formats}}
+      </span>
+      <button type="button" 
+        ng-show="project.ds.currentMode() == 'edit'"
+        ng-click="project.ds.showDetails('comment', {'commentID': comment['commentID']})"> Edit </button>
+    </div>
+  </div>
+</div>

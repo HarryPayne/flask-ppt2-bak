@@ -23,7 +23,7 @@
    *            string in the location bar.
    */
 
-  "use strict";
+  //"use strict";
   
   angular
     .module("app.project")
@@ -59,6 +59,7 @@
       getProjectDataFromLocation: getProjectDataFromLocation,
       hideDetails: hideDetails,
       initService: initService,
+      isSelected: isSelected,
       jsonToModel: jsonToModel,
       jumpToAtachFile: jumpToAtachFile,
       jumpToAddForm: jumpToAddForm,
@@ -380,6 +381,44 @@
         deferred.resolve();
       }
       return deferred.promise;
+    }
+
+    /**
+     * @name isSelected
+     * @desc Return the truth of the statement "this is the item you want to 
+     *        work on." The primary key values of the item are compared with
+     *        the stateParam values for each key.
+     */
+    function isSelected(model, table_name, keys, index) {
+      if (typeof index == "undefined" || 
+          typeof keys == "undefined" || 
+          keys.length == 0 ||
+          typeof service.projectModel[table_name] == "undefined" ||
+          service.projectModel[table_name].length == 0) {
+        return false;
+      }
+      var selected = false;
+      var item = service.projectModel[table_name][index];
+      if (typeof item != "undefined") {
+        _.each(keys, function(key){
+          var state_value = service.stateParams[key];
+          var item_value = item[key].toString();
+          if ((typeof state_value != "undefined" 
+               && typeof item_value != "undefined" 
+               && state_value == item_value)) {
+            selected =  true;
+          }
+          else {
+            selected = false;
+          }
+        });
+      }
+/*      // If this is the one, flatten the data source
+      if (selected) {
+        this.flatten(table_name, index);
+      }
+*/      
+      return selected;
     }
 
     function jumpToAtachFile() {

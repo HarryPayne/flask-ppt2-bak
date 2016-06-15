@@ -19,7 +19,7 @@ from wtforms_alchemy.fields import (QuerySelectField,
 from wtforms_components import DateRange, read_only
 from wtforms_components import DateIntervalField
 from wtforms_components.widgets import ReadOnlyWidgetProxy
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, Required
 from flask_ppt2 import app, db
 from flask_ppt2.widgets import ChoicesSelect
 import flask_ppt2.alchemy_models as alch
@@ -45,7 +45,7 @@ class FormlyAttributes:
 
         key            attribute name
         type           form field class name
-        read_only      flag for computed attributes
+        read_only      flag for computed attributes.
         required       mandatory field
         label          field label
         description    help text for the field
@@ -59,7 +59,7 @@ class FormlyAttributes:
     the form class, which is intended to be the order in which they appear on
     the page in the front end.
     """
-    def formly_attributes(self, prefix=""):
+    def formly_attributes(self, model_prefix=""):
         """Return a list of angular-formly fields for the form."""
         model = inspect(self.Meta.model)
         attrs = []
@@ -368,7 +368,7 @@ class Description(ModelForm, FormlyAttributes, DataSerializer):
                 "dependencies", "proposer", "customer", "created", "ended",
                 "descriptionLastModified", "descriptionLastModifiedBy"]
 
-    name = StringField(label=u"name",
+    name = StringField(label=u"name", validators=[Required()],
         description=u"A clear description of the objective/purpose of "
                      "the proposed project, and if known, what it would "
                      "take to complete. The first 100 characters will be "
@@ -468,7 +468,7 @@ class Description(ModelForm, FormlyAttributes, DataSerializer):
 
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
-    descriptionLastModified = DateTimeField(u"last updated", format="%Y-%m-%dT%H:%M:%SZ")
+    descriptionLastModified = DateTimeField(u"last updated", format="%Y-%m-%dT%H:%M:%S.%fZ")
     descriptionLastModifiedBy = StringField(u"last updated by")
 
     def __init__(self, *args, **kwargs):
@@ -693,12 +693,12 @@ class Comment(ModelForm, FormlyAttributes, DataSerializer):
         description=u"Comment text goes here.")
     commentAuthor = StringField(u"created by",
         description=u"User ID of original author. This is a computed value.")
-    commentAuthored = DateTimeField(u"on", format="%Y-%m-%dT%H:%M:%SZ",
+    commentAuthored = DateTimeField(u"on", format="%Y-%m-%dT%H:%M:%S.%fZ",
         description=u"Date that comment was written. This is a computed "
                      "value.")
     commentEditor = StringField(u"last edited by",
         description=u"Most recent editor. This is a computed attribute.")
-    commentEdited = DateTimeField(u"on", format="%Y-%m-%dT%H:%M:%SZ",
+    commentEdited = DateTimeField(u"on", format="%Y-%m-%dT%H:%M:%S.%fZ",
         description=u"Time of last edit. This is a computed value.")
 
     def __init__(self, *args, **kwargs):

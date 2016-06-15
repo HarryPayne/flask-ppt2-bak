@@ -1011,8 +1011,7 @@ def projectEdit(projectID, tableName):
         elif tableName == "comment":
             commentID = int(request.json["commentID"])
             if commentID:
-                c = alch.Comment.query.\
-                        filter_by(projectID = projectID).\
+                c = db.session.query(alch.Comment).                  \
                         filter_by(commentID = commentID).first()
                 c_success = "The comment was updated."
 

@@ -12,8 +12,7 @@
       replace: true,
       scope: {
         comment: "=",
-        ctrl: "=",
-        index: "@"
+        ctrl: "="
       },
       templateUrl: "static/common/projectDataFormatDirectives/projectDataCommentDetail.html",
       link: function(scope, element, attributes) {
