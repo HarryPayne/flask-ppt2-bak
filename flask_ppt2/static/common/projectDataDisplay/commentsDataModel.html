@@ -19,11 +19,12 @@
   <div project-data-comment-detail></div>
 </div>
 
-<div class="form-group" ng-repeat="comment in ctrl.datasource()">
-  <div ng-if="(ctrl.mode == 'edit.detail' && ctrl.isSelected(comment))">
-    <div project-data-comment-detail></div>
+<div class="form-group" ng-repeat="comment in ctrl.datasource">
+  <div ng-if="(ctrl.mode == 'edit.detail' && ctrl.isSelected('comments', $index))">
+    <div project-data-comment-detail comment="ctrl.datasource[$index]"
+      ctrl="ctrl"></div>
   </div>
-  <div ng-if="!(ctrl.mode == 'edit.detail' && ctrl.isSelected(comment))">
+  <div ng-if="!(ctrl.mode == 'edit.detail' && ctrl.isSelected('comments', $index))">
     <div project-data-comment></div>
   </div>
 </div>

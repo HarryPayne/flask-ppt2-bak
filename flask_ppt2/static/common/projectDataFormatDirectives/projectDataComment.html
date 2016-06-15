@@ -1,12 +1,14 @@
 <div>
   <label ng-bind="comment['commentAuthor']" class="col-sm-2 control-label"></label>
 </div>
-
 <div class="col-sm-10" style="padding-top: 7px;">
   <span ng-bind-html="comment['comment']"></span><br/>
-  Entered <span ng-bind="comment['commentAuthored.printValue']"></span>
-  <span ng-show="comment['commentEditor']"><br/>Last edited by <span ng-bind="comment['commentEditor']"></span> on <span ng-bind="comment['commentEdited.printValue']"></span></span>
+  Entered {{comment['commentAuthored'] | amUtc | amLocal | amCalendar:referenceTime:formats}}.
+  <span ng-show="comment['commentEditor']">
+    <br/>Last edited by <span ng-bind="comment['commentEditor']"></span> 
+    on {{comment['commentEdited'] | amUtc | amLocal | amCalendar:referenceTime:formats}}
+  </span>
   <button type="button" 
     ng-show="ctrl.mode == 'edit'"
-    ng-click="ctrl.showDetails('comment', [{name: 'commentID', value: {id: comment['commentID']}}])"> Edit </button>
+    ng-click="ctrl.showDetails('comment', {'commentID': comment['commentID']})"> Edit </button>
 </div>

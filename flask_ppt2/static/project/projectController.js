@@ -24,20 +24,21 @@
     this.ds = projectDataService;
     this.ls = projectListService;
     this.log_s = loginStateService;
-    
-    this.attributes = attributesService.getAttributes;
-    this.changeMode = projectDataService.changeMode;
+    this.projectListPromise = projectListPromise;
+    this.fields = attributesPromise;
+
+    this.changeMode = this.ds.changeMode;
     this.currentMode = projectDataService.currentMode;
     this.dateOptions = {changeYear: true, changeMonth: true};
     this.error = this.ds.server;
+    this.formlyOptions = this.as.formlyOptions;
+    this.getFormlyOptions = this.as.getFormlyOptions;
     this.jumpToAtachFile = projectDataService.jumpToAtachFile;
     this.jumpToAddForm = projectDataService.jumpToAddForm;
     this.masterList = this.ls.getMasterList;
+    this.showDetails = this.ds.shotDetails;
     this.success = this.ds.success;
     this.viewUrl = projectDataService.viewUrl;
-
-    this.attributesPromise = attributesPromise;
-    this.projectListPromise = projectListPromise;
 
     /* angular-formly options for Bootstrap horizontal layout and for 
      * readonly display on the view page. */
@@ -57,7 +58,9 @@
     };
 
     $scope.$on("setProjectFormPristine", function() {
-      $scope.projectForm.$setPristine(true);
+      if (typeof projectForm != "undefined") {
+        $scope.projectForm.$setPristine(true);
+      }
     });
     
     $scope.$on(["$stateChangeStart"], unsavedDataPopup);
@@ -85,7 +88,7 @@
       }
       
       /** if the "projectForm" project editing form has unsaved changes ... */
-      if ($scope.projectForm.$dirty) {
+      if (typeof $scope.projectForm != "undefined" && $scope.projectForm.$dirty) {
         event.preventDefault();
 
         var modalOptions = {

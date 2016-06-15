@@ -1,28 +1,36 @@
-<label for="dispositionID" class="col-sm-2 control-label">
-  <label ng-bind="disp['disposedInFY'].desc"></label>
-  <label ng-bind="disp['disposedInQ'].desc"></label>
-</label>
+<div>
+  <label for="dispositionID" class="col-sm-2 control-label">
+    <span ng-show="disp['disposedIn'].start">FY</span>{{disp['disposedIn'].start | amDateFormat:"YY"}}
+    <span ng-show="disp['disposedIn'].start">Q</span>{{disp['disposedIn'].start | amDateFormat:"Q"}} 
+  </label>
+</div>
 <div class="col-sm-10" style="padding-top: 7px;">
-  <span ng-bind="disp['dispositionID'].desc" class="text-capitalize"></span>.
-  <span ng-show="disp['reconsiderInQ'].desc || disp['reconsiderInFY'].desc">
-    Reconsider in <span ng-bind="disp['reconsiderInFY'].desc"></span>
-    <span ng-bind="disp['reconsiderInQ'].desc"></span>.
+  <span class="text-capitalize">{{disp['dispositionDesc']}}.</span>
+  <span ng-show="disp['reconsiderIn']">
+    Reconsider in 
+      FY{{disp['reconsiderIn'].start | amDateFormat:"YY"}}
+      Q{{disp['reconsiderIn'].start | amDateFormat:"Q"}}.
+    </span>
+  <span ng-show="disp['plannedFor'].start">
+    Start in 
+      {{disp['plannedFor'].start | amDateFormat:"MMM"}}<span ng-show="disp['plannedFor'].end">, 
+      {{disp['plannedFor'].start | amDateFormat:"YYYY"}}</span>. 
+    </span>
   </span>
-  <span ng-show="disp['startInY'].desc || disp['startInM'].desc">
-    Start in <span ng-bind="disp['startInM'].desc"></span>
-    <span ng-bind="disp['startInY'].desc"></span>.
-  </span>
-  <span ng-show="disp['finishInY'].desc || disp['finishInM'].desc">
-    Finish in <span ng-bind="disp['finishInM'].desc"></span>
-    <span ng-bind="disp['finishInY'].desc"></span>.
+    </span>
+  <span ng-show="disp['plannedFor'].end">
+    Finish in 
+      {{disp['plannedFor'].start | amDateFormat:"MMM"}}<span ng-show="disp['plannedFor'].end">, {{disp['plannedFor'].end | amDateFormat:"YYYY"}}</span>. 
+    </span>
   </span>
   <span ng-show="disp['explanation']">
     <br/>
-    <span ng-bind-html="disp['explanation']"></span>
+    {{disp['explanation']}}
   </span>
   <span>
     <br/>
-    Last modified by <span ng-bind="disp['lastModifiedBy']"></span> on <span ng-bind="disp['lastModified.printValue']"></span>
+    Last modified by {{disp['dispositionLastModifiedBy']}} on 
+    {{disp['dispositionLastModified'] | amUtc | amLocal | amCalendar:referenceTime:formats}}.
   </span>
 
   <button type="button"

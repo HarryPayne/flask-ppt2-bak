@@ -37,7 +37,7 @@ Data attributes:
                                "$timeout"];
   
   function attributesService($rootScope, $http, $q, projectListService, 
-                             $timeout) {
+                             $timeout, attributesPromise) {
     var service = {
       addAttrToDataObj: addAttrToDataObj,
       addUniqueAttrToDataObj: addUniqueAttrToDataObj,
@@ -48,6 +48,7 @@ Data attributes:
       getFormlyContainerNames: getFormlyContainerNames,
       getFormlyOptions: getFormlyOptions,
       getFormlyField: getFormlyField,
+      getFormlyFieldObj: getFormlyFieldObj,
       getFormlyFields: getFormlyFields,
       getFormlyFieldsDict: getFormlyFieldsDict,
       getFormlyFormNames: getFormlyFormNames,
@@ -271,6 +272,15 @@ Data attributes:
       return service.formlyFieldsDict[key];
     }
     
+    function getFormlyFieldObj() {
+      if (service.hasFormlyFields()) {
+        return service.formlyFields;
+      }
+      else {
+        return service.updateFormlyFields();
+      }
+    }
+
     /**
      *  @name getFormlyFields
      *  @desc Return formly fields for the requested data table.
@@ -288,8 +298,9 @@ Data attributes:
      *  @return {Object} service.formlyFieldsDict
      */
     function getFormlyFieldsDict() {
-      return service.formlyFieldsDict
+      return service.formlyFieldsDict;
     }
+
 
     /**
      *  @name getFormlyFormNames
@@ -694,7 +705,7 @@ Data attributes:
             });
           });
           SaveState();
-          deferred.resolve();
+          deferred.resolve(service.formlyFields);
         });
       return deferred.promise;
     }

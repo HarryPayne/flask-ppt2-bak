@@ -8,17 +8,16 @@
   
   function ProjectDataCommentDetail() {
     
-    function controller() {
-      var vm = this;
-    }
-
     return {
-      controller: controller,
-      controllerAs: "detailCtrl",
-      restrict: "EA",
+      replace: true,
+      scope: {
+        comment: "=",
+        ctrl: "=",
+        index: "@"
+      },
       templateUrl: "static/common/projectDataFormatDirectives/projectDataCommentDetail.html",
-      link: function(scope, element, attributes, ctrl) {
-        console.log("");
+      link: function(scope, element, attributes) {
+        console.log(scope);
       },
     };
     

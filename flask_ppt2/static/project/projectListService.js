@@ -100,7 +100,7 @@
      *  @return {Number}
      */
     function allProjectsCount() {
-      return service.getMasterList().allProjects.length;
+      return service.masterList.allProjects.length;
     }
 
     /**
@@ -119,7 +119,12 @@
      *  @return {Object}
      */
     function getMasterList() {
-      return service.masterList;
+      if (service.hasProjects()) {
+        return service.masterList;
+      }
+      else {
+        return service.updateAllProjects()
+      }
     };
 
     /**
@@ -450,7 +455,7 @@
       $http(request)
         .then(function(response) {
           service.setAllProjectResults(response, projectID);
-          deferred.resolve(projectID);
+          deferred.resolve(service.masterList.projectID);
         });
       return deferred.promise;
     };

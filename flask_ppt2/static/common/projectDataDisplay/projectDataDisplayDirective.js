@@ -14,14 +14,13 @@
    * 
    *  The attributes for this directive are:
    * 
-   *    datasource - a reference to an external function that supplies a list
-   *      of items to be rendered. In the case of the tables that are one-to-
+   *    datasource - a reference to an external function that supplies a data
+   *      model to be rendered. In the case of the tables that are one-to-
    *      one with projectID, these items will be attributes of the project
    *      under consideration. In the case of the one-to-many tables, this will
    *      be the list of items (comments or dispositions) to be listed.
-   * 
    *    detailDatasource - a reference to an external function that supplies
-   *      a list of attributes for the detail item to be edited. 
+   *      a list of formly fields for the detail item. 
    *    detailIsSelected - a reference to a function that returns true when
    *      looping over the one-to-many items and landing on the one the user
    *      has selected.
@@ -53,7 +52,9 @@
     .module("app.common")
     .directive("projectDataDisplay", ProjectDataDisplay);
   
-  function ProjectDataDisplay() {
+  ProjectDataDisplay.$inject = ["$stateParams"]
+  
+  function ProjectDataDisplay($stateParams) {
     
     function controller() {
       //this.dataModel = getDataModelFromTable(this.table);
@@ -68,15 +69,17 @@
       this.saveDetails = saveDetails;
       //this.selectedKeys = typeof keys == "function" ? keys() : [];
       this.showDetails = showDetails;
+      this.stateParams = $stateParams;
     }
     
     return {
       restrict: "EA",
       scope: {
-        datasource: "&",
+        datasource: "=",
         detailDatasource: "&",
         detailIsSelected: "&",
         error: "=",
+        fields: "=",
         header: "=",
         hide: "&",
         keys: "=",
@@ -266,23 +269,32 @@
      * @name isSelected
      * @desc Return the truth of the statement "this is the item you want to 
      *        work on." The primary key values of the item are compared with
-     *        the primary key values specified by the keys attribute.
+     *        the stateParam values for each key.
      */
-    function isSelected(item) {
-      if (typeof item == "undefined" || typeof this.keys == "undefined" || this.keys.length == 0 ) {
+    function isSelected(table_name, index) {
+      if (typeof index == "undefined" || 
+          typeof this.keys == "undefined" || 
+          this.keys.length == 0 ||
+          this.datasource == "undefined" ||
+          this.datasource.length == 0) {
         return false;
       }
       var selected = false;
-      _.each(this.keys, function(key){
-        var value = getValueFromKey(key);
-        if ((typeof item[key.name].id == "undefined" && item[key.name] == value)
-            || (typeof item[key.name].id != "undefined" && item[key.name].id == value)) {
-          selected =  true;
-        }
-        else {
-          selected = false;
-        }
-      });
+      var item = this.datasource[index];
+      if (typeof item != "undefined") {
+        _.each(this.keys, function(key){
+          var state_value = this.stateParams[key];
+          var item_value = item[key].toString();
+          if ((typeof state_value != "undefined" 
+               && typeof item_value != "undefined" 
+               && state_value == item_value)) {
+            selected =  true;
+          }
+          else {
+            selected = false;
+          }
+        }, this);
+      }
       return selected;
     }
 

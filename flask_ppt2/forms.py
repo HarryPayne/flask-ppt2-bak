@@ -59,7 +59,7 @@ class FormlyAttributes:
     the form class, which is intended to be the order in which they appear on
     the page in the front end.
     """
-    def formly_attributes(self):
+    def formly_attributes(self, prefix=""):
         """Return a list of angular-formly fields for the form."""
         model = inspect(self.Meta.model)
         attrs = []
@@ -265,12 +265,15 @@ class DataSerializer:
         found and convert to local time on the client. Add a "Z" to
         the output from isoformat() to tell the client to treat the
         strings as UTC.
+        
+        For QuerySelect fields, take the descriptions associated with the
+        selected values and stick them into a field named fooDesc. On the
+        front end, use that for display.
         """
         output = {}
         for key in self._fields.keys():
             if key == "csrf_token":
                 continue
-            name = key
             data = self.data[key]
             
             if type(data) == datetime:
@@ -288,18 +291,25 @@ class DataSerializer:
                 if len(data):
                     options = self.get_options_from_list(key, data)
                     data = [option["id"] for option in options]
+                    desc = ", ".join([option["desc"] for option in options])
                 else:
                     data = None
+                    desc = ""
+                output["{}Desc".format(key)] = desc
 
             elif getattr(self, key).type == "QuerySelectField":
                 # Promote integer value to choice selection
                 if data:
                     options = self.get_options_from_list(key, [data])
                     data = options[0]["id"] if len(options) > 0 else None
+                    desc = options[0]["desc"] if len(options) > 0 else ""
                 else:
                     data = None
+                    desc = ""
+                output["{}Desc".format(key)] = desc
 
-            output[name] = data
+            output[key] = data
+
         return output
 
 # Classes to provide choices for select field choices
@@ -458,7 +468,7 @@ class Description(ModelForm, FormlyAttributes, DataSerializer):
 
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
-    descriptionLastModified = DateTimeField(u"last updated")
+    descriptionLastModified = DateTimeField(u"last updated", format="%Y-%m-%dT%H:%M:%SZ")
     descriptionLastModifiedBy = StringField(u"last updated by")
 
     def __init__(self, *args, **kwargs):
@@ -554,7 +564,7 @@ class Portfolio(ModelForm, FormlyAttributes, DataSerializer):
                      "ED-05), when will that happen?")
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
-    portfolioLastModified = DateTimeField(u"last updated")
+    portfolioLastModified = DateTimeField(u"last updated", format="%Y-%m-%dT%H:%M:%SZ")
     portfolioLastModifiedBy = StringField(u"last updated by")
 
     def __init__(self, *args, **kwargs):
@@ -602,7 +612,7 @@ class Project(ModelForm, FormlyAttributes, DataSerializer):
 
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
-    projectLastModified = DateTimeField(u"last updated")
+    projectLastModified = DateTimeField(u"last updated", format="%Y-%m-%dT%H:%M:%SZ")
     projectLastModifiedBy = StringField(u"last updated by")
 
     def __init__(self, *args, **kwargs):
@@ -646,7 +656,7 @@ class Disposition(ModelForm, FormlyAttributes, DataSerializer):
                      "project.")
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
-    dispositionLastModified = DateTimeField(label=u"last updated")
+    dispositionLastModified = DateTimeField(label=u"last updated", format="%Y-%m-%dT%H:%M:%SZ")
     dispositionLastModifiedBy = StringField(label=u"last updated by")
 
     def __init__(self, *args, **kwargs):
@@ -664,7 +674,7 @@ class Latest_disposition(Disposition):
 
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
-    latestDispositionLastModified = DateTimeField(label=u"last updated")
+    latestDispositionLastModified = DateTimeField(label=u"last updated", format="%Y-%m-%dT%H:%M:%SZ")
     latestDispositionLastModifiedBy = StringField(label=u"last updated by")
 
     def __init__(self, *args, **kwargs):
@@ -683,12 +693,12 @@ class Comment(ModelForm, FormlyAttributes, DataSerializer):
         description=u"Comment text goes here.")
     commentAuthor = StringField(u"created by",
         description=u"User ID of original author. This is a computed value.")
-    commentAuthored = DateTimeField(u"on",
+    commentAuthored = DateTimeField(u"on", format="%Y-%m-%dT%H:%M:%SZ",
         description=u"Date that comment was written. This is a computed "
                      "value.")
     commentEditor = StringField(u"last edited by",
         description=u"Most recent editor. This is a computed attribute.")
-    commentEdited = DateTimeField(u"on",
+    commentEdited = DateTimeField(u"on", format="%Y-%m-%dT%H:%M:%SZ",
         description=u"Time of last edit. This is a computed value.")
 
     def __init__(self, *args, **kwargs):

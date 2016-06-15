@@ -32,16 +32,14 @@
           attributesPromise: ["attributesService", 
             function(attributesService) {
               // Make sure formlyFields and project list are available for init.
-              if (!attributesService.hasFormlyFields()) {
-                return attributesService.updateFormlyFields();
-              }
-            }],
+              return attributesService.getFormlyFieldObj();
+            }
+          ],
           projectListPromise: ["projectListService",
             function(projectListService) {
-              if (!projectListService.hasProjects()) {
-                return projectListService.updateAllProjects();
-              }
-            }]
+              return projectListService.getMasterList()
+            }
+          ]
         }
       }) 
       .state("project.add",  {
@@ -88,21 +86,7 @@
         url: "/add/:projectID",
         controller: function ($stateParams) {
           console.log($stateParams, projectID);
-        },
-        onEnter: ["attributesService", "projectListService",
-          function(attributesService, projectListService) {
-            if (!attributesService.getAllAttributes()) {
-              /** then the list of attributes is empty. Get it */
-              attributesService.updateAllAttributes()
-                .then(function() {
-                  attributesService.updateProjAttrsFromRawItem('comment', 
-                    [{name: 'commentID', value: {id: 0}}]);
-                });
-            } else {
-              attributesService.updateProjAttrsFromRawItem('comment', 
-                [{name: 'commentID', value: {id: 0}}]);
-            }
-          }]
+        }
       })
       .state("project.comment.edit", {
         /** state for the project editing Comment sub-tab */
@@ -119,6 +103,11 @@
       .state("project.comment.edit.detail", {
         /** state for editing the specified comment */
         url: "/detail/:commentID",
+        resolve: {
+          commentID: ["$stateParams", function($stateParams) {
+            return $stateParams.commentID;
+          }]
+        },
         controller: function ($stateParams, projectID) {
           $stateParams.projectID = projectID;
           console.log($stateParams, projectID);

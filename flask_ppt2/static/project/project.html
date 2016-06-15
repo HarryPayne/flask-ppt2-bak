@@ -12,21 +12,20 @@
         <li role="presentation" ng-class="{active:project.ds.currentSubtab() == 'disposition'}"><a ui-sref="project.disposition.edit({projectID:project.ds.projectID})">Dispositions</a></li>
         <li role="presentation" ng-class="{active:project.ds.currentSubtab() == 'projectMan'}"><a ui-sref="project.projectMan.edit({projectID:project.ds.projectID})">Project Management</a></li>
         <li role="presentation" ng-class="{active:project.ds.currentSubtab() == 'comment'}"><a ui-sref="project.comment.edit({projectID:project.ds.projectID})">Comments</a></li>
-        <li role="presentation" ng-class="{active:project.ds.currentSubtab() == 'attach'}"><a ui-sref="project.attach.edit({projectID:project.ds.projectID})">Attach a File</a></li>
+        <!--li role="presentation" ng-class="{active:project.ds.currentSubtab() == 'attach'}"><a ui-sref="project.attach.edit({projectID:project.ds.projectID})">Attach a File</a></li -->
       </ul>
                 
       <div class="clearfix">
         <form name="projectForm" novalidate class="form-horizontal">
 
-        <span ng-show="project.ds.success" class="col-sm-offset-2 col-sm-10 alert alert-success alert-dismissible">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">×</button>
-          <span ng-bind="project.ds.success"></span>
-        </span>
+          <span ng-show="project.ds.success" class="col-sm-offset-2 col-sm-10 alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">×</button>
+            <span ng-bind="project.ds.success"></span>
+          </span>
 
-        <div ui-view></div>
+          <div ui-view></div>
   
         </form>
-
   
       <ng-repeat="error in project.ds.error">
         <span ng-show="project.ds.error" class="col-sm-offset-2 col-sm-10 alert alert-danger alert-dismissible">

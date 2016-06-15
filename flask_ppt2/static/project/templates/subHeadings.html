@@ -18,11 +18,11 @@
     <li ng-show="project.ds.currentMode() == 'disposition.add' && project.log_s.canEditProjects()">
       Add a disposition
     </li>
-    <li ng-show="project.ds.currentMode() != 'attach' && project.log_s.canEditProjects()">
+    <!-- li ng-show="project.ds.currentMode() != 'attach' && project.log_s.canEditProjects()">
       <a ui-sref="project.attach({projectID:project.ds.projectID})" ng-click="project.jumpToAtachFile();">Attach a File</a>
     </li>
     <li ng-show="project.ds.currentMode() == 'attach' && project.log_s.canEditProjects()">
       Attach a File
-    </li>
+    </li -->
   </ul>
 </div>

@@ -11,7 +11,7 @@
 
   <h4 class="col-sm-12">Portfolio Attributes</h4>
   <formly-form model="project.ds.projectModel" 
-    fields="project.as.formlyFields.portfolio"
+    fields="project.as.formlyFields['portfolio']"
     options="project.editOptions">
     <button type="submit" class="col-sm-offset-2"
       ng-click="project.ds.saveProject('portfolio')">Save</button>

@@ -12,7 +12,7 @@
 
   <h4 class="col-sm-12">Project Management Attributes</h4>
   <formly-form model="project.ds.projectModel" 
-    fields="project.as.formlyFields.project"
+    fields="project.as.formlyFields['project']"
     options="project.editOptions">
     <button type="submit" class="col-sm-offset-2"
       ng-click="project.ds.saveProject('project')">Save</button>

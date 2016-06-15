@@ -50,6 +50,9 @@
       currentSubtab: currentSubtab,
       editMode: editMode,
       //getFieldDataFromResult: getFieldDataFromResult,
+      getFormlyFields: attributesService.getFormlyFields,
+      getModelObject: getModelObject,
+      getModelValue: getModelValue,
       getProjectData: getProjectData,
       getProjectDataValues: getProjectDataValues,
       getProjectAttributes: attributesService.getProjectAttributes,
@@ -224,6 +227,19 @@
         return true;
       }
       return false;
+    }
+    
+    /**
+     * @name getModelValue
+     * @decs A method that returns the value of the requested model attribute.
+     * @param {string} attr_name - name of the requested attribute.
+     */
+    function getModelValue(attr_name) {
+      return service.projectModel[attr_name];
+    }
+
+    function getModelObject() {
+      return service.projectModel;
     }
     
     /**
@@ -497,13 +513,24 @@
      * @name saveProject
      * @desc Save edits made to the specified table by sending data back to the
      *        server. Revised data for that table (and a fresh csrf token) are
-     *        returned, along with success or error messages.
+     *        returned, along with success or error messages. In the case of
+     *        data that is many-to-one with projects, the form sends a list
+     *        index object. It's "name" attribute give the top level name of
+     *        the attribute that contains the list, and an "index" value, which
+     *        gives the position in that list of the item to be saved.
      * @param {string} table_name - the name of the table being updated.
-     * @param {Object[]} keys - list of primary key values used to identify the
+     * @param {Object[]} list_index - list of primary key values used to identify the
      *        record of interest if the table is one-to-many with projectID.
      */
-    function saveProject(table_name, keys) {
+    function saveProject(table_name, list_index) {
       var projectID = $state.params.projectID ? $state.params.projectID : "";
+      var data;
+      if (typeof list_index != "undefined") {
+        data = tableToJSON(table_name, list_index.model);
+      }
+      else {
+        data = tableToJSON(table_name, service.projectModel);
+      }
       var request = {
         method: "POST",
         url: "/projectEdit/" + projectID + "/" + table_name,
@@ -511,12 +538,12 @@
           "Content-Type": "application/json; charset=UTF-8",
           "X-CSRFToken": service.csrf_token
         },
-        data: tableToJSON(table_name, service.projectModel) 
+        data: data 
       };
        $http(request)
         .then(function (response) {
           if (response.status == 200) {
-              service.setProjectData(response, keys);
+              service.setProjectData(response);
               service.noCheck = true;
               var stateName = table_name;
               if (table_name == "project") {
@@ -579,10 +606,13 @@
      * @param {Object} keys
      */
     function showDetails(table_name, keys) {
-      var selected = attributesService.updateProjAttrsFromRawItem(table_name, keys);
+      keys.projectID = service.projectID;
+      $state.go("project."+table_name+".edit.detail", keys);
+
+/*     var selected = attributesService.updateProjAttrsFromRawItem(table_name, keys);
       if (table_name == 'comment') {
         $state.go("project.comment.edit.detail", 
-                  {projectID: service.projectID, commentID: selected.commentID});
+                  {projectID: service.projectID, keys});
       }
       if (table_name == 'disposition') {
         $state.go("project.disposition.edit.detail", 
@@ -590,6 +620,7 @@
                    disposedInFY: selected.disposedInFY.id,
                    disposedInQ: selected.disposedInQ.id});
       }
+*/
     }
 
     /**
@@ -600,7 +631,9 @@
      * @return {Boolean} 
      */
     function showEditSuccess() {
-      return Boolean(_.contains(projectForm.classList, "ng-pristine") && service.success);
+      if (typeof projectForm != "undefined") {
+        return Boolean(_.contains(projectForm.classList, "ng-pristine") && service.success);
+      }
     }
     
     /**
@@ -621,9 +654,12 @@
         var key = field.key;
         var value = model[field.key];
         var json = valueToJSON(key, value);
+        if (typeof key == "undefined") {
+          key;
+        }
 
         // Last modified information is added on the back end.
-        if (key.search(/astModified$/) > -1) {
+        if (typeof key != "undefined" && key.search(/astModified$/) > -1) {
           return;
         }
         else if (key.search(/astModifiedBy$/) > -1) {
@@ -720,6 +756,9 @@
       // Dive into remaining objects.
       else if (typeof value == "object") {
         /* Should we keep going or not? That is the question. */
+        if (key == "dispositions") {
+          key;
+        }
 
         // Is this the project model?
         if (key == "projectModel") {
@@ -743,10 +782,11 @@
          * sub-objects. */
         else if (_.contains(attributesService.getFormlyContainerNames(), key)) {
           var table_name = key.replace(/s$/, "");
-          var item_keys = Object.keys(value);
-          return _.map(item_keys, function(item_key) {
-            return tableToJSON(table_name, value[item_key]);
+          var subitems = [];
+          _.each(value, function(item) {
+            subitems.push(modelToJSON(item));
           });
+          return subitems;
         }
       }
       

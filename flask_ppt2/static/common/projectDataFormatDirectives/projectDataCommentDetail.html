@@ -1,52 +1,51 @@
-<div ng-hide="ctrl.mode == 'add'">
-  <label ng-bind="comment['commentAuthor']" class="col-sm-2 control-label"></label>
-</div>
-<div ng-show="ctrl.mode == 'add'" class="col-sm-2"></div>
-
-<div ng-hide="ctrl.mode == 'add'"
-  class="col-sm-10" style="padding-top: 7px;">
-  <span ng-bind="comment['comment']"></span><br/>
-  Entered <span ng-bind-html="comment['commentAuthored.printValue']"></span>
-  <span ng-show="comment['commentEditor']"><br/>Last edited by <span ng-bind="comment['commentEditor']"></span> on <span ng-bind="comment['commentEdited.printValue']"></span></span>
-  <button type="button" 
-    ng-show="ctrl.mode == 'edit'"
-    ng-click="ctrl.showDetails('comment', [{name: 'commentID', id: comment['commentID']}])"> Edit </button>
-  <button type="button" 
-    ng-show="ctrl.mode == 'edit.detail'"
-    ng-click="ctrl.hideDetails('comment', [{name: 'commentID', id: comment['commentID']}])"> Cancel </button>
-</div>
-
-<div class="col-sm-offset-2 col-sm-10" style="background-color: #f8f8f8; border-color: #e7e7e7;">
-  <h5 ng-hide="ctrl.mode == 'add'">Edit this comment:</h5>
-</div>
-
-<div style="background-color: #f8f8f8; border-color: #e7e7e7;">
-  <div class="form-group" 
-    ng-repeat="attr in ctrl.details()" 
-    ng-if="attr.name != 'commentID'"
-    ng-class="{required: attr.required}">
-    <label for="{{attr.name}}" ng-bind="attr.label" class="col-sm-2 control-label text-capitalize"></label>
-    <div ng-switch="attr.format" class="col-sm-10" style="padding-top: 7px;">
-      <span ng-show="attr.errors" ng-bind="attr.errors" class="alert alert-danger" role="alert"></span>
-      <span ng-switch-when="date" project-data-date></span>
-      <span ng-switch-when="dateRangeSelect" project-data-date-range-select></span>
-      <span ng-switch-when="multipleSelect" project-data-multiple-select></span>
-      <span ng-switch-when="number" project-data-number></span>
-      <span ng-switch-when="string" project-data-string></span>
-      <span ng-switch-when="textArea" project-data-text-area></span>
+<div>
+  <form name="detailForm" novalidate>
+    <div ng-hide="ctrl.mode == 'add'">
+      <label ng-bind="comment['commentAuthor']" class="col-sm-2 control-label"></label>
     </div>
-  </div>
-</div>
+    <div ng-show="ctrl.mode == 'add'" class="col-sm-2"></div>
 
-<div class="col-sm-offset-2">
-  <div ng-hide="ctrl.mode == 'add' || ctrl.mode == 'edit.detail'" class="col-sm-4">
-    Entered <span ng-bind="comment['commentAuthored.printValue']"></span>
-    <span ng-show="comment['commentEditor']"><br/>Last edited by <span ng-bind="comment['commentEditor']"></span> on <span ng-bind="comment['commentEdited.printValue']"></span></span><br/>
-  </div class="col-sm-4">
-  <button type="button" ng-click="ctrl.save('comment', [{name: 'commentID', value: {id: comment['commentID']}}])"> Save </button>
-  <button type="button" ng-click="ctrl.hideDetails('comment', [{name: 'commentID', id: comment['commentID']}])"> Cancel </button>
-</div>
+    <div ng-hide="ctrl.mode == 'add'"
+      class="col-sm-10" style="padding-top: 7px;">
+      <span ng-bind="comment['comment']"></span><br/>
+      Entered <span ng-bind-html="comment['commentAuthored'] | amUtc | amLocal | amCalendar:referenceTime:formats"></span>
+      <span ng-show="comment['commentEditor'].length"><br/>
+        Last edited by <span ng-bind="comment['commentEditor']"></span> 
+        on <span ng-bind="comment['commentEdited'] | amUtc | amLocal | amCalendar:referenceTime:formats"></span>
+      </span>
+      <button type="button" 
+        ng-show="ctrl.mode == 'edit'"
+        ng-click="ctrl.showDetails('comment', [{name: 'commentID', id: comment['commentID']}])"> Edit </button>
+      <button type="button" 
+        ng-show="ctrl.mode == 'edit.detail'"
+        ng-click="ctrl.hideDetails('comment', [{name: 'commentID', id: comment['commentID']}])"> Cancel </button>
+    </div>
 
-<div ng-show="ctrl.mode == 'add'" class="col-sm-12">
-  <h4> Earlier Comments </h4>
+    <div class="col-sm-offset-2 col-sm-10" style="background-color: #f8f8f8; border-color: #e7e7e7;">
+      <h5 ng-hide="ctrl.mode == 'add'">Edit this comment:</h5>
+    </div>
+
+    <div style="background-color: #f8f8f8; border-color: #e7e7e7;"
+      class="col-sm-offset-2 col-sm-10">
+      <formly-form model="comment"
+        fields="ctrl.fields" 
+        form="detailForm">
+      </formly-form>
+    </div>
+
+    <div class="col-sm-offset-2">
+      <div ng-hide="ctrl.mode == 'add' || ctrl.mode == 'edit.detail'" class="col-sm-4">
+        Entered <span ng-bind="comment['commentAuthored'] | amUtc | amLocal | amCalendar:referenceTime:formats"></span>
+        <span ng-show="comment['commentEditor'].length"><br/>
+          Last edited by <span ng-bind="comment['commentEditor']"></span>
+          on <span ng-bind="comment['commentEdited'] | amUtc | amLocal | amCalendar:referenceTime:formats"></span></span><br/>
+      </div class="col-sm-4">
+      <button type="button" ng-click="ctrl.options.updateInitialValue(); ctrl.save('comment', {model: comment, field_name: 'comments'})"> Save </button>
+      <button type="button" ng-click="ctrl.hideDetails('comment', [{name: 'commentID', id: comment['commentID']}])"> Cancel </button>
+    </div>
+
+    <div ng-show="ctrl.mode == 'add'" class="col-sm-12">
+      <h4> Earlier Comments </h4>
+    </div>
+  </form>
 </div>

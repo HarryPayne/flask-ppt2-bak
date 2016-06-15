@@ -1,8 +1,8 @@
 
-<span ng-show="ctrl.success" class="col-sm-offset-2 col-sm-10 alert alert-success alert-dismissible">
+<div ng-show="ctrl.showSuccess()" class="col-sm-offset-2 col-sm-10 alert alert-success alert-dismissible">
   <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">×</button>
   <span ng-bind="ctrl.success"></span>
-</span>
+</div>
 <span ng-show="ctrl.error" class="col-sm-offset-2 col-sm-10 alert alert-danger alert-dismissible">
   <button type="button" class="close" data-dismiss="alert" aria-label="Close" aria-hidden="true">×</button>
   <span ng-bind="ctrl.error"></span>
@@ -19,12 +19,11 @@
   <div project-data-disposition-detail></div>
 </div>
 
-<div class="form-group" 
-  ng-repeat="disp in ctrl.datasource()">
-  <div ng-show="(ctrl.mode == 'edit.detail' && ctrl.isSelected(disp))">
+<div class="form-group" ng-repeat="disp in ctrl.datasource()">
+  <div ng-if="(ctrl.mode == 'edit.detail' && ctrl.isSelected(disp))">
     <div project-data-disposition-detail></div>
   </div>
-  <div ng-hide="ctrl.mode == 'edit.detail' && ctrl.isSelected(disp)">
+  <div ng-if="!(ctrl.mode == 'edit.detail' && ctrl.isSelected(disp))">
     <div project-data-disposition></div>
   </div>
 </div>
