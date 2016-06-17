@@ -23,7 +23,21 @@
           function(selectStateService) {
             selectStateService.initService();
           }
-        ]
+        ],
+        resolve: {
+          attributesPromise: ["attributesService", 
+            function(attributesService) {
+              // Make sure formlyFields and project list are available for init.
+              return attributesService.getFormlyFieldObj();
+            }
+          ],
+          projectListPromise: ["projectListService",
+            function(projectListService) {
+              return projectListService.getMasterList()
+            }
+          ]
+        }
+
       })
       .state("select.home", {
         url: "/home",
@@ -34,20 +48,7 @@
         templateUrl: "/static/select/templates/addProject.html",
         data: {
           requiresLogin: true
-        },
-        onEnter: ["attributesService", "projectDataService",
-          function(attributesService, projectDataService) {
-            if (!attributesService.getAllAttributes()) {
-              /** then the list of attributes is empty. Get it */
-              attributesService.updateAllAttributes()
-                .then(projectDataService.getProjectData({projectID: 0}));
-            }
-            else {
-              projectDataService.getProjectData({projectID: 0});
-            }
-          }
-        ]
-      });
+        }      });
   };
   
 }());

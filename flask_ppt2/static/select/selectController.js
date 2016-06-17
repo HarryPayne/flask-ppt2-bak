@@ -18,13 +18,13 @@
     .module("app.select")
     .controller("Select", Select);
   
-  Select.$inject = ["$scope", "$state", "attributesService", "loginStateService", 
-                    "modalConfirmService", "projectDataService", "projectListService", 
-                    "selectStateService"];
+  Select.$inject = ["$scope", "$state", "attributesService", "attributesPromise", 
+                    "loginStateService", "modalConfirmService", "projectDataService", 
+                    "projectListPromise", "projectListService", "selectStateService"];
   
-  function Select($scope, $state, attributesService, loginStateService, 
-                  modalConfirmService, projectDataService, projectListService, 
-                  selectStateService) {
+  function Select($scope, $state, attributesService, attributesPromise, 
+                  loginStateService, modalConfirmService, projectDataService, 
+                  projectListPromise, projectListService, selectStateService) {
     
     this.state = $state;
     

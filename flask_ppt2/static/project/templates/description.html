@@ -12,7 +12,9 @@
   <h4 class="col-sm-12">Description Attributes</h4>
   <formly-form model="project.ds.projectModel" 
     fields="project.as.formlyFields['description']"
-    options="project.as.getFormlyOptions(project.currentMode())">
-    <button type="submit" class="col-sm-offset-2"
+    options="project.as.getFormlyOptions(project.currentMode())"
+    form="project.form">
+    <button  ng-hide="project.ds.currentMode()=='view'"
+      type="submit" class="col-sm-offset-2"
       ng-click="project.ds.saveProject('description')">Save</button>
   </formly-form>

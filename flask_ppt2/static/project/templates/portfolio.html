@@ -13,6 +13,7 @@
   <formly-form model="project.ds.projectModel" 
     fields="project.as.formlyFields['portfolio']"
     options="project.editOptions">
-    <button type="submit" class="col-sm-offset-2"
+    <button  ng-hide="project.ds.currentMode()=='view'"
+      type="submit" class="col-sm-offset-2"
       ng-click="project.ds.saveProject('portfolio')">Save</button>
   </formly-form>

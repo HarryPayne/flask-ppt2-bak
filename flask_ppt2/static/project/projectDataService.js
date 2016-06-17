@@ -49,6 +49,7 @@
       currentMode: currentMode,
       currentSubtab: currentSubtab,
       editMode: editMode,
+      //flatten: flatten,
       //getFieldDataFromResult: getFieldDataFromResult,
       getFormlyFields: attributesService.getFormlyFields,
       getModelObject: getModelObject,
@@ -57,6 +58,7 @@
       getProjectDataValues: getProjectDataValues,
       getProjectAttributes: attributesService.getProjectAttributes,
       getProjectDataFromLocation: getProjectDataFromLocation,
+      hasProjectModel: hasProjectModel,
       hideDetails: hideDetails,
       initService: initService,
       isSelected: isSelected,
@@ -75,8 +77,7 @@
       showEditSuccess: showEditSuccess,
       stateParams: $stateParams,
       tableToJSON: tableToJSON,
-      valueToJSON: valueToJSON,
-      viewUrl: $state.current.data ? $state.current.data.viewUrl : "",
+      valueToJSON: valueToJSON
     };
     
     initService();
@@ -231,6 +232,26 @@
     }
     
     /**
+     * @name flatten
+     * @desc Flatten the data for one choice of sub-object by assigning those 
+     *       values to this.datasource. Parameters specify which list of
+     *       many-to-one items with respect to a project, and which item in
+     *       that list, by index is to be flattened.
+     * @param {string} list_name    The name of the attribute in datasource()
+     *                              chosen for flattening ("comments", or 
+     *                              "dispositions").
+     * @param {number} index        The index of the selected item.
+     */
+    function flatten(list_name, index) {
+      var selected = service.projectModel[list_name][index];
+      var fields = service.getFormlyFields(list_name);
+      _.each(fields, function(field) {
+        delete service.projectModel[field.key];
+        service.projectModel[field.key] = this[field.key];
+      }, selected);
+    }
+
+    /**
      * @name getModelValue
      * @decs A method that returns the value of the requested model attribute.
      * @param {string} attr_name - name of the requested attribute.
@@ -239,8 +260,14 @@
       return service.projectModel[attr_name];
     }
 
-    function getModelObject() {
-      return service.projectModel;
+    function getModelObject(params) {
+      if (service.hasProjectModel()) {
+        return service.projectModel;
+      }
+      else {
+        return service.getProjectData(params);
+      }
+      
     }
     
     /**
@@ -327,6 +354,15 @@
       }
     }
 
+    function hasProjectModel() {
+      if (typeof service.projectModel != "undefined" && 
+          Object.keys(service.projectModel).length > 0) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
     /**
      *  @name hideDetails
      *  @desc a function for canceling out of Add a Comment or Add a Disposition
@@ -411,13 +447,12 @@
           else {
             selected = false;
           }
-        });
+        }, this);
       }
-/*      // If this is the one, flatten the data source
+      // If this is the one, flatten the data source
       if (selected) {
-        this.flatten(table_name, index);
+        service.flatten(table_name, index);
       }
-*/      
       return selected;
     }
 
@@ -646,20 +681,7 @@
      */
     function showDetails(table_name, keys) {
       keys.projectID = service.projectID;
-      $state.go("project."+table_name+".edit.detail", keys);
-
-/*     var selected = attributesService.updateProjAttrsFromRawItem(table_name, keys);
-      if (table_name == 'comment') {
-        $state.go("project.comment.edit.detail", 
-                  {projectID: service.projectID, keys});
-      }
-      if (table_name == 'disposition') {
-        $state.go("project.disposition.edit.detail", 
-                  {projectID: projectListService.getProjectID(), 
-                   disposedInFY: selected.disposedInFY.id,
-                   disposedInQ: selected.disposedInQ.id});
-      }
-*/
+      $state.go("project."+table_name+".editDetail", keys);
     }
 
     /**
@@ -810,7 +832,8 @@
         //}
 
         // Is it one of the tables we know about?
-        else if (_.contains(attributesService.getFormlyFormNames(), key)) {
+        else if (_.filter(attributesService.getFormlyFormNames(), 
+                        function(name) {return name==this}, 'comment').length > 0) {
           return tableToJSON(key, value);
         }
 
@@ -819,7 +842,7 @@
          * is a table name with "s" appended to the end. So "comments" would
          * contain a list of comment objects. Return a list of converted
          * sub-objects. */
-        else if (_.contains(attributesService.getFormlyContainerNames(), key)) {
+        else if (_.isArray(value)) {
           var table_name = key.replace(/s$/, "");
           var subitems = [];
           _.each(value, function(item) {

@@ -20,7 +20,7 @@
     $stateProvider
       .state('project', {
         /** virtual root state for Project tab view */
-        url: '/project',
+        url: '/project/:projectID',
         controller: "Project",
         controllerAs: "project",
         templateUrl:"/static/project/project.html",
@@ -39,9 +39,30 @@
             function(projectListService) {
               return projectListService.getMasterList()
             }
+          ],
+          projectDataPromise: ["projectDataService",
+            function(projectDataService) {
+              return projectDataService.getModelObject($stateParams);
+            }
+          ],
+          projectDataPromise: ["projectDataService", "$stateParams",
+            function(projectDataService, $stateParams) {
+              return projectDataService.getModelObject($stateParams);
+            }
           ]
         }
       }) 
+      .state('project.detail', {
+        /** default state for project display view */
+        url: '/',
+        controller: function ($stateParams) {
+          console.log($stateParams);
+        },
+        templateUrl: "/static/project/templates/detail.html",
+        data: {
+          requiresLogin: false
+        }
+      })
       .state("project.add",  {
         /** state for adding a project */
         url: "/add",
@@ -57,23 +78,12 @@
           requiresLogin: true
         }
       })
-      .state("project.attach.edit", {
-        /** state for attaching a file under the Attach sub-tab */
-        url: "/edit/:projectID",
-        controller: function ($stateParams) {
-          console.log($stateParams);
-        },
-        controllerAs: "project",
-        data: {
-          requiresLogin: true
-        }
-      })
       .state('project.comment', {
         /** virtual root for project.comment views */
         url: '/comment',
-        templateUrl: "/static/project/templates/comment.html",
+        templateUrl: "/static/project/templates/commentView.html",
         data: {
-          requiresLogin: true
+          requiresLogin: true,
         },
         resolve: {
           projectID: ["$stateParams", function($stateParams) {
@@ -83,14 +93,15 @@
       })
       .state("project.comment.add", {
         /** state for adding a comment to specified project */
-        url: "/add/:projectID",
+        url: "/add/",
         controller: function ($stateParams) {
           console.log($stateParams, projectID);
         }
       })
       .state("project.comment.edit", {
         /** state for the project editing Comment sub-tab */
-        url: "/edit/:projectID",
+        url: "/edit",
+        templateUrl: "/static/project/templates/commentEdit.html",
         resolve: {
           projectID: ["$stateParams", function($stateParams) {
             return $stateParams.projectID;
@@ -100,9 +111,10 @@
           console.log($stateParams);
         }
       })
-      .state("project.comment.edit.detail", {
+      .state("project.comment.editDetail", {
         /** state for editing the specified comment */
-        url: "/detail/:commentID",
+        url: "/editDetail/:commentID",
+        templateUrl: "/static/project/templates/commentDetail.html",
         resolve: {
           commentID: ["$stateParams", function($stateParams) {
             return $stateParams.commentID;
@@ -123,24 +135,13 @@
       })
       .state("project.description.edit", {
         /** state for project editing Description sub-tab */
-        url: "/edit/:projectID",
+        url: "/edit",
         controller: function ($stateParams) {
           console.log($stateParams);
           this.options.formState.readOnly = false;
         },
         data: {
           requiresLogin: true
-        }
-      })
-      .state('project.detail', {
-        /** state for project display view */
-        url: '/:projectID',
-        controller: function ($stateParams) {
-          console.log($stateParams);
-        },
-        templateUrl: "/static/project/templates/detail.html",
-        data: {
-          requiresLogin: false
         }
       })
       .state("project.disposition", {
@@ -153,7 +154,7 @@
       })
       .state("project.disposition.add", {
         /** state for adding a disposition to the specified project */
-        url: "/add/:projectID",
+        url: "/add",
         controller: function($stateParams) {
           console.log($stateParams);
         },
@@ -178,7 +179,7 @@
       })
       .state("project.disposition.edit", {
         /** state for project editing Disposition tab */
-        url: "/edit/:projectID",
+        url: "/edit",
         resolve: {
           projectID: ["$stateParams", function($stateParams) {
             return $stateParams.projectID;
@@ -191,7 +192,7 @@
       .state("project.disposition.edit.detail", {
         /** state for editing the specified disposition, where the primary key
             consists of the year and quarter of the disposition */
-        url: "/detail/:disposedInFY/:disposedInQ",
+        url: "/detail/:disposedIn",
         controller: function ($stateParams, projectID) {
           console.log($stateParams);
         }
@@ -206,7 +207,7 @@
       })
       .state("project.portfolio.edit", {
         /** state for project editing under the Portfolio sub-tab */
-        url: "/edit/:projectID",
+        url: "/edit",
         controller: function ($stateParams) {
           console.log($stateParams);
         }
@@ -221,7 +222,7 @@
       })
       .state("project.projectMan.edit", {
         /** state for project editing under the Project Management sub-tab */
-        url: "/edit/:projectID",
+        url: "/edit",
         controller: function ($stateParams) {
           console.log($stateParams);
         }

@@ -9,6 +9,5 @@
     on {{comment['commentEdited'] | amUtc | amLocal | amCalendar:referenceTime:formats}}
   </span>
   <button type="button" 
-    ng-show="ctrl.mode == 'edit'"
     ng-click="ctrl.showDetails('comment', {'commentID': comment['commentID']})"> Edit </button>
 </div>

@@ -67,9 +67,9 @@ def get_formly_fields():
     attributes = dict()
     attributes["description"] = forms.Description().formly_attributes()
     attributes["portfolio"] = forms.Portfolio().formly_attributes()
-    attributes["disposition"] = forms.Disposition().formly_attributes()
+    attributes["dispositions"] = forms.Disposition().formly_attributes()
     attributes["project"] = forms.Project().formly_attributes()
-    attributes["comment"] = forms.Comment().formly_attributes()
+    attributes["comments"] = forms.Comment().formly_attributes()
 
     return jsonify(**attributes)
 

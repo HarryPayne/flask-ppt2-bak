@@ -68,8 +68,11 @@
       var location = $location.url();
       //var hashless_loc = location.substring(0, _.lastIndexOf(location, "#"));
       var entry = stateHistoryService.get(location);
-      if (entry == null) {
+      if (entry === null) {
         return;   //entry = service.getStateFromLocation();
+      }
+      if (typeof entry == "undefined") {
+        entry = service.getStateFromLocation();
       }
       //if ("projectID" in entry.params) {
       //  projectListService.setProjectID(entry.params.projectID);
@@ -94,26 +97,24 @@
       if (base == "project") {
         var projectID;
         var commentID;
-        var disposedInFY;
-        var disposedInQ;
+        var disposedIn;
+
+        state.params.projectID = parseInt(path.pop());
+
         if (_.last(path) == "comment" && path[1] == "detail") {
           state.name = "project.comment.edit.detail";
           state.params.commentID = parseInt(path[0]);
-          state.params.projectID = parseInt(path[2]);
         }
         else if (_.last(path) == "disposition" && path[2] == "detail") {
           state.name = "project.disposition.edit.detail";
-          state.params.projectID = parseInt(path[3]);
-          state.params.disposedInFY = parseInt(path[1]);
+          state.params.disposedIn = parseInt(path[1]);
           state.params.disposedInQ = parseInt(path[0]);
         }
-        else if (path.length == 1) {
+        else if (path.length == 0 || (path.length == 1 && path[0] == "")) {
           state.name = "project.detail";
-          state.params.projectID = parseInt(path[0]);
         }
         else {
           state.name = ["project", path[2], path[1]].join(".");
-          state.params.projectID = parseInt(path[0]);
         }
       }
       else if (base == "filter") {

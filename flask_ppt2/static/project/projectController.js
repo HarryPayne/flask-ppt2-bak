@@ -18,7 +18,7 @@
   
   function Project($scope, $state, projectDataService, projectListService, 
                    attributesService, modalConfirmService, loginStateService,
-                   attributesPromise, projectListPromise){
+                   attributesPromise, projectListPromise, projectDataPromise){
     
     this.as = attributesService;
     this.ds = projectDataService;
@@ -26,6 +26,7 @@
     this.log_s = loginStateService;
     this.projectListPromise = projectListPromise;
     this.fields = attributesPromise;
+    this.projectModel = projectDataPromise;
 
     this.changeMode = this.ds.changeMode;
     this.currentMode = projectDataService.currentMode;
@@ -38,7 +39,6 @@
     this.masterList = this.ls.getMasterList;
     this.showDetails = this.ds.shotDetails;
     this.success = this.ds.success;
-    this.viewUrl = projectDataService.viewUrl;
 
     /* angular-formly options for Bootstrap horizontal layout and for 
      * readonly display on the view page. */
