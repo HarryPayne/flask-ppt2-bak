@@ -5,9 +5,11 @@ examined to see whether we are executing in the dev, test, or prod environment.
 
 This module loads and initializes a number of extensions, notably
     * The database connection 
-    * CsrfProtect, which requires all POST requests to have a csrf token
+    * CsrfProtect, which requires all POST requests to have a csrf token,
+    *    even if there is no form (Flask will generate one),
     * JWT for authentication, and for sending user information, like roles,
-        out to the client in a secure way, and 
+        out to the client in a secure way, 
+    * CORS to facilitate using JWT against sources in different domains, and 
     * Flask-Principal for role based authorization
 """
 import os
@@ -37,7 +39,7 @@ app.secret_key = app.config["SECRET_KEY"]
 # Load/initialize extensions
 
 # CsrfProtect is for csrf protecting POST requests that do not contain a form.
-# By initializing it, all POST requests will need send an X-CSRFToken header
+# By initializing it, all POST requests must send an X-CSRFToken header
 # to be allowed to connect. 
 csrf = CsrfProtect()
 csrf.init_app(app)

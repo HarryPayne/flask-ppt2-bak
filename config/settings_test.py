@@ -37,3 +37,6 @@ FISCAL_QUARTERS = ((0, u""), (1, u"Q1 (Fall)"), (2, u"Q2 (Winter)"),
 YEAR_RANGE_MIN = 2004
 YEAR_RANGE_MAX = datetime.now().year + 3
 
+# Root directory of the Angular-PPT application, relative to the Flask ROOT
+# directory
+ANGULAR_ROOT = "/../../angular-ppt"

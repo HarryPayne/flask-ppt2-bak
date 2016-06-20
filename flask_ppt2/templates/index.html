@@ -11,18 +11,18 @@
     </style>
 
     {% if minified %}
-    <link href="/static/min/flask-ppm-tool.min.css" rel="stylesheet" media="screen">
+    <link href="/app/min/flask-ppm-tool.min.css" rel="stylesheet" media="screen">
     {% else %}
-    <link href="/static/vendor/jquery-ui/themes/smoothness/jquery-ui.min.css" rel="stylesheet" media="screen">
-    <link href="/static/vendor/datatables/media/css/jquery.dataTables.min.css" rel="stylesheet" media="screen">
-    <link href="/static/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="/static/vendor/angular-datatables/dist/plugins/bootstrap/datatables.bootstrap.min.css" rel="stylesheet" media="screen">
-    <!-- link href="/static/vendor/angular-readmore-master/css/style.css" rel="stylesheet" media="screen" -->
+    <link href="/app/vendor/jquery-ui/themes/smoothness/jquery-ui.min.css" rel="stylesheet" media="screen">
+    <link href="/app/vendor/datatables/media/css/jquery.dataTables.min.css" rel="stylesheet" media="screen">
+    <link href="/app/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/app/vendor/angular-datatables/dist/plugins/bootstrap/datatables.bootstrap.min.css" rel="stylesheet" media="screen">
+    <!-- link href="/app/vendor/angular-readmore-master/css/style.css" rel="stylesheet" media="screen" -->
 
-    <link href="/static/common/projectDataDisplay/projectDataDisplay.css" rel="stylesheet" media="screen">
-    <link href="/static/login/login.css" rel="stylesheet" media="screen">
-    <link href="/static/report/report.css" rel="stylesheet" media="screen">
-    <link href="/static/select/select.css" rel="stylesheet" media="screen">
+    <link href="/app/common/projectDataDisplay/projectDataDisplay.css" rel="stylesheet" media="screen">
+    <link href="/app/login/login.css" rel="stylesheet" media="screen">
+    <link href="/app/report/report.css" rel="stylesheet" media="screen">
+    <link href="/app/select/select.css" rel="stylesheet" media="screen">
     {% endif %}
     <style>     
       button.link {
@@ -113,129 +113,129 @@
       </footer>
     </div>
 
-    <script type="text/javascript" src="/static/vendor/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="/static/vendor/jquery-ui/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="/static/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular/angular.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-animate/angular-animate.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-datatables/dist/angular-datatables.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-datatables/dist/plugins/bootstrap/angular-datatables.bootstrap.min.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-resource/angular-resource.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-sanitize/angular-sanitize.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-touch/angular-touch.min.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-ui-date/dist/date.js"></script>
-    <script type="text/javascript" src="/static/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-bootstrap/ui-bootstrap.min.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-ui-router/release/angular-ui-router.min.js"></script>
-    <script type="text/javascript" src="/static/vendor/a0-angular-storage/dist/angular-storage.min.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-jwt/dist/angular-jwt.min.js"></script>
-    <script type="text/javascript" src="/static/vendor/underscore/underscore.js"></script>
-    <!-- script type="text/javascript" src="/static/vendor/angular-readmore-master/js/angular-readmore.js"></script -->
-    <script type="text/javascript" src="/static/vendor/datejs/build/date-en-US.js"></script>
-    <script type="text/javascript" src="/static/vendor/api-check/dist/api-check.min.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-formly/dist/formly.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-formly-templates-bootstrap/dist/angular-formly-templates-bootstrap.js"></script>
-    <script type="text/javascript" src="/static/vendor/moment/moment.js"></script>
-    <script type="text/javascript" src="/static/vendor/moment-range/dist/moment-range.js"></script>
-    <script type="text/javascript" src="/static/vendor/angular-moment/angular-moment.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/jquery-ui/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular/angular.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-animate/angular-animate.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-datatables/dist/angular-datatables.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-datatables/dist/plugins/bootstrap/angular-datatables.bootstrap.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-resource/angular-resource.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-sanitize/angular-sanitize.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-touch/angular-touch.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-ui-date/dist/date.js"></script>
+    <script type="text/javascript" src="/app/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-bootstrap/ui-bootstrap.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-ui-router/release/angular-ui-router.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/a0-angular-storage/dist/angular-storage.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-jwt/dist/angular-jwt.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/underscore/underscore.js"></script>
+    <!-- script type="text/javascript" src="/app/vendor/angular-readmore-master/js/angular-readmore.js"></script -->
+    <script type="text/javascript" src="/app/vendor/datejs/build/date-en-US.js"></script>
+    <script type="text/javascript" src="/app/vendor/api-check/dist/api-check.min.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-formly/dist/formly.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-formly-templates-bootstrap/dist/angular-formly-templates-bootstrap.js"></script>
+    <script type="text/javascript" src="/app/vendor/moment/moment.js"></script>
+    <script type="text/javascript" src="/app/vendor/moment-range/dist/moment-range.js"></script>
+    <script type="text/javascript" src="/app/vendor/angular-moment/angular-moment.min.js"></script>
 
     {% if minified %}
-    <script type="text/javascript" src="/static/min/flask-ppm-tool.min.js"></script>
-    <script type="text/javascript" src="/static/login/loginConfig.js"></script>
+    <script type="text/javascript" src="/app/min/flask-ppm-tool.min.js"></script>
+    <script type="text/javascript" src="/app/login/loginConfig.js"></script>
     {% else %}
 
-    <script type="text/javascript" src="/static/app.js"></script>
-    <script type="text/javascript" src="/static/app.config.js"></script>
-    <script type="text/javascript" src="/static/app.controller.js"></script>
-    <script type="text/javascript" src="/static/app.run.js"></script>
+    <script type="text/javascript" src="/app/app.js"></script>
+    <script type="text/javascript" src="/app/app.config.js"></script>
+    <script type="text/javascript" src="/app/app.controller.js"></script>
+    <script type="text/javascript" src="/app/app.run.js"></script>
 
-    <script type="text/javascript" src="/static/attributes/app.attributes.js"></script>
-    <script type="text/javascript" src="/static/attributes/attributesController.js"></script>
-    <script type="text/javascript" src="/static/attributes/attributesService.js"></script>
+    <script type="text/javascript" src="/app/attributes/app.attributes.js"></script>
+    <script type="text/javascript" src="/app/attributes/attributesController.js"></script>
+    <script type="text/javascript" src="/app/attributes/attributesService.js"></script>
     
-    <script type="text/javascript" src="/static/comment/app.comment.js"></script>
-    <script type="text/javascript" src="/static/comment/commentConfig.js"></script>
-    <script type="text/javascript" src="/static/comment/commentController.js"></script>
+    <script type="text/javascript" src="/app/comment/app.comment.js"></script>
+    <script type="text/javascript" src="/app/comment/commentConfig.js"></script>
+    <script type="text/javascript" src="/app/comment/commentController.js"></script>
 
-    <script type="text/javascript" src="/static/common/app.common.js"></script>
-    <script type="text/javascript" src="/static/common/jumpToProjectID/jumpToProjectIDDirective.js"></script>
-    <script type="text/javascript" src="/static/common/jumpToProjectChoice/jumpToProjectChoiceDirective.js"></script>
-    <script type="text/javascript" src="/static/common/projectDataDisplay/projectDataDisplayDirective.js"></script>
-    <script type="text/javascript" src="/static/common/projectDataFormatDirectives/projectDataCommentDetailDirective.js"></script>
-    <script type="text/javascript" src="/static/common/projectDataFormatDirectives/projectDataCommentDirective.js"></script>
-    <script type="text/javascript" src="/static/common/projectDataFormatDirectives/projectDataDateDirective.js"></script>
-    <script type="text/javascript" src="/static/common/projectDataFormatDirectives/projectDataDateRangeSelectDirective.js"></script>
-    <script type="text/javascript" src="/static/common/projectDataFormatDirectives/projectDataDispositionDirective.js"></script>
-    <script type="text/javascript" src="/static/common/projectDataFormatDirectives/projectDataDispositionDetailDirective.js"></script>
-    <script type="text/javascript" src="/static/common/projectDataFormatDirectives/projectDataMultipleSelectDirective.js"></script>
-    <script type="text/javascript" src="/static/common/projectDataFormatDirectives/projectDataNumberDirective.js"></script>
-    <script type="text/javascript" src="/static/common/projectDataFormatDirectives/projectDataStringDirective.js"></script>
-    <script type="text/javascript" src="/static/common/projectDataFormatDirectives/projectDataTextAreaDirective.js"></script>
+    <script type="text/javascript" src="/app/common/app.common.js"></script>
+    <script type="text/javascript" src="/app/common/jumpToProjectID/jumpToProjectIDDirective.js"></script>
+    <script type="text/javascript" src="/app/common/jumpToProjectChoice/jumpToProjectChoiceDirective.js"></script>
+    <script type="text/javascript" src="/app/common/projectDataDisplay/projectDataDisplayDirective.js"></script>
+    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataCommentDetailDirective.js"></script>
+    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataCommentDirective.js"></script>
+    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataDateDirective.js"></script>
+    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataDateRangeSelectDirective.js"></script>
+    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataDispositionDirective.js"></script>
+    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataDispositionDetailDirective.js"></script>
+    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataMultipleSelectDirective.js"></script>
+    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataNumberDirective.js"></script>
+    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataStringDirective.js"></script>
+    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataTextAreaDirective.js"></script>
     
-    <script type="text/javascript" src="/static/curate/app.curate.js"></script>
-    <script type="text/javascript" src="/static/curate/curateConfig.js"></script>
-    <script type="text/javascript" src="/static/curate/curateController.js"></script>
+    <script type="text/javascript" src="/app/curate/app.curate.js"></script>
+    <script type="text/javascript" src="/app/curate/curateConfig.js"></script>
+    <script type="text/javascript" src="/app/curate/curateController.js"></script>
 
-    <script type="text/javascript" src="/static/filter/app.filter.js"></script>
-    <script type="text/javascript" src="/static/filter/filterBuilderService.js"></script>
-    <script type="text/javascript" src="/static/filter/filterConfig.js"></script>
-    <script type="text/javascript" src="/static/filter/filterController.js"></script>
+    <script type="text/javascript" src="/app/filter/app.filter.js"></script>
+    <script type="text/javascript" src="/app/filter/filterBuilderService.js"></script>
+    <script type="text/javascript" src="/app/filter/filterConfig.js"></script>
+    <script type="text/javascript" src="/app/filter/filterController.js"></script>
 
-    <script type="text/javascript" src="/static/header/app.header.js"></script>
-    <script type="text/javascript" src="/static/header/headerController.js"></script>
+    <script type="text/javascript" src="/app/header/app.header.js"></script>
+    <script type="text/javascript" src="/app/header/headerController.js"></script>
     
-    <!-- script type="text/javascript" src="/static/home/app.home.js"></script>
-    <script type="text/javascript" src="/static/home/homeConfig.js"></script>
-    <script type="text/javascript" src="/static/home/homeController.js"></script>
-    <script type="text/javascript" src="/static/home/homeSubHeadingsDirective.js"></script -->
+    <!-- script type="text/javascript" src="/app/home/app.home.js"></script>
+    <script type="text/javascript" src="/app/home/homeConfig.js"></script>
+    <script type="text/javascript" src="/app/home/homeController.js"></script>
+    <script type="text/javascript" src="/app/home/homeSubHeadingsDirective.js"></script -->
 
-    <script type="text/javascript" src="/static/login/app.login.js"></script>
-    <script type="text/javascript" src="/static/login/loginApiService.js"></script>
-    <script type="text/javascript" src="/static/login/loginConfig.js"></script>
-    <script type="text/javascript" src="/static/login/loginController.js"></script>
-    <script type="text/javascript" src="/static/login/loginRun.js"></script>
-    <script type="text/javascript" src="/static/login/loginService.js"></script>
-    <script type="text/javascript" src="/static/login/loginStateService.js"></script>
+    <script type="text/javascript" src="/app/login/app.login.js"></script>
+    <script type="text/javascript" src="/app/login/loginApiService.js"></script>
+    <script type="text/javascript" src="/app/login/loginConfig.js"></script>
+    <script type="text/javascript" src="/app/login/loginController.js"></script>
+    <script type="text/javascript" src="/app/login/loginRun.js"></script>
+    <script type="text/javascript" src="/app/login/loginService.js"></script>
+    <script type="text/javascript" src="/app/login/loginStateService.js"></script>
 
-    <script type="text/javascript" src="/static/loginInjector/app.loginInjectorProvider.js"></script>
-    <script type="text/javascript" src="/static/loginInjector/loginInjector.js"></script>
+    <script type="text/javascript" src="/app/loginInjector/app.loginInjectorProvider.js"></script>
+    <script type="text/javascript" src="/app/loginInjector/loginInjector.js"></script>
 
-    <script type="text/javascript" src="/static/manage/app.manage.js"></script>
-    <script type="text/javascript" src="/static/manage/manageConfig.js"></script>
-    <script type="text/javascript" src="/static/manage/manageController.js"></script>
+    <script type="text/javascript" src="/app/manage/app.manage.js"></script>
+    <script type="text/javascript" src="/app/manage/manageConfig.js"></script>
+    <script type="text/javascript" src="/app/manage/manageController.js"></script>
     
-    <script type="text/javascript" src="/static/modalConfirm/app.modalConfirm.js"></script>
-    <script type="text/javascript" src="/static/modalConfirm/modalConfirmService.js"></script>
+    <script type="text/javascript" src="/app/modalConfirm/app.modalConfirm.js"></script>
+    <script type="text/javascript" src="/app/modalConfirm/modalConfirmService.js"></script>
 
-    <script type="text/javascript" src="/static/project/app.project.js"></script>
-    <script type="text/javascript" src="/static/project/projectConfig.js"></script>
-    <script type="text/javascript" src="/static/project/projectController.js"></script>
-    <script type="text/javascript" src="/static/project/projectDataService.js"></script>
-    <script type="text/javascript" src="/static/project/projectListService.js"></script>
-    <script type="text/javascript" src="/static/project/projectSubHeadingsDirective.js"></script>
+    <script type="text/javascript" src="/app/project/app.project.js"></script>
+    <script type="text/javascript" src="/app/project/projectConfig.js"></script>
+    <script type="text/javascript" src="/app/project/projectController.js"></script>
+    <script type="text/javascript" src="/app/project/projectDataService.js"></script>
+    <script type="text/javascript" src="/app/project/projectListService.js"></script>
+    <script type="text/javascript" src="/app/project/projectSubHeadingsDirective.js"></script>
     
-    <script type="text/javascript" src="/static/report/app.report.js"></script>
-    <script type="text/javascript" src="/static/report/reportConfig.js"></script>
-    <script type="text/javascript" src="/static/report/reportController.js"></script>
-    <script type="text/javascript" src="/static/report/reportTableService.js"></script>
-    <script type="text/javascript" src="/static/report/reportTableSubHeadingsDirective.js"></script>
+    <script type="text/javascript" src="/app/report/app.report.js"></script>
+    <script type="text/javascript" src="/app/report/reportConfig.js"></script>
+    <script type="text/javascript" src="/app/report/reportController.js"></script>
+    <script type="text/javascript" src="/app/report/reportTableService.js"></script>
+    <script type="text/javascript" src="/app/report/reportTableSubHeadingsDirective.js"></script>
     
-    <script type="text/javascript" src="/static/select/app.select.js"></script>
-    <script type="text/javascript" src="/static/select/selectConfig.js"></script>
-    <script type="text/javascript" src="/static/select/selectController.js"></script>
-    <script type="text/javascript" src="/static/select/selectNameSearchFilter.js"></script>
-    <script type="text/javascript" src="/static/select/selectStateService.js"></script>
-    <script type="text/javascript" src="/static/select/selectSubHeadingsDirective.js"></script>
+    <script type="text/javascript" src="/app/select/app.select.js"></script>
+    <script type="text/javascript" src="/app/select/selectConfig.js"></script>
+    <script type="text/javascript" src="/app/select/selectController.js"></script>
+    <script type="text/javascript" src="/app/select/selectNameSearchFilter.js"></script>
+    <script type="text/javascript" src="/app/select/selectStateService.js"></script>
+    <script type="text/javascript" src="/app/select/selectSubHeadingsDirective.js"></script>
 
-    <script type="text/javascript" src="/static/stateLocation/app.stateLocation.js"></script>
-    <script type="text/javascript" src="/static/stateLocation/stateLocationRun.js"></script>
-    <script type="text/javascript" src="/static/stateLocation/sessionService.js"></script>
-    <script type="text/javascript" src="/static/stateLocation/stateHistoryFactory.js"></script>
-    <script type="text/javascript" src="/static/stateLocation/stateLocationService.js"></script>
+    <script type="text/javascript" src="/app/stateLocation/app.stateLocation.js"></script>
+    <script type="text/javascript" src="/app/stateLocation/stateLocationRun.js"></script>
+    <script type="text/javascript" src="/app/stateLocation/sessionService.js"></script>
+    <script type="text/javascript" src="/app/stateLocation/stateHistoryFactory.js"></script>
+    <script type="text/javascript" src="/app/stateLocation/stateLocationService.js"></script>
 
-    <script type="text/javascript" src="/static/title/app.title.js"></script>
-    <script type="text/javascript" src="/static/title/titleController.js"></script>
+    <script type="text/javascript" src="/app/title/app.title.js"></script>
+    <script type="text/javascript" src="/app/title/titleController.js"></script>
     {% endif %}
 
   </body>

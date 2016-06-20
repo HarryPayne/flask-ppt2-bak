@@ -6,7 +6,8 @@ from sqlalchemy.sql.expression import or_
 import sys
 
 from flask import (abort, g, json, jsonify, 
-                   render_template, request)
+                   render_template, request,
+                   send_from_directory)
 from flask_cors import cross_origin
 from flask_jwt import current_identity, jwt_required
 from flask_principal import Permission, RoleNeed
@@ -16,6 +17,12 @@ from werkzeug.urls import url_decode, url_unquote
 from flask_ppt2 import app, db
 from flask_ppt2 import forms
 import flask_ppt2.alchemy_models as alch
+
+# Add a static directory for the AngularJS application, under the route "/app".
+@app.route("/app/<path:filename>")
+def angular_app(filename):
+    return send_from_directory(app.root_path + app.config.get("ANGULAR_ROOT"),
+                               filename)
 
 # Create a flask_principal permission that requires the user to have 
 # the "Curator" role. Used to protect all methods that change data on
@@ -962,7 +969,12 @@ def updateFromForm(model, result, lastModifiedBy):
 @jwt_required()
 @curator_permission.require(http_exception=403)
 def projectEdit(projectID, tableName):
-    """ Update specified table for specified project."""
+    """ Update specified table for specified project.
+    
+    Check the jwt, csrf token, and the user's roles before doing anything.
+    The csrf token gets you in the door, a valid jwt token is a trusted
+    source for your roles.
+    """
     if projectID:
         p = db.session.query(alch.Description).join(alch.Portfolio)
         p = p.filter_by(projectID=projectID).first()
@@ -1036,6 +1048,8 @@ def projectEdit(projectID, tableName):
         return jsonify(**response)
 
 # Check the jwt, csrf token, and the user's roles before doing anything.
+# The csrf token gets you in the door, a valid jwt token is a trusted
+# source for your roles.
 #
 # The data returned are the same as those from getProjectAttributes plus:
 #
@@ -1048,10 +1062,6 @@ def projectEdit(projectID, tableName):
 @curator_permission.require()
 def projectCreate():
     """Create new project."""
-    if 'Curator' not in current_identity.groups:
-        # Must be a Curator to edit project metadata
-        abort(401)
-
     description_errors = []
 
     p = alch.Description(created = datetime.today().strftime("%Y-%m-%d"),
