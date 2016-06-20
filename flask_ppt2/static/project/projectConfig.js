@@ -40,11 +40,6 @@
               return projectListService.getMasterList()
             }
           ],
-          projectDataPromise: ["projectDataService",
-            function(projectDataService) {
-              return projectDataService.getModelObject($stateParams);
-            }
-          ],
           projectDataPromise: ["projectDataService", "$stateParams",
             function(projectDataService, $stateParams) {
               return projectDataService.getModelObject($stateParams);

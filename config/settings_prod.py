@@ -40,4 +40,4 @@ YEAR_RANGE_MAX = datetime.now().year + 3
 
 # Root directory of the Angular-PPT application, relative to the Flask ROOT
 # directory
-ANGULAR_ROOT = "/../../angular-ppt"
+ANGULAR_ROOT = "/../../angular-ppt/src"
