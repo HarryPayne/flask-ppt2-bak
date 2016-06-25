@@ -687,18 +687,18 @@ class Comment(ModelForm, FormlyAttributes, DataSerializer):
         model = alch.Comment
         include_primary_keys = True
         only = ["commentID", "comment", "commentAuthor", "commentAuthored",
-                "commentEditor", "commentEdited"]
+                "commentLastModifiedBy", "commentLastModified"]
 
     comment = TextAreaField(u"",
         description=u"Comment text goes here.")
     commentAuthor = StringField(u"created by",
         description=u"User ID of original author. This is a computed value.")
-    commentAuthored = DateTimeField(u"on", format="%Y-%m-%dT%H:%M:%S.%fZ",
+    commentAuthored = DateTimeField(u"on", format="%Y-%m-%dT%H:%M:%SZ",
         description=u"Date that comment was written. This is a computed "
                      "value.")
-    commentEditor = StringField(u"last edited by",
+    commentLastModifiedBy = StringField(u"last edited by",
         description=u"Most recent editor. This is a computed attribute.")
-    commentEdited = DateTimeField(u"on", format="%Y-%m-%dT%H:%M:%S.%fZ",
+    commentLastModified = DateTimeField(u"on", format="%Y-%m-%dT%H:%M:%S.%fZ",
         description=u"Time of last edit. This is a computed value.")
 
     def __init__(self, *args, **kwargs):
@@ -706,7 +706,7 @@ class Comment(ModelForm, FormlyAttributes, DataSerializer):
         read_only(self.commentID)
         read_only(self.commentAuthor)
         read_only(self.commentAuthored)
-        read_only(self.commentEditor)
-        read_only(self.commentEdited)
+        read_only(self.commentLastModified)
+        read_only(self.commentLastModifiedBy)
 
 

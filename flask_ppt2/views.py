@@ -1022,6 +1022,7 @@ def projectEdit(projectID, tableName):
 
         elif tableName == "comment":
             commentID = int(request.json["commentID"])
+            
             if commentID:
                 c = db.session.query(alch.Comment).                  \
                         filter_by(commentID = commentID).first()
@@ -1031,8 +1032,8 @@ def projectEdit(projectID, tableName):
                 c = alch.Comment(projectID=projectID)
                 request.json["commentID"] = None
                 request.json["commentAuthor"] = current_identity.get_id()
-                request.json["commentEditor"] = None
-                request.json["commentEdited"] = None
+                request.json["commentLastModifiedBy"] = None
+                request.json["commentLastModified"] = None
                 c_success = "A new comment was created."
 
             form, errors = updateFromForm(forms.Comment, c, lastModifiedBy)

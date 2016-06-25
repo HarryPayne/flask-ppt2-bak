@@ -500,11 +500,11 @@ class Comment(Base):
     commentAuthor = Column(String(100),
                            nullable=True, index=True, 
                            server_default=text("''"))
-    commentAuthored = Column(DateTime, onupdate=datetime.utcnow)
-    commentEditor = Column(String(100),
+    commentAuthored = Column(DateTime)
+    commentLastModifiedBy = Column(String(100),
                            nullable=True, index=True, 
                            server_default=text("''"))
-    commentEdited = Column(DateTime, onupdate=datetime.utcnow)
+    commentLastModified = Column(DateTime, onupdate=datetime.utcnow)
 
     # Relationship to base table.
     t_description = relationship("Description", backref="comments")

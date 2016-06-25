@@ -19,10 +19,10 @@
     <link href="/app/vendor/angular-datatables/dist/plugins/bootstrap/datatables.bootstrap.min.css" rel="stylesheet" media="screen">
     <!-- link href="/app/vendor/angular-readmore-master/css/style.css" rel="stylesheet" media="screen" -->
 
-    <link href="/app/common/projectDataDisplay/projectDataDisplay.css" rel="stylesheet" media="screen">
-    <link href="/app/login/login.css" rel="stylesheet" media="screen">
-    <link href="/app/report/report.css" rel="stylesheet" media="screen">
-    <link href="/app/select/select.css" rel="stylesheet" media="screen">
+    <link href="/app/src/common/projectDataDisplay/projectDataDisplay.css" rel="stylesheet" media="screen">
+    <link href="/app/src/login/login.css" rel="stylesheet" media="screen">
+    <link href="/app/src/report/report.css" rel="stylesheet" media="screen">
+    <link href="/app/src/select/select.css" rel="stylesheet" media="screen">
     {% endif %}
     <style>     
       button.link {
@@ -132,7 +132,6 @@
     <script type="text/javascript" src="/app/vendor/angular-jwt/dist/angular-jwt.min.js"></script>
     <script type="text/javascript" src="/app/vendor/underscore/underscore.js"></script>
     <!-- script type="text/javascript" src="/app/vendor/angular-readmore-master/js/angular-readmore.js"></script -->
-    <script type="text/javascript" src="/app/vendor/datejs/build/date-en-US.js"></script>
     <script type="text/javascript" src="/app/vendor/api-check/dist/api-check.min.js"></script>
     <script type="text/javascript" src="/app/vendor/angular-formly/dist/formly.js"></script>
     <script type="text/javascript" src="/app/vendor/angular-formly-templates-bootstrap/dist/angular-formly-templates-bootstrap.js"></script>
@@ -142,100 +141,100 @@
 
     {% if minified %}
     <script type="text/javascript" src="/app/min/flask-ppm-tool.min.js"></script>
-    <script type="text/javascript" src="/app/login/loginConfig.js"></script>
+    <script type="text/javascript" src="/app/src/login/loginConfig.js"></script>
     {% else %}
 
-    <script type="text/javascript" src="/app/app.js"></script>
-    <script type="text/javascript" src="/app/app.config.js"></script>
-    <script type="text/javascript" src="/app/app.controller.js"></script>
-    <script type="text/javascript" src="/app/app.run.js"></script>
+    <script type="text/javascript" src="/app/src/app.js"></script>
+    <script type="text/javascript" src="/app/src/app.config.js"></script>
+    <script type="text/javascript" src="/app/src/app.controller.js"></script>
+    <script type="text/javascript" src="/app/src/app.run.js"></script>
 
-    <script type="text/javascript" src="/app/attributes/app.attributes.js"></script>
-    <script type="text/javascript" src="/app/attributes/attributesController.js"></script>
-    <script type="text/javascript" src="/app/attributes/attributesService.js"></script>
+    <script type="text/javascript" src="/app/src/attributes/app.attributes.js"></script>
+    <script type="text/javascript" src="/app/src/attributes/attributesController.js"></script>
+    <script type="text/javascript" src="/app/src/attributes/attributesService.js"></script>
     
-    <script type="text/javascript" src="/app/comment/app.comment.js"></script>
-    <script type="text/javascript" src="/app/comment/commentConfig.js"></script>
-    <script type="text/javascript" src="/app/comment/commentController.js"></script>
+    <script type="text/javascript" src="/app/src/comment/app.comment.js"></script>
+    <script type="text/javascript" src="/app/src/comment/commentConfig.js"></script>
+    <script type="text/javascript" src="/app/src/comment/commentController.js"></script>
 
-    <script type="text/javascript" src="/app/common/app.common.js"></script>
-    <script type="text/javascript" src="/app/common/jumpToProjectID/jumpToProjectIDDirective.js"></script>
-    <script type="text/javascript" src="/app/common/jumpToProjectChoice/jumpToProjectChoiceDirective.js"></script>
-    <script type="text/javascript" src="/app/common/projectDataDisplay/projectDataDisplayDirective.js"></script>
-    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataCommentDetailDirective.js"></script>
-    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataCommentDirective.js"></script>
-    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataDateDirective.js"></script>
-    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataDateRangeSelectDirective.js"></script>
-    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataDispositionDirective.js"></script>
-    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataDispositionDetailDirective.js"></script>
-    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataMultipleSelectDirective.js"></script>
-    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataNumberDirective.js"></script>
-    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataStringDirective.js"></script>
-    <script type="text/javascript" src="/app/common/projectDataFormatDirectives/projectDataTextAreaDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/app.common.js"></script>
+    <script type="text/javascript" src="/app/src/common/jumpToProjectID/jumpToProjectIDDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/jumpToProjectChoice/jumpToProjectChoiceDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/projectDataDisplay/projectDataDisplayDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/projectDataFormatDirectives/projectDataCommentDetailDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/projectDataFormatDirectives/projectDataCommentDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/projectDataFormatDirectives/projectDataDateDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/projectDataFormatDirectives/projectDataDateRangeSelectDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/projectDataFormatDirectives/projectDataDispositionDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/projectDataFormatDirectives/projectDataDispositionDetailDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/projectDataFormatDirectives/projectDataMultipleSelectDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/projectDataFormatDirectives/projectDataNumberDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/projectDataFormatDirectives/projectDataStringDirective.js"></script>
+    <script type="text/javascript" src="/app/src/common/projectDataFormatDirectives/projectDataTextAreaDirective.js"></script>
     
-    <script type="text/javascript" src="/app/curate/app.curate.js"></script>
-    <script type="text/javascript" src="/app/curate/curateConfig.js"></script>
-    <script type="text/javascript" src="/app/curate/curateController.js"></script>
+    <script type="text/javascript" src="/app/src/curate/app.curate.js"></script>
+    <script type="text/javascript" src="/app/src/curate/curateConfig.js"></script>
+    <script type="text/javascript" src="/app/src/curate/curateController.js"></script>
 
-    <script type="text/javascript" src="/app/filter/app.filter.js"></script>
-    <script type="text/javascript" src="/app/filter/filterBuilderService.js"></script>
-    <script type="text/javascript" src="/app/filter/filterConfig.js"></script>
-    <script type="text/javascript" src="/app/filter/filterController.js"></script>
+    <script type="text/javascript" src="/app/src/filter/app.filter.js"></script>
+    <script type="text/javascript" src="/app/src/filter/filterBuilderService.js"></script>
+    <script type="text/javascript" src="/app/src/filter/filterConfig.js"></script>
+    <script type="text/javascript" src="/app/src/filter/filterController.js"></script>
 
-    <script type="text/javascript" src="/app/header/app.header.js"></script>
-    <script type="text/javascript" src="/app/header/headerController.js"></script>
+    <script type="text/javascript" src="/app/src/header/app.header.js"></script>
+    <script type="text/javascript" src="/app/src/header/headerController.js"></script>
     
-    <!-- script type="text/javascript" src="/app/home/app.home.js"></script>
-    <script type="text/javascript" src="/app/home/homeConfig.js"></script>
-    <script type="text/javascript" src="/app/home/homeController.js"></script>
-    <script type="text/javascript" src="/app/home/homeSubHeadingsDirective.js"></script -->
+    <!-- script type="text/javascript" src="/app/src/home/app.home.js"></script>
+    <script type="text/javascript" src="/app/src/home/homeConfig.js"></script>
+    <script type="text/javascript" src="/app/src/home/homeController.js"></script>
+    <script type="text/javascript" src="/app/src/home/homeSubHeadingsDirective.js"></script -->
 
-    <script type="text/javascript" src="/app/login/app.login.js"></script>
-    <script type="text/javascript" src="/app/login/loginApiService.js"></script>
-    <script type="text/javascript" src="/app/login/loginConfig.js"></script>
-    <script type="text/javascript" src="/app/login/loginController.js"></script>
-    <script type="text/javascript" src="/app/login/loginRun.js"></script>
-    <script type="text/javascript" src="/app/login/loginService.js"></script>
-    <script type="text/javascript" src="/app/login/loginStateService.js"></script>
+    <script type="text/javascript" src="/app/src/login/app.login.js"></script>
+    <script type="text/javascript" src="/app/src/login/loginApiService.js"></script>
+    <script type="text/javascript" src="/app/src/login/loginConfig.js"></script>
+    <script type="text/javascript" src="/app/src/login/loginController.js"></script>
+    <script type="text/javascript" src="/app/src/login/loginRun.js"></script>
+    <script type="text/javascript" src="/app/src/login/loginService.js"></script>
+    <script type="text/javascript" src="/app/src/login/loginStateService.js"></script>
 
-    <script type="text/javascript" src="/app/loginInjector/app.loginInjectorProvider.js"></script>
-    <script type="text/javascript" src="/app/loginInjector/loginInjector.js"></script>
+    <script type="text/javascript" src="/app/src/loginInjector/app.loginInjectorProvider.js"></script>
+    <script type="text/javascript" src="/app/src/loginInjector/loginInjector.js"></script>
 
-    <script type="text/javascript" src="/app/manage/app.manage.js"></script>
-    <script type="text/javascript" src="/app/manage/manageConfig.js"></script>
-    <script type="text/javascript" src="/app/manage/manageController.js"></script>
+    <script type="text/javascript" src="/app/src/manage/app.manage.js"></script>
+    <script type="text/javascript" src="/app/src/manage/manageConfig.js"></script>
+    <script type="text/javascript" src="/app/src/manage/manageController.js"></script>
     
-    <script type="text/javascript" src="/app/modalConfirm/app.modalConfirm.js"></script>
-    <script type="text/javascript" src="/app/modalConfirm/modalConfirmService.js"></script>
+    <script type="text/javascript" src="/app/src/modalConfirm/app.modalConfirm.js"></script>
+    <script type="text/javascript" src="/app/src/modalConfirm/modalConfirmService.js"></script>
 
-    <script type="text/javascript" src="/app/project/app.project.js"></script>
-    <script type="text/javascript" src="/app/project/projectConfig.js"></script>
-    <script type="text/javascript" src="/app/project/projectController.js"></script>
-    <script type="text/javascript" src="/app/project/projectDataService.js"></script>
-    <script type="text/javascript" src="/app/project/projectListService.js"></script>
-    <script type="text/javascript" src="/app/project/projectSubHeadingsDirective.js"></script>
+    <script type="text/javascript" src="/app/src/project/app.project.js"></script>
+    <script type="text/javascript" src="/app/src/project/projectConfig.js"></script>
+    <script type="text/javascript" src="/app/src/project/projectController.js"></script>
+    <script type="text/javascript" src="/app/src/project/projectDataService.js"></script>
+    <script type="text/javascript" src="/app/src/project/projectListService.js"></script>
+    <script type="text/javascript" src="/app/src/project/projectSubHeadingsDirective.js"></script>
     
-    <script type="text/javascript" src="/app/report/app.report.js"></script>
-    <script type="text/javascript" src="/app/report/reportConfig.js"></script>
-    <script type="text/javascript" src="/app/report/reportController.js"></script>
-    <script type="text/javascript" src="/app/report/reportTableService.js"></script>
-    <script type="text/javascript" src="/app/report/reportTableSubHeadingsDirective.js"></script>
+    <script type="text/javascript" src="/app/src/report/app.report.js"></script>
+    <script type="text/javascript" src="/app/src/report/reportConfig.js"></script>
+    <script type="text/javascript" src="/app/src/report/reportController.js"></script>
+    <script type="text/javascript" src="/app/src/report/reportTableService.js"></script>
+    <script type="text/javascript" src="/app/src/report/reportTableSubHeadingsDirective.js"></script>
     
-    <script type="text/javascript" src="/app/select/app.select.js"></script>
-    <script type="text/javascript" src="/app/select/selectConfig.js"></script>
-    <script type="text/javascript" src="/app/select/selectController.js"></script>
-    <script type="text/javascript" src="/app/select/selectNameSearchFilter.js"></script>
-    <script type="text/javascript" src="/app/select/selectStateService.js"></script>
-    <script type="text/javascript" src="/app/select/selectSubHeadingsDirective.js"></script>
+    <script type="text/javascript" src="/app/src/select/app.select.js"></script>
+    <script type="text/javascript" src="/app/src/select/selectConfig.js"></script>
+    <script type="text/javascript" src="/app/src/select/selectController.js"></script>
+    <script type="text/javascript" src="/app/src/select/selectNameSearchFilter.js"></script>
+    <script type="text/javascript" src="/app/src/select/selectStateService.js"></script>
+    <script type="text/javascript" src="/app/src/select/selectSubHeadingsDirective.js"></script>
 
-    <script type="text/javascript" src="/app/stateLocation/app.stateLocation.js"></script>
-    <script type="text/javascript" src="/app/stateLocation/stateLocationRun.js"></script>
-    <script type="text/javascript" src="/app/stateLocation/sessionService.js"></script>
-    <script type="text/javascript" src="/app/stateLocation/stateHistoryFactory.js"></script>
-    <script type="text/javascript" src="/app/stateLocation/stateLocationService.js"></script>
+    <script type="text/javascript" src="/app/src/stateLocation/app.stateLocation.js"></script>
+    <script type="text/javascript" src="/app/src/stateLocation/stateLocationRun.js"></script>
+    <script type="text/javascript" src="/app/src/stateLocation/sessionService.js"></script>
+    <script type="text/javascript" src="/app/src/stateLocation/stateHistoryFactory.js"></script>
+    <script type="text/javascript" src="/app/src/stateLocation/stateLocationService.js"></script>
 
-    <script type="text/javascript" src="/app/title/app.title.js"></script>
-    <script type="text/javascript" src="/app/title/titleController.js"></script>
+    <script type="text/javascript" src="/app/src/title/app.title.js"></script>
+    <script type="text/javascript" src="/app/src/title/titleController.js"></script>
     {% endif %}
 
   </body>
