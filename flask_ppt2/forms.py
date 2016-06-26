@@ -203,6 +203,7 @@ class FormlyAttributes:
             else:
                 attr["type"] = "input"
                 opt["type"] = "text"
+                attr["defaultValue"] = ""
         elif field.type == "TextAreaField":
             if self._field_is_readonly(field):
                 attr["type"] = "displayTextArea"
@@ -212,9 +213,11 @@ class FormlyAttributes:
                 attr["type"] = "textarea"
                 opt["rows"] = 8
                 opt["cols"] = 80
+                attr["defaultValue"] = ""
         elif field.type == "IntegerField":
             attr["type"] = "input"
             opt["type"] = "number"
+            attr["defaultValue"] = 0
         elif field.type == "DateTimeField":
             if self._field_is_readonly(field):
                 attr["type"] = "displayTimestamp"
@@ -222,6 +225,7 @@ class FormlyAttributes:
             else:
                 attr["type"] = "timestamp"
                 opt["type"] = "timestamp"
+                attr["defaultValue"] = ""
         elif field.type == "DateField":
             if self._field_is_readonly(field):
                 attr["type"] = "date"
@@ -230,18 +234,23 @@ class FormlyAttributes:
                 attr["type"] = "datepicker"
                 opt["type"] = "text"
                 opt["datepickerPopup"] = 'MM/dd/yyyy'
+                attr["defaultValue"] = ""
         elif field.type == "QuerySelectField":
             attr["type"] = "select"
+            attr["defaultValue"] = 0
         elif field.type == "QuerySelectMultipleField":
             attr["type"] = "select"
             # Add a "multiple" attribute to the field
             attr["ngModelAttrs"] = {"multiple": {"attribute": "multiple"}}
+            attr["defaultValue"] = []
         elif field.type == "DecimalField":
             attr["type"] = "input"
             opt["type"] = "number"
+            attr["defaultValue"] = ""
         elif field.type == "DateIntervalField":
             attr["type"] = "daterange"
             opt["type"] = "daterange"
+            attr["defaultValue"] = ""
         
         return attr
             
@@ -637,12 +646,12 @@ class Disposition(ModelForm, FormlyAttributes, DataSerializer):
         only = ["explanation", "disposedIn", "reconsiderIn", "plannedFor",
                 "dispositionLastModified", "dispositionLastModifiedBy"]
 
-    disposedIn = DateIntervalField(u"disposed",
+    disposedIn = DateIntervalField(u"disposed", validators=[Required()],
         description=u"In which planning cycle was this disposition made? "
                      "Changing this date and pressing save will create a new "
                      "disposition record.  If you don't change the date, then "
                      "you will update the record you are looking at.")
-    disposition = QuerySelectField(u"disposition",
+    disposition = QuerySelectField(u"disposition", validators=[Required()],
         query_factory=disposition_choices,
         description=u"What decision was made during the planning cycle with "
                      "respect to this project?")
@@ -689,7 +698,7 @@ class Comment(ModelForm, FormlyAttributes, DataSerializer):
         only = ["commentID", "comment", "commentAuthor", "commentAuthored",
                 "commentLastModifiedBy", "commentLastModified"]
 
-    comment = TextAreaField(u"",
+    comment = TextAreaField(u"comment", validators=[Required()],
         description=u"Comment text goes here.")
     commentAuthor = StringField(u"created by",
         description=u"User ID of original author. This is a computed value.")

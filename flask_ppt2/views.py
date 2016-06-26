@@ -1021,19 +1021,19 @@ def projectEdit(projectID, tableName):
                 success = d_success + cycle
 
         elif tableName == "comment":
-            commentID = int(request.json["commentID"])
+            commentID = request.json.get("commentID", None)
             
             if commentID:
+                commentID = int(commentID)
                 c = db.session.query(alch.Comment).                  \
                         filter_by(commentID = commentID).first()
                 c_success = "The comment was updated."
 
             else:
-                c = alch.Comment(projectID=projectID)
-                request.json["commentID"] = None
-                request.json["commentAuthor"] = current_identity.get_id()
-                request.json["commentLastModifiedBy"] = None
-                request.json["commentLastModified"] = None
+                c = alch.Comment(projectID=projectID,
+                                 commentAuthor=current_identity.get_id(),
+                                 commentAuthored=datetime.utcnow(),
+                                 commentLastModifiedBy=None)
                 c_success = "A new comment was created."
 
             form, errors = updateFromForm(forms.Comment, c, lastModifiedBy)
