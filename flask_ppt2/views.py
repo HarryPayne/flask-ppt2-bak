@@ -1,11 +1,13 @@
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from intervals import DateInterval
 import re
 from sqlalchemy import Date, desc, String, Text
 from sqlalchemy.inspection import inspect
 from sqlalchemy.sql.expression import or_
 import sys
 
-from flask import (abort, g, json, jsonify, 
+from flask import (json, jsonify, 
                    render_template, request,
                    send_from_directory)
 from flask_cors import cross_origin
@@ -515,10 +517,6 @@ def getReportResults():
                 # Filter on matches to controlled vocabulary choices.
                 # Key is an association proxy name. To get to the data column
                 # name, we use the naming convention.
-                if col.is_association_proxy:
-                    data_col = "{}ID".format(re.sub("s\\b", "", key))
-                else:
-                    data_col = "{}ID".format(key)
 
                 # Get unique list of null and integer values in query.
                 raw_values = list(set(query[key]))
@@ -726,7 +724,6 @@ def get_report_rows_from_query(p, columns):
         options         default datatables options
     """
     rows = []
-    response = {}
     for item in p:
         row = {"projectID": getattr(item, "projectID")}
         for col in columns:
@@ -949,12 +946,21 @@ def update_result_last_modified(result, lastModifiedBy):
     setattr(result, last_modified_by_col, lastModifiedBy["id"])
     setattr(result, last_modified_col, datetime.utcnow())
 
-def updateFromForm(model, result, lastModifiedBy):
+def updateFromForm(model, result, lastModifiedBy, disposedIn=None):
     """Utility for updating db model from json and query result."""
     errors = []
     update_result_last_modified(result, lastModifiedBy)
     form = model.from_json(request.json)
     if form.validate_on_submit():
+        if (disposedIn):
+            # Undo the shift that validate_on_submit applies to result
+            # (how does it do that!?)
+            if (result.disposedIn.lower + relativedelta(months=3) - relativedelta(days=1) == result.disposedIn.upper):
+                result.disposedIn.lower += app.config["FISCAL_YEAR_OFFSET"]
+                result.disposedIn.upper = result.disposedIn.lower + relativedelta(months=3) - relativedelta(days=1)
+            else:
+                result.disposedIn.lower += app.config["FISCAL_YEAR_OFFSET"]
+                result.disposedIn.upper = result.disposedIn.lower + relativedelta(years=1) - relativedelta(days=1)
         try:
             form.populate_obj(result)
             db.session.add(result)
@@ -999,25 +1005,40 @@ def projectEdit(projectID, tableName):
         elif tableName == "disposition":
             request.json["projectID"] = int(projectID)
             request.json["lastModifiedBy"] = current_identity.get_id()
+            disposedIn = request.json.get("disposedIn", None)
+            if disposedIn:
+                disposedIn = DateInterval.from_string(disposedIn)
             d = db.session.query(alch.Disposition)                  \
-                    .filter_by(projectID=projectID)                 \
-                    .filter_by(disposedInFY=disposedInFY)           \
-                    .filter_by(disposedInQ=disposedInQ).first()
+                    .filter_by(projectID = projectID)               \
+                    .filter_by(disposedIn = disposedIn).first()
             if not d:
+                # Create a new object from the request.
                 d = alch.Disposition(projectID=projectID)
                 d_success = "A new disposition was created for cycle "
             else:
-                d_success = "Updated disposition for cycle "
+                # Consider the Fiscal Year offset, and decide whether the 
+                # primary key value "disposedIn" has changed or not. If yes,
+                # then we are really creating a new disposition. If not, we
+                # need to re-shift the data in the database to match what is
+                # in the request.
+                if (d.disposedIn.lower == disposedIn.lower + app.config["FISCAL_YEAR_OFFSET"] and
+                    d.disposedIn.upper == disposedIn.upper + app.config["FISCAL_YEAR_OFFSET"]):
+                    d_success = "Updated disposition for cycle "
+                else:
+                    d = alch.Disposition(projectID=projectID)
+                    d_success = "A new disposition was created for cycle "
 
-            form, errors = updateFromForm(forms.Disposition, d, lastModifiedBy)
+            form, errors = updateFromForm(forms.Disposition, d, lastModifiedBy, disposedIn)
             if not errors:
-                disposedInFY = form["disposedInFY"].data
-                FY = [item[1] for item in form["disposedInFY"].choices 
-                      if item[0] == disposedInFY][0]
-                disposedInQ = form["disposedInQ"].data
-                Q = [item[1] for item in form["disposedInQ"].choices 
-                     if item[0] == disposedInQ][0]
-                cycle = "{FY} {Q}.".format( FY = FY, Q = Q)
+                disposedIn = request.json.get("disposedIn")
+                disposedIn = DateInterval.from_string(disposedIn)
+                FY = "FY{}".format(disposedIn.lower.strftime("%y"))
+                month = disposedIn.lower.strftime("%m")
+                if (disposedIn.lower + relativedelta(months=3) - relativedelta(days=1) == disposedIn.upper):
+                    Q = app.config["FISCAL_QUARTERS"][int(int(month)/3 + 1)]
+                else:
+                    Q = ""
+                cycle = "{FY} {Q}.".format( FY = FY, Q = Q[1])
                 success = d_success + cycle
 
         elif tableName == "comment":

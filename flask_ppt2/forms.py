@@ -1,27 +1,20 @@
 import calendar
-from collections import OrderedDict
 from datetime import datetime, date
-from dateutil.relativedelta import relativedelta
-from infinity import inf
 from intervals import DateInterval
 import re
-from operator import itemgetter
 
 from flask_wtf import Form
-from sqlalchemy.ext.associationproxy import _AssociationList
 from sqlalchemy.inspection import inspect
-from wtforms import (StringField, BooleanField, DateField, DateTimeField,
-                     DecimalField, TextAreaField, PasswordField, 
-                     validators, FormField)
+from wtforms import (StringField, DateField, DateTimeField,
+                     DecimalField, TextAreaField)
 from wtforms_alchemy import model_form_factory 
 from wtforms_alchemy.fields import (QuerySelectField, 
                                     QuerySelectMultipleField)
-from wtforms_components import DateRange, read_only
+from wtforms_components import read_only
 from wtforms_components import DateIntervalField
 from wtforms_components.widgets import ReadOnlyWidgetProxy
-from wtforms.validators import DataRequired, Length, Required
+from wtforms.validators import Required
 from flask_ppt2 import app, db
-from flask_ppt2.widgets import ChoicesSelect
 import flask_ppt2.alchemy_models as alch
 
 BaseModelForm = model_form_factory(Form)
@@ -82,7 +75,6 @@ class FormlyAttributes:
                     # get the meaningful key by replacing a final "s" with
                     # "ID". And the options are a tuple where we only care 
                     # about the second.
-                    id_name = re.sub("s\\b", "ID", key)
                     options = self.get_options_from_factory(key, field.query_factory)
                     attr = self._get_attr_base(key, field, model)
                     opt = attr["templateOptions"]
@@ -247,9 +239,8 @@ class FormlyAttributes:
             attr["type"] = "input"
             opt["type"] = "number"
             attr["defaultValue"] = ""
-        elif field.type == "DateIntervalField":
+        elif field.type in ["DateIntervalField"]:
             attr["type"] = "daterange"
-            opt["type"] = "daterange"
             attr["defaultValue"] = ""
         
         return attr
@@ -320,6 +311,19 @@ class DataSerializer:
             output[key] = data
 
         return output
+
+# Custom field for the custom FiscalQuarterType column.
+class DateIntervalField(DateIntervalField):
+    def __init__(self, label='', validators=None, transform_data=False, **kwargs):
+        super(DateIntervalField, self).__init__(label, validators, **kwargs)
+        self.transform_data = transform_data
+
+    def process_formdata(self, valuelist):
+        if self.transform_data:
+            data = str(valuelist[0])
+            # transform your data here. (for example: data = data.replace('-', '.'))
+
+        super(DateIntervalField, self).process_formdata([data])
 
 # Classes to provide choices for select field choices
 
@@ -647,6 +651,7 @@ class Disposition(ModelForm, FormlyAttributes, DataSerializer):
                 "dispositionLastModified", "dispositionLastModifiedBy"]
 
     disposedIn = DateIntervalField(u"disposed", validators=[Required()],
+        transform_data=True,
         description=u"In which planning cycle was this disposition made? "
                      "Changing this date and pressing save will create a new "
                      "disposition record.  If you don't change the date, then "

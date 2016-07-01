@@ -81,7 +81,6 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import (Column, Date, DateTime, ForeignKey,
                         Float, Integer, String, Text, text)
-from sqlalchemy.dialects.postgresql import DATERANGE
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship, backref
 import sqlalchemy.types as types
