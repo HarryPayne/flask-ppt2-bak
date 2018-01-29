@@ -1,8 +1,12 @@
 """User model with LDAP authentication and authorization."""
 from flask_login import UserMixin
 from ldap3 import Server, Connection, ALL, SUBTREE, LDAPBindError
+import os
 from sqlalchemy import (Column, Date, DateTime, ForeignKey,
                         Float, Integer, String, Text, text)
+
+if os.environ["PPT_ENVIRONMENT"] == "dev":
+    import pydevd
 
 from flask_ppt2 import app, db
 
@@ -73,10 +77,10 @@ class User(Base, UserMixin):
             self.firstname = ldapres["givenName"]
             self.lastname = ldapres["sn"]
             self.mail = ldapres["mail"]
-            self.active = True
+            self.is_active = True
 
     def is_active(self):
-        return self.active
+        return self.is_active
 
     def get_id(self):
         return self.uid
@@ -88,7 +92,7 @@ class User(Base, UserMixin):
                 "lastname": self.lastname,
                 "mail": self.mail,
                 "groups": self.groups,
-                "is_active": self.active}
+                "is_active": self.is_active}
 
     def __repr__(self):
         return '<User %r>' % (self.uid)

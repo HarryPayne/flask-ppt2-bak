@@ -8,8 +8,7 @@ SECRET_KEY = 'Kgg{9G8*jEoJeyKP6BkyTYGeM=vjtV2y2t#RpDH/QmvFhhPDnk'
 WTF_CSRF_ENABLED = True
 WTF_CSRF_SECRET_KEY = SECRET_KEY
 
-#SQLALCHEMY_DATABASE_URI = "mysql://root:stormy@localhost/projects"
-SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://payne:stormy@localhost/projects"
+SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://payne:stormy@localhost/ppt"
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, '..', 'db_repository')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 

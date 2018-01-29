@@ -1,9 +1,9 @@
 import calendar
 from datetime import datetime, date
 from intervals import DateInterval
-import re
+import os, re
 
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from sqlalchemy.inspection import inspect
 from wtforms import (StringField, DateField, DateTimeField,
                      DecimalField, TextAreaField)
@@ -17,7 +17,10 @@ from wtforms.validators import Required
 from flask_ppt2 import app, db
 import flask_ppt2.alchemy_models as alch
 
-BaseModelForm = model_form_factory(Form)
+if os.environ["PPT_ENVIRONMENT"] == "dev":
+    import pydevd
+
+BaseModelForm = model_form_factory(FlaskForm)
 
 FISCAL_YEAR_OFFSET = app.config.get("FISCAL_YEAR_OFFSET")
 FISCAL_QUARTERS = app.config.get("FISCAL_QUARTERS")
@@ -29,6 +32,7 @@ class ModelForm(BaseModelForm):
     def get_session(cls):
         return db.session
 
+
 class FormlyAttributes:
     """Mixin class for forms to generate a list of form field descriptions.
 
@@ -39,14 +43,14 @@ class FormlyAttributes:
         key            attribute name
         type           form field class name
         read_only      flag for computed attributes.
-        required       mandatory field
+        required       true for mandatory fields
         label          field label
         description    help text for the field
         options        choices for QuerySelect and QuerySelectMultiple
                          fields. Each option is an object with attributes
                          "id" and "label". If the field has no choices
                          then the field will not have an options attr.
-        table          table name where data lives
+        table          table name where data live
 
     The order of the objects is the same as the order in which they appear in
     the form class, which is intended to be the order in which they appear on
@@ -161,12 +165,12 @@ class FormlyAttributes:
         """Convert list of option objects into Bootstrap select objects."""
         if len(choices):
             # Look for choices from the table where key is linked to the
-            # primary key.
+            # primary key, using a naming convention.
             try:
                 root = key[:-1]      # take off trailing "s"
-                return [{"id": getattr(item, "{}ID".format(root)),
-                         "desc": getattr(item, "{}Desc".format(root))}
-                        for item in choices]
+                return [{"id": getattr(c, "{}ID".format(root)),
+                         "desc": getattr(c, "{}Desc".format(root))}
+                        for c in choices]
             except:
                 pass
 
@@ -318,24 +322,20 @@ class DateIntervalField(DateIntervalField):
         super(DateIntervalField, self).__init__(label, validators, **kwargs)
         self.transform_data = transform_data
 
-    def process_formdata(self, valuelist):
-        if self.transform_data:
-            data = str(valuelist[0])
-            # transform your data here. (for example: data = data.replace('-', '.'))
-
-        super(DateIntervalField, self).process_formdata([data])
-
 # Classes to provide choices for select field choices
+
 
 class GeneratedChoices:
 
     def serialize_options(self):
         return self.choices
 
+
 class Fiscalyears(GeneratedChoices):
     choices = [(y, u"FY{}".format(y))
                for y in range(YEAR_RANGE_MIN, YEAR_RANGE_MAX)]
     choices.insert(0, (0, u""))
+
 
 class Quarters(GeneratedChoices):
     choices = FISCAL_QUARTERS

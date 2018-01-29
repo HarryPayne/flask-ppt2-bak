@@ -91,20 +91,20 @@ class PPTLDAPTests(unittest.TestCase):
     
     def test_ldap_fetch_hit(self):
         """Test ldap_fetch of testadmin user with valid password"""
-        from flask_ppt2.models import ldap_fetch
+        from flask_ppt2.auth.models import ldap_fetch
         from ldap3 import LDAPKeyError
-        u = ldap_fetch(uid="testadmin", passwd="testadmin")
+        u = ldap_fetch("testadmin", passwd="testadmin")
         self.assertIsNotNone(u)
-        self.assertEqual(u["uid"], "testadmin")
-        self.assertEqual(len(u["groups"]), 3)
+        self.assertEqual(u["username"], "testadmin")
+        self.assertEqual(len(u["roles"]), 3)
         self.assertIsNone(u["mail"])
         self.assertEqual(u["givenName"], "test")
         self.assertEqual(u["sn"], "admin")
-    
+     
     def test_ldap_fetch_miss(self):
         """Test ldap_fetch of testadmin user with wrong password"""
-        from flask_ppt2.models import ldap_fetch
-        u = ldap_fetch(uid="nottestadmin", passwd="nottestadmin")
+        from flask_ppt2.auth.models import ldap_fetch
+        u = ldap_fetch("nottestadmin", passwd="nottestadmin")
         self.assertIsNone(u)
         
         
