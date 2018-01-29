@@ -5,7 +5,7 @@ examined to see whether we are executing in the dev, test, or prod environment.
 
 This module loads and initializes a number of extensions, notably
     * The database connection 
-    * CsrfProtect, which requires all POST requests to have a csrf token,
+    * CSRFProtect, which requires all POST requests to have a csrf token,
     *    even if there is no form (Flask will generate one),
     * JWT for authentication, and for sending user information, like roles,
         out to the client in a secure way, 
@@ -21,9 +21,12 @@ from flask_login import current_user, LoginManager
 from flask_principal import (AnonymousIdentity, Identity, identity_changed,
                              identity_loaded, Principal, RoleNeed)
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf.csrf import CsrfProtect 
+from flask_wtf import CSRFProtect 
 import wtforms_json
 
+if os.environ["PPT_ENVIRONMENT"] == "dev":
+    import pydevd
+  
 app = Flask(__name__)
 
 # Make environment specific choice of configuration
@@ -38,10 +41,10 @@ app.secret_key = app.config["SECRET_KEY"]
 
 # Load/initialize extensions
 
-# CsrfProtect is for csrf protecting POST requests that do not contain a form.
+# CSRFProtect is for csrf protecting POST requests that do not contain a form.
 # By initializing it, all POST requests must send an X-CSRFToken header
 # to be allowed to connect. 
-csrf = CsrfProtect()
+csrf = CSRFProtect()
 csrf.init_app(app)
 
 cors = CORS(app)
@@ -58,11 +61,13 @@ wtforms_json.init()
 # show the user). We do check the directory again when handling each request.
 
 from flask_ppt2.auth.models import User
+
 def authenticate(username, password):
     """Try authenticating with given username and password."""
     user = User(username=username, passwd=password)
     if user.active is not False:
         return user
+
 
 def identity_loader(payload):
     """Return user object referred to in payload."""
@@ -77,6 +82,7 @@ def identity_loader(payload):
     return current_user
 
 jwt = JWT(app, authenticate, identity_loader)
+
 
 @jwt.jwt_payload_handler
 def make_payload(user):
