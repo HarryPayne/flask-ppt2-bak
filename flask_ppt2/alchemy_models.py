@@ -79,8 +79,8 @@ from a list/controlled vocabulary:
 """
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from sqlalchemy import (Column, Date, DateTime, ForeignKey,
-                        Float, Integer, String, Text, text)
+from sqlalchemy import (Column, Date, DateTime, ForeignKey, Float, Integer, 
+                        Sequence, String, Text, text)
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship, backref
 import sqlalchemy.types as types
@@ -145,7 +145,7 @@ class Childlist(Base):
     __tablename__ = "childlist"
     info = {"label": "children"}
 
-    childID = Column(Integer, primary_key=True, nullable=False)
+    childID = Column(Integer, primary_key=True)
     childDesc = Column(String(100), nullable=False, index=True, 
                        server_default=text("''"))
 
@@ -397,12 +397,14 @@ class Quarters(Base):
     quarterDesc = Column(String(12), nullable=False, 
                          server_default=text("''"))
 
+
 class Months(Base):
     __tablename__ = "months"
 
     monthID = Column(Integer, primary_key=True, server_default=text("'0'"))
     monthDesc = Column(String(12), nullable=False, server_default=text("''"))
 #*****End list/controlled vocabulary tables. **********
+
 
 #*****Begin association tables. **********
 class Child(Base):
@@ -424,6 +426,7 @@ class Child(Base):
         self.childlist = childlist
         self.description = description
 
+
 class Driver(Base):
     __tablename__ = "driver"
     # Supports Description.drivers association proxy.
@@ -442,6 +445,7 @@ class Driver(Base):
     def __init__(self, driverlist=None, description=None):
         self.driverlist = driverlist
         self.description = description
+
 
 class Stakeholder(Base):
     __tablename__ = "stakeholder"
@@ -508,10 +512,11 @@ class Comment(Base):
     # Relationship to base table.
     t_description = relationship("Description", backref="comments")
 
+
 class Description(Base):
     __tablename__ = "description"
 
-    projectID = Column(Integer, primary_key=True)
+    projectID = Column(Integer, Sequence("project_id_seq"), primary_key=True)
     name = Column(String(100), nullable=False, index=True, 
                   server_default=text("''"))
     abstract = Column(Text, index=True)
