@@ -1,11 +1,18 @@
+# -*- coding: utf-8 -*-
+"""
+    flask_ppt2.views
+    ~~~~~~~~~~~~~~~~    
+    This module implements flask views for the flask_ppt2 package.
+    
+"""
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from intervals import DateInterval
-import re
+import os, re
 from sqlalchemy import Date, desc, String, Text
 from sqlalchemy.inspection import inspect
 from sqlalchemy.sql.expression import or_
-import sys
+from sys import exc_info
 
 from flask import (json, jsonify, 
                    render_template, request,
@@ -13,18 +20,14 @@ from flask import (json, jsonify,
 from flask_cors import cross_origin
 from flask_jwt import current_identity, jwt_required
 from flask_principal import Permission, RoleNeed
-from werkzeug.datastructures import ImmutableMultiDict
 from werkzeug.urls import url_decode, url_unquote
 
 from flask_ppt2 import app, db
 from flask_ppt2 import forms
 import flask_ppt2.alchemy_models as alch
 
-# Add a static directory for the AngularJS application, under the route "/app".
-@app.route("/app/<path:filename>")
-def angular_app(filename):
-    return send_from_directory(app.root_path + app.config.get("ANGULAR_ROOT"),
-                               filename)
+if os.environ["PPT_ENVIRONMENT"] == "dev":
+    import pydevd
 
 # Create a flask_principal permission that requires the user to have 
 # the "Curator" role. Used to protect all methods that change data on
@@ -32,19 +35,30 @@ def angular_app(filename):
 curator_permission = Permission(RoleNeed("Curator"))
 curator_permission.description = "User must be a Curator"
 
-# Don't mess with the user table, defined in the auth module.
-TABLE_MODELS = [getattr(alch, t.name.capitalize())
-                    for t in alch.DBmetadata.sorted_tables
-                    if t.name not in ["fiscalyears", 'user']]
+# Get SQLAlchemy table models. Don't mess with the user table, defined 
+# in the auth module.
+TABLE_MODELS = [getattr(alch, t.name.capitalize()) for t in 
+                alch.DBmetadata.sorted_tables
+                if t.name not in ["fiscalyears", 'user']]
 
-# Flask page template handlers
+@app.route("/app/<path:filename>")
+def angular_app(filename):
+    """Add a static directory for the angular-ppt companion Javascript 
+    application. Relative path to that application is specified in the 
+    config module.
+    """
+    return send_from_directory(app.root_path + app.config.get("ANGULAR_ROOT"),
+                               filename)
 
 @app.errorhandler(404)
 def not_found_error(error):
+    """404 error page template handler"""
     return render_template('404.html'), 404
+
 
 @app.errorhandler(500)
 def internal_error(error):
+    """500 error page template handler"""
     db.session.rollback()
     return render_template('500.html'), 500
 
@@ -56,6 +70,7 @@ def index():
     return render_template('index.html',
                            title='Home',
                            minified=app.config["MINIFIED"])
+
 
 # We use angular-formly to configure forms on the front end dynamically. We
 # do that by sending lists of field definitions in JSON. The lists are built
@@ -71,7 +86,9 @@ def get_formly_fields():
 
     Returns a dictionary
         keys:   names of the 5 data tables
-        values: list of formly attributes for the key table. Forms are built
+        values: list of formly attributes for the key table. 
+    
+    Forms are generated on the front end.
     """
     attributes = dict()
     attributes["description"] = forms.Description().formly_attributes()
@@ -81,6 +98,7 @@ def get_formly_fields():
     attributes["comments"] = forms.Comment().formly_attributes()
 
     return jsonify(**attributes)
+
 
 @app.route("/getBriefDescriptions", methods=["POST"])
 def getBriefDescriptions():
@@ -98,15 +116,17 @@ def getBriefDescriptions():
     descriptions = [result._asdict() for result in results]
     return jsonify(descriptions=descriptions)
 
-# Under the Select tab there is an option for the user to select one of the
-# controlled vocabulary attributes and get a count of projects for each value
-# in that vocabulary. These two methods provide the data for rendering the
-# drop down to select an attribute and to return the breakdown results,
-# respectively.
 
 @app.route("/getBreakdownChoices", methods=['POST'])
 def getBreakdownChoices_JSON():
-    """Return breakdown results as JSON"""
+    """Return breakdown results as JSON
+    
+    Under the Select tab there is an option for the user to select one of the
+    controlled vocabulary attributes and get a count of projects for each value
+    in that vocabulary. These two methods provide the data for rendering the
+    drop down to select an attribute and to return the breakdown results,
+    respectively.
+    """
     # strip out query_factory functions to make field data serializable
     fields = get_all_select_fields()
     for field in fields:
@@ -114,7 +134,7 @@ def getBreakdownChoices_JSON():
     return jsonify(choices=fields)
 
 def get_all_select_fields():
-    """Send choices for breakdown by attribute dropdown as list of dicts."""
+    """Send choices for controlled vocabulary fields as list of dicts"""
     fields = []
     fields += get_select_field_labels_from(forms.Description())
     fields += get_select_field_labels_from(forms.Portfolio())
@@ -871,6 +891,7 @@ def getProjectAttributesJSON(projectID):
 def getProjectAttributes(projectID, table_name=None):
     """Return database data as JSON."""
     # Get data from database.
+    pydevd.settrace()
     p = db.session.query(alch.Description).filter_by(projectID=projectID).first()
     if not p:
         # send back forms with no data (for creating a new project)
@@ -880,7 +901,7 @@ def getProjectAttributes(projectID, table_name=None):
         p.comments = []
         p.dispositions = []
 
-    descriptionForm = forms.Description(ImmutableMultiDict({}), p)
+    descriptionForm = forms.Description(obj=p)
     csrf_token = descriptionForm["csrf_token"].current_token
 
     form_data = {}
@@ -889,12 +910,11 @@ def getProjectAttributes(projectID, table_name=None):
         form_data.update(descriptionForm.serialize_data())
 
     if table_name in ("portfolio", None):
-        portfolio_form = forms.Portfolio(ImmutableMultiDict({}), 
-                                         p.portfolio[0])
+        portfolio_form = forms.Portfolio(obj=p.portfolio[0])
         form_data.update(portfolio_form.serialize_data())
 
     if table_name in ("project", None):
-        project_form = forms.Project(ImmutableMultiDict({}), p.project[0])
+        project_form = forms.Project(obj=p.project[0])
         form_data.update(project_form.serialize_data())
 
     if table_name in ("disposition", None):
@@ -904,7 +924,7 @@ def getProjectAttributes(projectID, table_name=None):
                         .order_by(desc(latest))              \
                         .all()
         form_data["dispositions"] = [
-            forms.Disposition(ImmutableMultiDict({}), d).serialize_data()
+            forms.Disposition(obj=d).serialize_data()
             for d in dispositions]
 
     if table_name in ("comment", None):
@@ -914,7 +934,7 @@ def getProjectAttributes(projectID, table_name=None):
                         .order_by(desc(latest))              \
                         .all()
         form_data["comments"] = [
-            forms.Comment(ImmutableMultiDict({}), c).serialize_data()
+            forms.Comment(obj=c).serialize_data()
             for c in comments]
         
     return {"projectID": projectID,
@@ -966,7 +986,7 @@ def updateFromForm(model, result, lastModifiedBy, disposedIn=None):
             db.session.add(result)
             db.session.commit()
         except:
-            errors.append(sys.exc_info()[0])
+            errors.append(exc_info()[0])
     else:
         errors = form.errors
     return form, errors
@@ -1101,7 +1121,7 @@ def projectCreate():
             db.session.commit()
             projectID = p.projectID
         except:
-            description_errors.append(sys.exc_info()[0])
+            description_errors.append(exc_info()[0])
     else:
         description_errors = descriptionForm.errors
 
@@ -1127,7 +1147,7 @@ def projectCreate():
             db.session.add(pr)
             db.session.commit()
         except:
-            description_errors.append(sys.exc_info()[0])
+            description_errors.append(exc_info()[0])
     else:
         description_errors = portfolioForm.errors + projectForm.errors
 
