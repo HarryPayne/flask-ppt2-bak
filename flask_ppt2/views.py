@@ -891,7 +891,7 @@ def getProjectAttributesJSON(projectID):
 def getProjectAttributes(projectID, table_name=None):
     """Return database data as JSON."""
     # Get data from database.
-    pydevd.settrace()
+    # pydevd.settrace()
     p = db.session.query(alch.Description).filter_by(projectID=projectID).first()
     if not p:
         # send back forms with no data (for creating a new project)
@@ -929,10 +929,10 @@ def getProjectAttributes(projectID, table_name=None):
 
     if table_name in ("comment", None):
         latest = alch.Comment.commentAuthored
-        comments = db.session.query(alch.Comment)            \
-                        .filter_by(projectID=projectID)      \
-                        .order_by(desc(latest))              \
-                        .all()
+        comments = db.session.query(alch.Comment).           \
+                        filter_by(projectID=projectID).      \
+                        order_by(desc(latest)).              \
+                        all()
         form_data["comments"] = [
             forms.Comment(obj=c).serialize_data()
             for c in comments]
@@ -1109,7 +1109,7 @@ def projectCreate():
     p = alch.Description(created = datetime.today().strftime("%Y-%m-%d"),
                          descriptionLastModifiedBy = current_identity.get_id())
 
-    descriptionForm = forms.Description(request.form, p)
+    descriptionForm = forms.Description(request.form)
 
     # *** should be able to create all 3 forms, add them to the session and
     # *** do a commit. let sqlalchemy do its thing.

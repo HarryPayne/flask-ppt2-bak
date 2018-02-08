@@ -1,16 +1,20 @@
-"""User model and login form for auth blueprint.
-
-This module defines a User class for auth information in ldap. Authorization
-information comes from ldap groups that the user is in. 
-
-It also defines a wtforms form for the login form. This ensures that login
-is protected against csrf attacks.
-
-@author: payne
+# -*- coding: utf-8 -*-
 """
-from ldap3 import Server, Connection, ALL, SUBTREE, LDAPBindError
+    flask_ppt2.auth.model
+    ~~~~~~~~~~~~~~~~~~~~~
+    User model and login form for the auth blueprint against an LDAP directory
+
+    This module defines a User form for auth information in ldap. Authorization
+    information comes from ldap groups that the user is in. 
+    
+    It also defines a wtforms form for the login form. This ensures that login
+    is protected against csrf attacks.
+    
+    @author: payne
+"""
+from ldap3 import Server, Connection, ALL, SUBTREE
+from ldap3.core.exceptions import LDAPBindError
 from sqlalchemy import (Column, String)
-from flask_login import UserMixin
 from wtforms import StringField, PasswordField, validators
 
 from flask_ppt2 import app, db
@@ -27,24 +31,27 @@ LDAP_GROUP_OBJECT_FILTER = config.get("LDAP_GROUP_OBJECT_FILTER")
 LDAP_GROUP_MEMBERS_FIELD = config.get("LDAP_GROUP_MEMBERS_FIELD")
 LDAP_GROUP_RDN = config.get("LDAP_GROUP_RDN")
 
-# Open a connection to the directory and try to authenticate with the given
-# username and password. If you get in, search for attributes from your user
-# record, and search again for the names of the groups you are in, if those
-# groups are in the right place in the directory.
+
 
 def ldap_fetch(username=None, name=None, passwd=None):
+    """Open a connection to the directory and try to authenticate with the 
+    given username and password. If you get in, search for attributes from 
+    your user record, and search again for the names of the groups you are 
+    in, if those groups are in the right place in the directory.
+    """
     try:
         server = Server(LDAP_HOST, get_info=ALL)
-        dn = "{0}={1},{2}".format(LDAP_USER_OBJECTS_RDN, username, LDAP_SEARCH_BASE)
+        dn = "{0}={1},{2}".format(LDAP_USER_OBJECTS_RDN, 
+                                  username, 
+                                  LDAP_SEARCH_BASE)
 
         if username is not None and passwd is not None:
             conn = Connection(server, dn, passwd, auto_bind=True)
-            success = True
         else:
             conn = Connection(server, auto_bind=True)
-            success = False
         conn.search(LDAP_SEARCH_BASE, 
-                    '({0}={1})'.format(LDAP_USER_OBJECTS_RDN, username),
+                    '({0}={1})'.format(LDAP_USER_OBJECTS_RDN, 
+                                       username),
                     search_scope=SUBTREE,
                     attributes=[LDAP_USER_OBJECTS_RDN, 
                                 'cn', 'givenName', 'sn', 'mail'],
@@ -71,13 +78,15 @@ def ldap_fetch(username=None, name=None, passwd=None):
     except LDAPBindError:
         return None
 
-# The user model, which returns some user attributes and the names of groups
-# you are in, which corresponds to the roles you have.
 
 class User(Base):
+    """The user form, which returns some user attributes and the names of 
+    groups you are in, which corresponds to the roles you have.
+    """
     username = Column(String(64), primary_key=True)
     
-    def __init__(self, username=None, name=None, passwd=None, roles=None, mail=None):
+    def __init__(self, username=None, name=None, passwd=None, roles=None, 
+                 mail=None):
         self.username = username
         self.name = name
         self.roles = roles
@@ -122,7 +131,7 @@ class User(Base):
         return '<User %r>' % (self.username)
 
 class LoginForm(ModelForm):
-
+    """Flask WTF form for the login screen"""
     username = StringField("Username", [validators.Length(min=2, max=64)])
     password = PasswordField("Password", [validators.Required()])
 

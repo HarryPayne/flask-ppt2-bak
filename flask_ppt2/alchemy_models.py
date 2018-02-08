@@ -1,5 +1,8 @@
 # coding: utf-8
-"""SQLAlchemy table classes and models.
+"""
+    flask_ppt2.alchemy_models
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
+    SQLAlchemy table classes and models.
 
 We are using the SQLAlchemy ORM to model the data and Flask WTForms for REST
 behavior and to control what users see. This module is all about the data
@@ -516,7 +519,8 @@ class Comment(Base):
 class Description(Base):
     __tablename__ = "description"
 
-    projectID = Column(Integer, Sequence("project_id_seq"), primary_key=True)
+#     projectID = Column(Integer, Sequence("project_id_seq"), primary_key=True)
+    projectID = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False, index=True, 
                   server_default=text("''"))
     abstract = Column(Text, index=True)

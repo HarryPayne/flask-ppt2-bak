@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+    flask_ppt2.forms
+    ~~~~~~~~~~~~~~~~    
+    This module implements Flask-WTF forms and classes for SQLAlchemy models.
+    
+"""
 import calendar
 from datetime import datetime, date
 from intervals import DateInterval

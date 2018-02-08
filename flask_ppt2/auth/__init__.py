@@ -1,12 +1,13 @@
-"""Module for csrf protected auth against an ldap server.
+# -*- coding: utf-8 -*-
+"""
+    flask_pp2.auth
+    ~~~~~~~~~~~~~~
+    Package for CSRF protected authentication and authorization 
 
-This module defines an auth Blueprint for handling the authentication and
-authorization process. An ldap directory holds authentication credentials,
-and authorization is based on group membership in certain ldap groups. Look
-in the models module for that code.
-
-The purpose is to provide a way to CSRF protect the login form so that 
-protection can be site wide for all POST requests. 
+    This module defines an auth Blueprint for handling the authentication and
+    authorization process. The purpose is to provide a way to CSRF protect the 
+    login form so that CSRF protection can be site wide for all POST requests.
+    
 """
 from flask import (abort, Blueprint, flash, g, jsonify, redirect,
                    render_template, request, session, url_for)
