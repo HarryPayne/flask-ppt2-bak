@@ -214,8 +214,8 @@ class FormlyAttributes:
             else:
                 attr["type"] = "input"
                 attr["type"] = "textarea"
-                opt["rows"] = 8
-                opt["cols"] = 80
+                opt["rows"] = 5
+#                 opt["cols"] = 80
                 attr["defaultValue"] = ""
         elif field.type == "IntegerField":
             attr["type"] = "input"
@@ -231,7 +231,7 @@ class FormlyAttributes:
                 attr["defaultValue"] = ""
         elif field.type == "DateField":
             if self._field_is_readonly(field):
-                attr["type"] = "date"
+                attr["type"] = "datepicker"
                 del opt["description"]
             else:
                 attr["type"] = "datepicker"
