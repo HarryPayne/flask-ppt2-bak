@@ -13,11 +13,11 @@
     {% if minified %}
     <link href="/app/min/flask-ppm-tool.min.css" rel="stylesheet" media="screen">
     {% else %}
-    <link href="/app/vendor/jquery-ui/themes/smoothness/jquery-ui.min.css" rel="stylesheet" media="screen">
-    <link href="/app/vendor/datatables/media/css/jquery.dataTables.min.css" rel="stylesheet" media="screen">
-    <link href="/app/vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="/app/vendor/angular-datatables/dist/plugins/bootstrap/datatables.bootstrap.min.css" rel="stylesheet" media="screen">
-    <!-- link href="/app/vendor/angular-readmore-master/css/style.css" rel="stylesheet" media="screen" -->
+    <link href="/app/node_modules/angular-ui-router-uib-modal/sample/css/styles.css" rel="stylesheet" media="screen">
+    <link href="/app/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/app/node_modules/angular-ui-bootstrap/dist/ui-bootstrap-csp.css" rel="stylesheet" media="screen">
+    <link href="/app/node_modules/datatables/media/css/jquery.dataTables.min.css" rel="stylesheet" media="screen">
+    <link href="/app/node_modules/angular-datatables/dist/plugins/bootstrap/datatables.bootstrap.min.css" rel="stylesheet" media="screen">
 
     <link href="/app/src/common/projectDataDisplay/projectDataDisplay.css" rel="stylesheet" media="screen">
     <link href="/app/src/login/login.css" rel="stylesheet" media="screen">
@@ -113,32 +113,108 @@
       </footer>
     </div>
 
-    <!--script type="text/javascript" src="/app/vendor/jquery/dist/jquery.js"></script-->
-    <script type="text/javascript" src="/app/vendor/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="/app/vendor/jquery-ui/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="/app/vendor/datatables/media/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular/angular.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-animate/angular-animate.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-datatables/dist/angular-datatables.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-datatables/dist/plugins/bootstrap/angular-datatables.bootstrap.min.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-resource/angular-resource.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-sanitize/angular-sanitize.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-touch/angular-touch.min.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-ui-date/dist/date.js"></script>
-    <script type="text/javascript" src="/app/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-bootstrap/ui-bootstrap.min.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-ui-router/release/angular-ui-router.min.js"></script>
-    <script type="text/javascript" src="/app/vendor/a0-angular-storage/dist/angular-storage.min.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-jwt/dist/angular-jwt.min.js"></script>
-    <script type="text/javascript" src="/app/vendor/underscore/underscore.js"></script>
+    <!-- Put custom templates here -->
+    {% raw %}
+    <script type="text/ng-template" id="datepicker.html">
+      <p class="input-group">
+        <input  type="text"
+                id="{{::id}}"
+                name="{{::id}}"
+                ng-model="model[options.key]"
+                class="form-control"
+                ng-click="datepicker.open($event)"
+                uib-datepicker-popup="{{to.datepickerOptions.format}}"
+                is-open="datepicker.opened"
+                datepicker-options="to.datepickerOptions" />
+        <span class="input-group-btn">
+            <button type="button" class="btn btn-default" ng-click="datepicker.open($event)" ng-disabled="to.disabled"><i class="glyphicon glyphicon-calendar"></i></button>
+        </span>
+      </p>
+    </script>
+    <script type="text/ng-template" id="label-wrapper.html">
+    <div>
+      <label for="{{::id}}" class="col-sm-2 control-label text-capitalize">
+        {{to.label}} {{to.required ? '*' : ''}}
+      </label>
+      <div ng-class="col-sm-8">
+        <formly-transclude></formly-transclude>
+      </div>
+      </div>
+    </script>
+    <script type="text/ng-template" id="display-template.html">
+    <div>
+      <p class="form-control-static">{{model[options.key]}}</p>
+      </div>
+    </script>
+    <script type="text/ng-template" id="textarea-template.html">
+    <div>
+      <textarea ng-if="!formState.readOnly" class="form-control" ng-model="model[options.key]"></textarea>
+      <p ng-if="formState.readOnly" class="form-control-static">{{model[options.key]}}</p>
+      </div>
+    </script>
+    <script type="text/ng-template" id="displayTextArea-template.html">
+    <div>
+      <p class="form-control-static">{{model[options.key].split("\n\n").join("<br><br>")}}</p>
+      </div>
+    </script>
+    <script type="text/ng-template" id="displayDate-template.html">
+    <div>
+      <p class="form-control-static">{{model[options.key] | amDateFormat:"MMM DD, YYYY"}}</p>
+      </div>
+    </script>
+    <script type="text/ng-template" id="displayDaterange-template.html">
+    <div>
+      <p class="form-control-static">
+        <span ng-show="model[options.key].start">FY</span>{{model[options.key].start | amDateFormat:"YYYY"}} 
+        <span ng-show="model[options.key].end">Q</span>{{model[options.key].end | amDateFormat:"Q"}} 
+      </p>
+      </div>
+    </script>
+    <script type="text/ng-template" id="displayTimestamp-template.html">
+    <div>
+      <p class="form-control-static">{{model[options.key] | amUtc | amLocal | amCalendar:referenceTime:formats}} 
+      </p>
+      </div>
+    </script>
+    <script type="text/ng-template" id="input-template.html">
+    <div>
+      <input ng-if="!formState.readOnly" class="form-control" ng-model="model[options.key]">
+      <p ng-if="formState.readOnly" class="form-control-static">{{model[options.key]}}</p>
+      </div>
+    </script>
+    <script type="text/ng-template" id="input-template.html">
+    <div>
+      <input ng-if="!formState.readOnly" class="form-control" ng-model="model[options.key]">
+      <p ng-if="formState.readOnly" class="form-control-static">{{model[options.key]}}</p>
+      </div>
+    </script>
+    {% endraw %}
+    
+    <script type="text/javascript" src="/app/node_modules/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="/app/node_modules/datatables/media/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/app/node_modules/api-check/dist/api-check.min.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular/angular.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-animate/angular-animate.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-datatables/dist/angular-datatables.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-datatables/dist/plugins/bootstrap/angular-datatables.bootstrap.min.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-resource/angular-resource.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-sanitize/angular-sanitize.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-touch/angular-touch.min.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-ui-date/dist/date.js"></script>
+    <script type="text/javascript" src="/app/node_modules/@uirouter/angularjs/release/angular-ui-router.min.js"></script>
+    <script type="text/javascript" src="/app/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-storage/dist/angular-storage.min.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-jwt/dist/angular-jwt.min.js"></script>
+    <script type="text/javascript" src="/app/node_modules/underscore/underscore.js"></script>
     <!-- script type="text/javascript" src="/app/vendor/angular-readmore-master/js/angular-readmore.js"></script -->
-    <script type="text/javascript" src="/app/vendor/api-check/dist/api-check.min.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-formly/dist/formly.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-formly-templates-bootstrap/dist/angular-formly-templates-bootstrap.js"></script>
-    <script type="text/javascript" src="/app/vendor/moment/moment.js"></script>
-    <script type="text/javascript" src="/app/vendor/moment-range/dist/moment-range.js"></script>
-    <script type="text/javascript" src="/app/vendor/angular-moment/angular-moment.min.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-formly/dist/formly.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-formly-templates-bootstrap/dist/angular-formly-templates-bootstrap.js"></script>
+    <script type="text/javascript" src="/app/node_modules/moment/moment.js"></script>
+    <script type="text/javascript" src="/app/node_modules/moment-range/dist/moment-range.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-moment/angular-moment.min.js"></script>
 
     {% if minified %}
     <script type="text/javascript" src="/app/min/flask-ppm-tool.min.js"></script>
@@ -151,6 +227,7 @@
     <script type="text/javascript" src="/app/src/app.run.js"></script>
 
     <script type="text/javascript" src="/app/src/attributes/app.attributes.js"></script>
+    <script type="text/javascript" src="/app/src/attributes/attributesConfig.js"></script>
     <script type="text/javascript" src="/app/src/attributes/attributesController.js"></script>
     <script type="text/javascript" src="/app/src/attributes/attributesService.js"></script>
     
@@ -237,6 +314,10 @@
     <script type="text/javascript" src="/app/src/title/app.title.js"></script>
     <script type="text/javascript" src="/app/src/title/titleController.js"></script>
     {% endif %}
+
+    <script type="text/javascript">
+        window['moment-range'].extendMoment(moment);
+    </script>
 
   </body>
 </html>
