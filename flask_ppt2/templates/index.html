@@ -15,6 +15,7 @@
     {% else %}
     <link href="/app/node_modules/angular-ui-router-uib-modal/sample/css/styles.css" rel="stylesheet" media="screen">
     <link href="/app/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/app/node_modules/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet" media="screen">
     <link href="/app/node_modules/angular-ui-bootstrap/dist/ui-bootstrap-csp.css" rel="stylesheet" media="screen">
     <link href="/app/node_modules/datatables/media/css/jquery.dataTables.min.css" rel="stylesheet" media="screen">
     <link href="/app/node_modules/angular-datatables/dist/plugins/bootstrap/datatables.bootstrap.min.css" rel="stylesheet" media="screen">
@@ -165,8 +166,8 @@
     <script type="text/ng-template" id="displayDaterange-template.html">
     <div>
       <p class="form-control-static">
-        <span ng-show="model[options.key].start">FY</span>{{model[options.key].start | amDateFormat:"YYYY"}} 
-        <span ng-show="model[options.key].end">Q</span>{{model[options.key].end | amDateFormat:"Q"}} 
+        <span ng-show="model[options.key].FY">FY</span>{{model[options.key].FY}} 
+        <span ng-show="model[options.key].Q">Q</span>{{model[options.key].Q}} 
       </p>
       </div>
     </script>
@@ -203,6 +204,8 @@
     <script type="text/javascript" src="/app/node_modules/angular-ui-date/dist/date.js"></script>
     <script type="text/javascript" src="/app/node_modules/@uirouter/angularjs/release/angular-ui-router.min.js"></script>
     <script type="text/javascript" src="/app/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/app/node_modules/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <script type="text/javascript" src="/app/node_modules/angular-daterangepicker/js/angular-daterangepicker.min.js"></script>
     <script type="text/javascript" src="/app/node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js"></script>
     <script type="text/javascript" src="/app/node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js"></script>
     <script type="text/javascript" src="/app/node_modules/angular-ui-router-uib-modal/angular-ui-router-uib-modal.js"></script>

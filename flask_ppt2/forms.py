@@ -12,6 +12,7 @@ import os, re
 
 from flask_wtf import FlaskForm
 from sqlalchemy.inspection import inspect
+from sqlalchemy_utils import DateRangeType
 from wtforms import (StringField, DateField, DateTimeField,
                      DecimalField, TextAreaField)
 from wtforms_alchemy import model_form_factory 
@@ -86,7 +87,8 @@ class FormlyAttributes:
                     # get the meaningful key by replacing a final "s" with
                     # "ID". And the options are a tuple where we only care 
                     # about the second.
-                    options = self.get_options_from_factory(key, field.query_factory)
+                    options = self.get_options_from_factory(key, 
+                                                            field.query_factory)
                     attr = self._get_attr_base(key, field, model)
                     opt = attr["templateOptions"]
                     opt["options"] = options
@@ -285,16 +287,21 @@ class DataSerializer:
         for key in self._fields.keys():
             if key == "csrf_token":
                 continue
+            field = self[key]
             data = self.data[key]
-            
-            if type(data) == datetime:
-                data = "{}Z".format(data.isoformat())
-            elif type(data) == date:
-                data = "{}".format(data.isoformat())
-            elif type(data) == DateInterval:
-                interval = data
-                data = "{}/{}".format(interval.lower.isoformat(),
-                                      interval.upper.isoformat())
+            if type(field) == DateIntervalField:
+                obj = field.object_data
+                if obj:
+                    data = "{}/{}".format(
+                        obj.lower.isoformat() if obj.lower else None,
+                        obj.upper.isoformat() if obj.upper else None)
+            elif type(field) == DateTimeField:
+                if data:
+                    data = "{}Z".format(data.isoformat())
+            elif type(field) == DateField:
+                if data:
+                    data = "{}".format(data.isoformat())
+                
             elif (getattr(self, key).type == "QuerySelectMultipleField"):
                 # Then the value is a list of list table objects from some
                 # table other than the one key is from. List value can be
@@ -420,8 +427,8 @@ class Description(ModelForm, FormlyAttributes, DataSerializer):
         description=u"Maturity shows where an idea is on the path to "
                       "full-fledged, planning-ready project.")
     proposer = StringField(u"proposer",
-        description = "Name of the organization and/or person that proposed the "
-               "original idea.")
+        description=u"Name of the organization and/or person that proposed "
+                     "the original idea.")
     customer = StringField(u"customer",
         description=u"Name of the person who says when the project is done.")
     sponsor = QuerySelectField(u"sponsor",
@@ -475,6 +482,7 @@ class Description(ModelForm, FormlyAttributes, DataSerializer):
         description=u"If this project has come to an end, one way or the "
                      "other, what is that final state?")
 
+    # unfortunate name to follow naming convention for select multiple fields.
     childs = QuerySelectMultipleField(u"children",
          query_factory=child_choices,
          description=u"For an absorbed project, enter the project ID of the "
@@ -488,7 +496,8 @@ class Description(ModelForm, FormlyAttributes, DataSerializer):
 
     # We need a table-specific handle for these two generic columns since
     # otherwise the search will never get to just one column
-    descriptionLastModified = DateTimeField(u"last updated", format="%Y-%m-%dT%H:%M:%S.%fZ")
+    descriptionLastModified = DateTimeField(u"last updated", 
+                                            format="%Y-%m-%dT%H:%M:%S.%fZ")
     descriptionLastModifiedBy = StringField(u"last updated by")
 
     def __init__(self, *args, **kwargs):
