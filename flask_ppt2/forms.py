@@ -24,6 +24,10 @@ from wtforms_components.widgets import ReadOnlyWidgetProxy
 from wtforms.validators import Required
 from flask_ppt2 import app, db
 import flask_ppt2.alchemy_models as alch
+from config.settings_dev import (FISCAL_YEAR_FORMAT, YEAR_RANGE_MIN,
+                                 YEAR_RANGE_MAX, FISCAL_QUARTERS)
+YEAR_RANGE_MIN = 2004
+
 
 if os.environ["PPT_ENVIRONMENT"] == "dev":
     import pydevd
@@ -156,7 +160,10 @@ class FormlyAttributes:
         attr = self._get_attr_base(key, field, model)
         if field.type.startswith("QuerySelect"):
             opt = attr["templateOptions"]
-            opt["options"] = self.get_options_from_factory(key, field.query_factory)
+            options_from_factory = self.get_options_from_factory(
+                                                key, field.query_factory)
+            opt["options"] = options_from_factory["options"]
+            opt["help"] = options_from_factory["help"]
             opt["valueProp"] = "id"
             opt["labelProp"] = "desc"
             if field.type == "QuerySelectMultipleField":
@@ -177,9 +184,16 @@ class FormlyAttributes:
             # primary key, using a naming convention.
             try:
                 root = key[:-1]      # take off trailing "s"
-                return [{"id": getattr(c, "{}ID".format(root)),
-                         "desc": getattr(c, "{}Desc".format(root))}
-                        for c in choices]
+                options = [{"id": getattr(c, "{}ID".format(root)),
+                            "desc": getattr(c, "{}Desc".format(root))}
+                            for c in choices]
+                try:
+                    help_text = [{"desc": getattr(c, "{}Desc".format(root)),
+                                  "text": getattr(c, "{}Text".format(root))}
+                                  for c in choices]
+                except:
+                    help_text = []
+                return {"options": options, "help": help_text}
             except:
                 pass
 
@@ -191,9 +205,18 @@ class FormlyAttributes:
                 root = re.sub("list\\b", "", data_tablename)
                 id_name = "{}ID".format(root)
                 desc_name = "{}Desc".format(root)
-                return [{"id": getattr(c, id_name),
-                         "desc": getattr(c, desc_name)}
-                        for c in choices]
+                text_name = "{}Text".format(root)
+                options = [{"id": getattr(c, id_name),
+                            "desc": getattr(c, desc_name)}
+                            for c in choices]
+                try:
+                    # Some attributes have no help text
+                    help_text = [{"desc": getattr(c, desc_name),
+                                  "text": getattr(c, text_name)}
+                                  for c in choices]
+                except:
+                    help_text = []
+                return {"options": options, "help": help_text}
             except:
                 return []
         else:
@@ -252,9 +275,14 @@ class FormlyAttributes:
             attr["type"] = "input"
             opt["type"] = "number"
             attr["defaultValue"] = ""
-        elif field.type in ["DateIntervalField"]:
-            attr["type"] = "daterange"
+        elif field.type in ["FiscalQuarterField"]:
+            attr["type"] = "daterangepicker"
             attr["defaultValue"] = ""
+            opt["fy_options"] = [{"id": 0, "desc": u""}] + \
+                [{"id": y, "desc": FISCAL_YEAR_FORMAT.format(year=y)}
+                 for y in range(YEAR_RANGE_MIN, YEAR_RANGE_MAX)]
+            opt["q_options"] = [{"id": q[0], "desc": q[1]}
+                                for q in FISCAL_QUARTERS]
         
         return attr
             
@@ -289,7 +317,7 @@ class DataSerializer:
                 continue
             field = self[key]
             data = self.data[key]
-            if type(field) == DateIntervalField:
+            if type(field) == FiscalQuarterField:
                 obj = field.object_data
                 if obj:
                     data = "{}/{}".format(
@@ -330,12 +358,6 @@ class DataSerializer:
 
         return output
 
-# Custom field for the custom FiscalQuarterType column.
-class DateIntervalField(DateIntervalField):
-    def __init__(self, label='', validators=None, transform_data=False, **kwargs):
-        super(DateIntervalField, self).__init__(label, validators, **kwargs)
-        self.transform_data = transform_data
-
 # Classes to provide choices for select field choices
 
 
@@ -344,16 +366,7 @@ class GeneratedChoices:
     def serialize_options(self):
         return self.choices
 
-
-class Fiscalyears(GeneratedChoices):
-    choices = [(y, u"FY{}".format(y))
-               for y in range(YEAR_RANGE_MIN, YEAR_RANGE_MAX)]
-    choices.insert(0, (0, u""))
-
-
-class Quarters(GeneratedChoices):
-    choices = FISCAL_QUARTERS
-
+# Fixme: Can these be made obsolete?
 class Years(GeneratedChoices):
     choices = [(y, str(y))
                for y in range(YEAR_RANGE_MIN, YEAR_RANGE_MAX)]
@@ -361,6 +374,12 @@ class Years(GeneratedChoices):
 
 class Months(GeneratedChoices):
     choices = [(item[0], item[1]) for item in enumerate(calendar.month_abbr)]
+
+# Custom field for the custom FiscalQuarterType column.
+class FiscalQuarterField(DateIntervalField):
+    def __init__(self, label='', validators=None, transform_data=False, **kwargs):
+        super(FiscalQuarterField, self).__init__(label, validators, **kwargs)
+        self.transform_data = transform_data
 
 
 # Primary table forms
@@ -588,7 +607,7 @@ class Portfolio(ModelForm, FormlyAttributes, DataSerializer):
                      "reporting requirements, high visibility, or any other "
                      "factor likely to require above average effort in "
                      "ordinary project management  tasks.")
-    budgetIn = DateIntervalField(u"budget in",
+    budgetIn = FiscalQuarterField(u"budget in",
         description=u"For projects whose budget needs to be planned (e.g., "
                      "ED-05), when will that happen?")
     # We need a table-specific handle for these two generic columns since
@@ -666,7 +685,7 @@ class Disposition(ModelForm, FormlyAttributes, DataSerializer):
         only = ["explanation", "disposedIn", "reconsiderIn", "plannedFor",
                 "dispositionLastModified", "dispositionLastModifiedBy"]
 
-    disposedIn = DateIntervalField(u"disposed", validators=[Required()],
+    disposedIn = FiscalQuarterField(u"disposed", validators=[Required()],
         transform_data=True,
         description=u"In which planning cycle was this disposition made? "
                      "Changing this date and pressing save will create a new "
@@ -678,10 +697,10 @@ class Disposition(ModelForm, FormlyAttributes, DataSerializer):
                      "respect to this project?")
     explanation = TextAreaField(u"explanation",
         description=u"State the reasons behind the disposition decision.")
-    reconsiderIn = DateIntervalField(u"reconsider",
+    reconsiderIn = FiscalQuarterField(u"reconsider",
         description=u"For a deferred project, when will it be considered "
                      "again?")
-    plannedFor = DateIntervalField(u"start",
+    plannedFor = FiscalQuarterField(u"start",
         description=u"Estimated dates for the  start and finish of work on the "
                      "project.")
     # We need a table-specific handle for these two generic columns since

@@ -31,6 +31,7 @@ JWT_AUTH_HEADER_PREFIX  = "bearer"
 
 # Offset to be added to calendar date to get FY date. Database dates are
 # calendar dates.
+FISCAL_YEAR_FORMAT = u"FY{year}"
 FISCAL_YEAR_OFFSET = relativedelta(months=+3)    # FY2008 Q1 starts 10/01/2007
 FISCAL_QUARTERS = ((0, u""), (1, u"Q1 (Fall)"), (2, u"Q2 (Winter)"), 
                    (3, u"Q3 (Spring)"), (4, u"Q4 (Summer)"))
