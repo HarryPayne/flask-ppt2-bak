@@ -92,7 +92,7 @@ class FormlyAttributes:
                     # "ID". And the options are a tuple where we only care 
                     # about the second.
                     options = self.get_options_from_factory(key, 
-                                                            field.query_factory)
+                        field.query_factory)["options"]
                     attr = self._get_attr_base(key, field, model)
                     opt = attr["templateOptions"]
                     opt["options"] = options
@@ -145,7 +145,10 @@ class FormlyAttributes:
         attr = self._get_attr_base(key, field, model)
         try:
             opt = attr["templateOptions"]
-            opt["options"] = self.get_options_from_factory(key, field.query_factory)
+            choices =  self.get_options_from_factory(key, 
+                field.query_factory)
+            opt["options"] = choices["options"]
+            opt["help"] = choices["help"]
             opt["valueProp"] = "id"
             opt["labelProp"] = "desc"
             if field.type == "QuerySelectMultipleField":
@@ -160,17 +163,17 @@ class FormlyAttributes:
         attr = self._get_attr_base(key, field, model)
         if field.type.startswith("QuerySelect"):
             opt = attr["templateOptions"]
-            options_from_factory = self.get_options_from_factory(
-                                                key, field.query_factory)
-            opt["options"] = options_from_factory["options"]
-            opt["help"] = options_from_factory["help"]
+            choices =  self.get_options_from_factory(key, 
+                field.query_factory)
+            opt["options"] = choices["options"]
+            opt["help"] = choices["help"]
             opt["valueProp"] = "id"
             opt["labelProp"] = "desc"
             if field.type == "QuerySelectMultipleField":
                 opt["multiple"] = True
             return attr
         else:
-            return None
+            return None         
 
     def get_options_from_factory(self, key, query_factory):
         """Convert query_factory tuples into Bootstrap select objects."""
@@ -334,8 +337,8 @@ class DataSerializer:
                 # Then the value is a list of list table objects from some
                 # table other than the one key is from. List value can be
                 # None.
-                if len(data):
-                    options = self.get_options_from_list(key, data)
+                if len(data) and bool(data[0]):
+                    options = self.get_options_from_list(key, data)["options"]
                     data = [option["id"] for option in options]
                     desc = ", ".join([option["desc"] for option in options])
                 else:
@@ -346,7 +349,7 @@ class DataSerializer:
             elif getattr(self, key).type == "QuerySelectField":
                 # Promote integer value to choice selection
                 if data:
-                    options = self.get_options_from_list(key, [data])
+                    options = self.get_options_from_list(key, [data])["options"]
                     data = options[0]["id"] if len(options) > 0 else None
                     desc = options[0]["desc"] if len(options) > 0 else ""
                 else:
@@ -366,7 +369,7 @@ class GeneratedChoices:
     def serialize_options(self):
         return self.choices
 
-# Fixme: Can these be made obsolete?
+# TODO: Can these be made obsolete?
 class Years(GeneratedChoices):
     choices = [(y, str(y))
                for y in range(YEAR_RANGE_MIN, YEAR_RANGE_MAX)]
