@@ -69,34 +69,36 @@
                   <!-- li role="presentation" ng-class="{active:header.isActive('home')}">
                     <a ui-sref="home.index">Home</a></li -->
                   <li role="presentation" ng-class="{active:header.isActive('select')}">
-                    <a ui-sref="select.home">Select</a></li>
+                    <a ui-sref="app.select.home">Select</a></li>
                   <li role="presentation" ng-class="{active:header.isActive('filter')}">
-                    <a ui-sref="filter.builder({query_string: header.getSql()})">Filter Builder</a></li>
+                    <a ui-sref="app.filter.builder({query_string: header.getSql()})">Filter Builder</a></li>
                   <li role="presentation" ng-class="{active:header.isActive('report')}">
-                    <a ui-sref="report.table({query_string: header.getSql()})">Report</a></li>
+                    <a ui-sref="app.report.table({query_string: header.getSql()})">Report</a></li>
                   <li role="presentation" ng-class="{active:header.isActive('project')}">
-                    <a ui-sref="project.detail({projectID: header.getProjectID()})">Project</a></li>
+                    <a ui-sref="app.project.detail({projectID: header.getProjectID()})">Project</a></li>
                   <li role="presentation" ng-class="{active:header.hasPrevious()}">
-                    <a ui-sref="project.detail({projectID: header.getPreviousID()})" ng-click="header.jumpToPreviousProject" ng-show="header.hasPreviousID()" data-toggle="tooltip" title="Go to previous project in list"><span class="glyphicon glyphicon-backward"></span></a>
+                    <a ui-sref="app.project.detail({projectID: header.getPreviousID()})" ng-click="header.jumpToPreviousProject()" ng-show="header.hasPreviousID()" data-toggle="tooltip" title="Go to previous project in list"><span class="glyphicon glyphicon-backward"></span></a>
                     <a class="disabled ng-hide" ng-hide="header.hasPreviousID()"><span class="glyphicon glyphicon-backward"></span></a>
                   </li>
                   <li role="presentation" ng-class="{active:header.hasNext()}" data-toggle="tooltip" title="Go to next project in list">
-                    <a ui-sref="project.detail({projectID: header.getNextID()})" ng-click="header.jumpToNextProject" ng-show="header.hasNext()" data-toggle="tooltip" title="Go to next project in list"><span class="glyphicon glyphicon-forward"></span></a>
+                    <a ui-sref="app.project.detail({projectID: header.getNextID()})" ng-click="header.jumpToNextProject()" ng-show="header.hasNext()" data-toggle="tooltip" title="Go to next project in list"><span class="glyphicon glyphicon-forward"></span></a>
                     <a class="disabled ng-hide" ng-hide="header.hasNext()"><span class="glyphicon glyphicon-forward"></span></a>
                   </li>
                   <li role="presentation" ng-class="{active:header.isActive('comment')}" 
                     ng-show="currentUser.roles.indexOf('ContentProvider') > -1 || currentUser.roles.indexOf('Curator') > -1">
-                    <a ui-sref="comment">Comments</a></li>
-                  <li role="presentation" ng-class="{active:header.isActive('manage')}" ng-show="currentUser.roles.indexOf('Manager') > -1"><a ui-sref="manage">Manage</a></li>
+                    <a ui-sref="app.comment">Comments</a></li>
+                  <li role="presentation" ng-class="{active:header.isActive('manage')}" ng-show="currentUser.roles.indexOf('Manager') > -1"><a ui-sref="app.manage">Manage</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                   {% raw %}
+                    <!-- li ng-hide="currentUser" class="active">
+                      <a href="#" ng-click="app.header.login();"><span class="glyphicon glyphicon-log-in"></span> Login</a></li -->
                     <li ng-hide="currentUser" class="active">
-                      <a href="#" ng-click="header.login();"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                      <a ui-sref="modal.login">Login</a></li>
                     <li ng-show="currentUser">
                       <span class="navbar-text">Welcome {{currentUser.firstname}}</span></li>
                     <li ng-show="currentUser" class="active">
-                      <a href="#" ng-click="header.logout();"> <span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                      <a href="#" ng-click="app.header.logout();"> <span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                    {% endraw %}
                  </ul>
             </div>
@@ -105,7 +107,8 @@
         </div>
       </header>
       <section id="body">
-        <div ui-view></div>
+        <div ui-view="app"></div>
+        <div ui-view="popup"></div>
       </section>
  
       <hr/>
@@ -202,7 +205,10 @@
     <script type="text/javascript" src="/app/node_modules/angular-sanitize/angular-sanitize.js"></script>
     <script type="text/javascript" src="/app/node_modules/angular-touch/angular-touch.min.js"></script>
     <script type="text/javascript" src="/app/node_modules/angular-ui-date/dist/date.js"></script>
+    <script type="text/javascript" src="/app/node_modules/@uirouter/core/_bundles/ui-router-core.js"></script>
     <script type="text/javascript" src="/app/node_modules/@uirouter/angularjs/release/angular-ui-router.min.js"></script>
+    <script type="text/javascript" src="/app/node_modules/@uirouter/sticky-states/_bundles/ui-router-sticky-states.js"></script>
+    <script type="text/javascript" src="/app/node_modules/@uirouter/dsr/_bundles/ui-router-dsr.min.js"></script>
     <script type="text/javascript" src="/app/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="/app/node_modules/bootstrap-daterangepicker/daterangepicker.js"></script>
     <script type="text/javascript" src="/app/node_modules/angular-daterangepicker/js/angular-daterangepicker.min.js"></script>
@@ -278,8 +284,8 @@
     <script type="text/javascript" src="/app/src/login/loginService.js"></script>
     <script type="text/javascript" src="/app/src/login/loginStateService.js"></script>
 
-    <script type="text/javascript" src="/app/src/loginInjector/app.loginInjectorProvider.js"></script>
-    <script type="text/javascript" src="/app/src/loginInjector/loginInjector.js"></script>
+    <!--script type="text/javascript" src="/app/src/loginInjector/app.loginInjectorProvider.js"></script>
+    <script type="text/javascript" src="/app/src/loginInjector/loginInjector.js"></script-->
 
     <script type="text/javascript" src="/app/src/manage/app.manage.js"></script>
     <script type="text/javascript" src="/app/src/manage/manageConfig.js"></script>
